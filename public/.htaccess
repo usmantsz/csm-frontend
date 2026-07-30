@@ -1,0 +1,12 @@
+# Ensure index.html is served for directory requests
+DirectoryIndex index.html
+
+# SPA: send all non-file requests to index.html (only if mod_rewrite is available)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>

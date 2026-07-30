@@ -1,0 +1,16 @@
+{
+  "short_name": "Commission Shop",
+  "name": "Commission Shop - Agriculture System",
+  "icons": [
+    {
+      "src": "assets/images/commission-shop-logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#15803d",
+  "background_color": "#ffffff"
+}
