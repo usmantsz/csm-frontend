@@ -109,6 +109,7 @@ const AddTeamMember = () => {
 
     return (
         <div className="space-y-6">
+            <div className='flex justify-end'>
             <button
                 type="button"
                 onClick={() => navigate('/admin/team')}
@@ -117,6 +118,7 @@ const AddTeamMember = () => {
                 <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {t('back_to_team_list')}
             </button>
+            </div>
 
             {/* Centered form container */}
             <div className="flex justify-center px-0">

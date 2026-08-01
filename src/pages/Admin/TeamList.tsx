@@ -146,13 +146,16 @@ const TeamList = () => {
 
     return (
         <div className="space-y-6">
-            <Link
+            <div className='flex justify-end w-full'>
+                <Link
                 to="/dashboard"
                 className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
             >
                 <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {t('back_to_dashboard')}
             </Link>
+            </div>
+            
 
             <div className={card}>
                 {/* Heading + Add button */}

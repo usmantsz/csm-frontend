@@ -113,6 +113,7 @@ const AddNewCrop = () => {
 
     return (
         <div className="space-y-6">
+            <div className="flex justify-end">
             <button
                 type="button"
                 onClick={() => navigate('/viewcrops')}
@@ -121,6 +122,7 @@ const AddNewCrop = () => {
                 <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {t('back_to_all_crops')}
             </button>
+            </div>
 
             <div className={`${card} mx-auto max-w-md`}>
                 <div className="space-y-5">

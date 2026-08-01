@@ -486,8 +486,35 @@ const CreateUserShopOwner = () => {
 
     const stepIndex = ['home', 'shop-details', 'subcription', 'cropselect'].indexOf(tabs);
 
+    // Fixed-size wrapper for step icons — forces a consistent, non-distorted
+    // render regardless of each Icon component's internal viewBox/size.
+    const IconWrap = ({ children }: { children: React.ReactNode }) => (
+        <span className="cs-step-icon">{children}</span>
+    );
+
     return (
         <div className="space-y-6">
+            <style>{`
+                .cs-step-icon {
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    width: 18px !important;
+                    height: 18px !important;
+                    min-width: 18px !important;
+                    flex-shrink: 0 !important;
+                    line-height: 0 !important;
+                }
+                .cs-step-icon svg {
+                    width: 100% !important;
+                    height: 100% !important;
+                    max-width: 18px !important;
+                    max-height: 18px !important;
+                    display: block !important;
+                    margin: 0 !important;
+                    flex-shrink: 0 !important;
+                }
+            `}</style>
             {/* Step indicator */}
             <div className="rounded-2xl border border-white-light bg-white dark:bg-[#0b1526]/60 dark:border-white/10 p-6 shadow-sm">
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('complete_all_steps')}</p>
@@ -509,7 +536,7 @@ const CreateUserShopOwner = () => {
                                     : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20'
                                 }`}
                         >
-                            <step.icon className="w-4 h-4 shrink-0" />
+                            <IconWrap><step.icon className="w-full h-full" /></IconWrap>
                             <span className="truncate">{step.label}</span>
                         </button>
                     ))}

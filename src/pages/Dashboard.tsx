@@ -27,7 +27,7 @@ import IconTrendingUp from '../components/Icon/IconTrendingUp';
 const card =
     'rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-900';
 const iconBadge =
-    'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300';
+    'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-primary-700 shadow-md ring-1 ring-gray-100 dark:bg-primary-900/30 dark:text-primary-300 dark:shadow-none dark:ring-0';
 const sectionHeading = 'text-lg font-semibold text-gray-900 dark:text-white';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -480,11 +480,11 @@ const Dashboard = () => {
             {/* Quick Actions */}
             <div className={card}>
                 <div className="mb-4 flex items-center gap-3">
-                    <span className={iconBadge}>
-                        <IconTag className="w-5 h-5" />
-                    </span>
-                    <h5 className={sectionHeading}>{t('quick_actions_title')}</h5>
-                </div>
+    <span className={iconBadge}>
+        <IconTag className="w-5 h-5" />
+    </span>
+    <h5 className={sectionHeading}>{t('quick_actions_title')}</h5>
+</div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <QuickActionButton to="/getassginshopcrops" icon={<IconPlus className="w-6 h-6" />} label={t('new_order')} description={t('crop_select_receipt')} color="primary" />
                     <QuickActionButton to="/addnewcustomer" icon={<IconUser className="w-6 h-6" />} label={t('add_customer')} description={t('naya_customer_register')} color="success" />

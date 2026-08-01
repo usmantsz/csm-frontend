@@ -70,6 +70,7 @@ export function ChangePasswordCard({
     };
 
     return (
+        <div className='flex justify-center mx-auto w-full'>
         <div
             className={`rounded-2xl border border-white-dark/15 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#0e1726] ${className}`}
         >
@@ -126,6 +127,7 @@ export function ChangePasswordCard({
                     {submitting ? t('updating') : t('update_password')}
                 </button>
             </form>
+        </div>
         </div>
     );
 }

@@ -14,8 +14,8 @@ const IconTag: FC<IconTagProps> = ({ className, fill = false, duotone = true }) 
                 stroke="currentColor"
                 strokeWidth="1.5"
             />
-            <circle opacity={duotone ? '0.5' : '1'} cx="8.60699" cy="8.87891" r="2" transform="rotate(-45 8.60699 8.87891)" stroke="currentColor" strokeWidth="1.5" />
-            <path opacity={duotone ? '0.5' : '1'} d="M11.5417 18.5L18.5208 11.5208" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <circle opacity={duotone ? '0.65' : '1'} cx="8.60699" cy="8.87891" r="2" transform="rotate(-45 8.60699 8.87891)" stroke="currentColor" strokeWidth="1.5" />
+            <path opacity={duotone ? '0.65' : '1'} d="M11.5417 18.5L18.5208 11.5208" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     );
 };

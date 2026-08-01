@@ -13,13 +13,15 @@ interface AgriculturalCardProps {
     className?: string;
 }
 
-// Sab variants ab ek hi green style use kar rahe hain, bg bhi QuickActionButton
-// ki tarha halka green tint hai (white nahi) — poora dashboard ek hi
-// green theme follow karta hai.
+// Sab variants ab ek hi green style use kar rahe hain. Card ka bg light mode
+// mein white + shadow hai (halka green tint hata diya, ab clean/modern
+// dikhta hai), dark mode mein pehle jaisa dark surface hai. Icon ka bg bhi
+// white + shadow hai, ring se defined kiya hai taake white-on-white blend
+// na ho. Icon ka color hamesha same green family rehta hai.
 const cardStyle = {
-    border: 'border-transparent dark:border-green-800',
-    bg: 'bg-green-50 dark:bg-green-900/20',
-    iconBg: 'bg-green-100 dark:bg-green-900/40 group-hover:bg-green-200 dark:group-hover:bg-green-900/60',
+    border: 'border-gray-100 dark:border-green-800',
+    bg: 'bg-white dark:bg-green-900/20',
+    iconBg: 'bg-white shadow-xl shadow-green-900/20 ring-1 ring-green-100 dark:bg-green-900/40 dark:shadow-none dark:ring-0 group-hover:shadow-2xl group-hover:shadow-green-900/30 dark:group-hover:bg-green-900/60',
     iconText: 'text-green-700 dark:text-green-300',
 };
 
@@ -39,8 +41,8 @@ const AgriculturalCard = ({
     return (
         <div className={`panel !bg-transparent !border-none !shadow-none !p-0 ${className}`}>
             <div
-    className={`group relative overflow-hidden rounded-2xl border ${styles.border} ${styles.bg} p-6 shadow-lg transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl active:translate-y-0 active:shadow-lg`}
->
+                className={`group relative overflow-hidden rounded-2xl border ${styles.border} ${styles.bg} p-6 shadow-lg transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl active:translate-y-0 active:shadow-lg`}
+            >
                 <div className="mb-4 flex items-center justify-between">
                     <div className="text-sm font-medium tracking-wide text-stone-700 dark:text-stone-300">
                         {title}

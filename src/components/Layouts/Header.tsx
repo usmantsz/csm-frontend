@@ -53,6 +53,27 @@ const formatTimeAgo = (dateStr: string) => {
     return d.toLocaleDateString();
 };
 
+// Tries multiple common field-naming conventions so this works whether the
+// logged-in account is an Admin, Team Member, Shop Owner, or Customer —
+// different portals/backends sometimes store the display name under
+// different keys (userNameF/userNameL, fullName, name, customerName, etc).
+function getDisplayName(u: Record<string, any> | null | undefined): string {
+    if (!u) return '';
+
+    const f = (u.userNameF as string) || (u.customerNameF as string) || (u.nameF as string) || '';
+    const l = (u.userNameL as string) || (u.customerNameL as string) || (u.nameL as string) || '';
+    const combined = `${f} ${l}`.trim();
+    if (combined) return combined;
+
+    const single =
+        (u.userName as string) ||
+        (u.customerName as string) ||
+        (u.fullName as string) ||
+        (u.name as string) ||
+        '';
+    return (single || '').trim();
+}
+
 const Header = () => {
     const [userRole, setUserRole] = useState<string | null>(null);
     const { canViewTickets, isTeamMember, canViewShops, canViewTeam, canViewShopOwners, canManageSubscriptions } = useUserPermissions();
@@ -102,6 +123,11 @@ const Header = () => {
             }
         }
     }, [location]);
+
+    // Robust display name for the logo area + profile dropdown, works across
+    // Admin / Team Member / Shop Owner / Customer portals even if the backend
+    // uses slightly different field names for each role.
+    const displayName = getDisplayName(dataUserLogin as Record<string, any>);
 
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -257,7 +283,9 @@ const Header = () => {
                     <div className="horizontal-logo flex lg:hidden justify-between items-center ltr:mr-2 rtl:ml-2">
                         <Link to="/" className="main-logo flex items-center shrink-0">
                             <img className="h-12 w-auto ltr:-ml-1 rtl:-mr-1 inline object-contain rounded-lg" src="/assets/images/commission-shop-logo.png" alt="Commission Shop" />
-                            <span className="text-xl ltr:ml-1.5 rtl:mr-1.5 font-semibold align-middle hidden md:inline dark:text-white-light transition-all duration-300">{t('app_name')}</span>
+                            <span className="text-xl ltr:ml-1.5 rtl:mr-1.5 font-semibold align-middle hidden md:inline dark:text-white-light transition-all duration-300 truncate max-w-[160px]">
+                                {displayName || t('app_name')}
+                            </span>
                         </Link>
                         <button
                             type="button"
@@ -270,52 +298,8 @@ const Header = () => {
                         </button>
                     </div>
 
-                    {/* <div className="ltr:mr-2 rtl:ml-2 hidden sm:block">
-                        <ul className="flex items-center space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
-                            <li>
-                                <Link to="/apps/calendar" title="My Planner" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-success hover:bg-white-light/90 dark:hover:bg-dark/60">
-                                    <IconCalendar />
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/apps/todolist" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-success hover:bg-white-light/90 dark:hover:bg-dark/60">
-                                    <IconEdit />
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/apps/chat" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-success hover:bg-white-light/90 dark:hover:bg-dark/60">
-                                    <IconChatNotification />
-                                </Link>
-                            </li>
-                        </ul>
-                    </div> */}
                     <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
                         <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
-                            {/* <form
-                                className={`${search && '!block'} sm:relative absolute inset-x-0 sm:top-0 top-1/2 sm:translate-y-0 -translate-y-1/2 sm:mx-0 mx-4 z-10 sm:block hidden`}
-                                onSubmit={() => setSearch(false)}
-                            >
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        className="form-input ltr:pl-9 rtl:pr-9 ltr:sm:pr-4 rtl:sm:pl-4 ltr:pr-9 rtl:pl-9 peer sm:bg-transparent bg-gray-100 placeholder:tracking-widest"
-                                        placeholder="Search..."
-                                    />
-                                    <button type="button" className="absolute w-9 h-9 inset-0 ltr:right-auto rtl:left-auto appearance-none peer-focus:text-success">
-                                        <IconSearch className="mx-auto" />
-                                    </button>
-                                    <button type="button" className="hover:opacity-80 sm:hidden block absolute top-1/2 -translate-y-1/2 ltr:right-2 rtl:left-2" onClick={() => setSearch(false)}>
-                                        <IconXCircle />
-                                    </button>
-                                </div>
-                            </form> */}
-                            {/* <button
-                                type="button"
-                                onClick={() => setSearch(!search)}
-                                className="search_btn sm:hidden p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:bg-white-light/90 dark:hover:bg-dark/60"
-                            >
-                                <IconSearch className="w-4.5 h-4.5 mx-auto dark:text-[#d0d2d6]" />
-                            </button> */}
                         </div>
                         <div>
                             {themeConfig.theme === 'light' ? (
@@ -386,69 +370,6 @@ const Header = () => {
                                 </ul>
                             </Dropdown>
                         </div>
-                        {/* <div className="dropdown shrink-0">
-                            <Dropdown
-                                offset={[0, 8]}
-                                placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                btnClassName="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-success hover:bg-white-light/90 dark:hover:bg-dark/60"
-                                button={<IconMailDot />}
-                            >
-                                <ul className="!py-0 text-dark dark:text-white-dark w-[300px] sm:w-[375px] text-xs">
-                                    <li className="mb-5" onClick={(e) => e.stopPropagation()}>
-                                        <div className="hover:!bg-transparent overflow-hidden relative rounded-t-md p-5 text-white w-full !h-[68px]">
-                                            <div
-                                                className="absolute h-full w-full bg-no-repeat bg-center bg-cover inset-0 bg-"
-                                                style={{
-                                                    backgroundImage: `url('/assets/images/menu-heade.jpg')`,
-                                                    backgroundRepeat: 'no-repeat',
-                                                    width: '100%',
-                                                    height: '100%',
-                                                }}
-                                            ></div>
-                                            <h4 className="font-semibold relative z-10 text-lg">Messages</h4>
-                                        </div>
-                                    </li>
-                                    {messages.length > 0 ? (
-                                        <>
-                                            <li onClick={(e) => e.stopPropagation()}>
-                                                {messages.map((message) => {
-                                                    return (
-                                                        <div key={message.id} className="flex items-center py-3 px-5">
-                                                            <div dangerouslySetInnerHTML={createMarkup(message.image)}></div>
-                                                            <span className="px-3 dark:text-gray-500">
-                                                                <div className="font-semibold text-sm dark:text-white-light/90">{message.title}</div>
-                                                                <div>{message.message}</div>
-                                                            </span>
-                                                            <span className="font-semibold bg-white-dark/20 rounded text-dark/60 px-1 ltr:ml-auto rtl:mr-auto whitespace-pre dark:text-white-dark ltr:mr-2 rtl:ml-2">
-                                                                {message.time}
-                                                            </span>
-                                                            <button type="button" className="text-neutral-300 hover:text-danger" onClick={() => removeMessage(message.id)}>
-                                                                <IconXCircle />
-                                                            </button>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </li>
-                                            <li className="border-t border-white-light text-center dark:border-white/10 mt-5">
-                                                <button type="button" className="text-success font-semibold group dark:text-gray-400 justify-center !py-4 !h-[48px]">
-                                                    <span className="group-hover:underline ltr:mr-1 rtl:ml-1">VIEW ALL ACTIVITIES</span>
-                                                    <IconArrowLeft className="group-hover:translate-x-1 transition duration-300 ltr:ml-1 rtl:mr-1" />
-                                                </button>
-                                            </li>
-                                        </>
-                                    ) : (
-                                        <li className="mb-5" onClick={(e) => e.stopPropagation()}>
-                                            <button type="button" className="!grid place-content-center hover:!bg-transparent text-lg min-h-[200px]">
-                                                <div className="mx-auto ring-4 ring-success/30 rounded-full mb-4 text-success">
-                                                    <IconInfoCircle fill={true} className="w-10 h-10" />
-                                                </div>
-                                                No data available.
-                                            </button>
-                                        </li>
-                                    )}
-                                </ul>
-                            </Dropdown>
-                        </div> */}
                         <div className="dropdown shrink-0">
                             <Dropdown
                                 offset={[0, 8]}
@@ -532,9 +453,7 @@ const Header = () => {
                                             <img className="rounded-md w-10 h-10 object-cover" src={dataUserLogin?.userProfileImage ? `${ServerSetting.serUrl}/profile/${dataUserLogin.userProfileImage}` : '/assets/images/profile-34.jpeg'} alt="userProfile" />
                                             <div className="ltr:pl-4 rtl:pr-4 truncate">
                                                 <h4 className="text-base">
-                                                    {(dataUserLogin?.userNameF != null || dataUserLogin?.userNameL != null)
-                                                        ? `${dataUserLogin?.userNameF ?? ''} ${dataUserLogin?.userNameL ?? ''}`.trim()
-                                                        : (userRole === 'customer' ? 'Customer' : 'User')}
+                                                    {displayName || (userRole === 'customer' ? 'Customer' : 'User')}
                                                     {(String(dataUserLogin?.userRole ?? '') === '0' || userRole === '0') && <span className="text-xs bg-primary-light dark:bg-primary rounded text-primary dark:text-white px-1 ltr:ml-2 rtl:ml-2">Admin</span>}
                                                     {(String(dataUserLogin?.userRole ?? '') === '1' || userRole === '1') && <span className="text-xs bg-success-light dark:bg-success rounded text-success dark:text-white px-1 ltr:ml-2 rtl:ml-2">Shop Owner</span>}
                                                     {(String(dataUserLogin?.userRole ?? '') === '2' || userRole === '2') && <span className="text-xs bg-info-light dark:bg-info rounded text-info dark:text-white px-1 ltr:ml-2 rtl:ml-2">Sub Admin</span>}
@@ -581,18 +500,6 @@ const Header = () => {
                                             )}
                                         </>
                                     )}
-                                    {/* <li>
-                                        <Link to="/apps/mailbox" className="dark:hover:text-white">
-                                            <IconMail className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                                            Inbox
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/auth/boxed-lockscreen" className="dark:hover:text-white">
-                                            <IconLockDots className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
-                                            Lock Screen
-                                        </Link>
-                                    </li> */}
                                     <li onClick={logout} className="border-t border-white-light dark:border-white-light/10">
                                         <Link to={''} className="text-danger !py-3">
                                             <IconLogout className="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" />

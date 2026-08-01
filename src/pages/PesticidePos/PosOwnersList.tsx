@@ -168,8 +168,8 @@ const PosOwnersList = () => {
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><Link to="/pesticide-pos/shops" className="text-primary hover:underline">Pesticide POS</Link></li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 text-gray-500 dark:text-gray-400">POS Owners</li>
             </ul>
-
-            <button
+             <div className='flex justify-end'>
+                 <button
                 type="button"
                 onClick={() => navigate('/pesticide-pos/shops')}
                 className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
@@ -177,6 +177,8 @@ const PosOwnersList = () => {
                 <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {t('back_to_pesticide_shop_list')}
             </button>
+             </div>
+            
 
             <div className={card}>
                 <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

@@ -37,6 +37,28 @@ import { useAuthToken } from '../../Hooks/useAuthToken';
 import { ServerSetting } from '../../helperComponents/ServerSetting';
 import axios from 'axios';
 
+// Tries multiple common field-naming conventions so this works whether the
+// logged-in account is an Admin, Team Member, Shop Owner, or Customer —
+// different portals/backends sometimes store the display name under
+// different keys (userNameF/userNameL, fullName, name, customerName, etc).
+function extractDisplayName(raw: Record<string, any> | null | undefined): string {
+    if (!raw) return '';
+    const u = raw?.data || raw || {};
+
+    const f = (u.userNameF as string) || (u.customerNameF as string) || (u.nameF as string) || '';
+    const l = (u.userNameL as string) || (u.customerNameL as string) || (u.nameL as string) || '';
+    const combined = `${f} ${l}`.trim();
+    if (combined) return combined;
+
+    const single =
+        (u.userName as string) ||
+        (u.customerName as string) ||
+        (u.fullName as string) ||
+        (u.name as string) ||
+        '';
+    return (single || '').trim();
+}
+
 const Sidebar = () => {
     const [currentMenu, setCurrentMenu] = useState<string>('');
     const [errorSubMenu, setErrorSubMenu] = useState(false);
@@ -50,6 +72,8 @@ const Sidebar = () => {
     const [userRole, setUserRole] = useState<string | null>(() =>
         typeof window !== 'undefined' ? localStorage.getItem('userRole') : null
     );
+    // Logged-in user's display name — shown in place of the static app name in the logo area
+    const [userName, setUserName] = useState<string>('');
     const { isTeamMember, canViewShops, canViewTeam, canViewShopOwners, canManageSubscriptions, canViewTickets } = useUserPermissions();
 
     // Team member: refresh permissions from API on load so sidebar shows all assigned sections (Shop Owners, Subscriptions, Support)
@@ -78,6 +102,25 @@ const Sidebar = () => {
     useEffect(() => {
         const stored = typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
         setUserRole(stored);
+
+        // Read logged-in user's name from userInformation (same source Profile.tsx uses).
+        // Falls back to a customerInformation key too, in case the customer portal
+        // stores its session under a different localStorage key.
+        try {
+            const rawUserInfo = typeof window !== 'undefined' ? localStorage.getItem('userInformation') : null;
+            const rawCustomerInfo = typeof window !== 'undefined' ? localStorage.getItem('customerInformation') : null;
+
+            let name = '';
+            if (rawUserInfo) {
+                name = extractDisplayName(JSON.parse(rawUserInfo));
+            }
+            if (!name && rawCustomerInfo) {
+                name = extractDisplayName(JSON.parse(rawCustomerInfo));
+            }
+            setUserName(name);
+        } catch {
+            setUserName('');
+        }
     }, [location, permissionsRefreshed]);
     const isSuperAdminOnly = userRole === '0';
     const toggleMenu = (value: string) => {
@@ -228,8 +271,8 @@ const Sidebar = () => {
                     <div className="flex justify-between items-center  py-3">
                         <NavLink to="/dashboard" className="main-logo flex items-center shrink-0 gap-2">
                             <img src="/assets/images/commission-shop-logo.png" alt="Commission Shop" className="h-14 w-14 object-contain flex-none rounded-lg" />
-                            <span className="text-xl ltr:ml-1 rtl:mr-1 font-bold align-middle lg:inline dark:text-white-light text-[#15803d] dark:text-[#4ade80]">
-                                {t('app_name')}
+                            <span className="text-xl ltr:ml-1 rtl:mr-1 font-bold align-middle lg:inline dark:text-white-light text-[#15803d] dark:text-[#4ade80] truncate max-w-[150px]">
+                                {userName || t('app_name')}
                             </span>
                         </NavLink>
 

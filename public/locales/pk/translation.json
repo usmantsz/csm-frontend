@@ -1007,6 +1007,7 @@
     "error_recording_return": "واپسی درج کرتے وقت خرابی۔",
     "failed_fetch_return_history": "واپسی کی تاریخ لوڈ نہیں ہو سکی۔",
     "error_fetching_return_history": "واپسی کی تاریخ لوڈ کرتے وقت خرابی۔",
+    "no_data_found": "کوئی ڈیٹا نہیں ملا",
 
     "pos_aria_toggle_sidebar": "سائیڈ بار ٹوگل",
     "pos_aria_open_menu": "مینو کھولیں",

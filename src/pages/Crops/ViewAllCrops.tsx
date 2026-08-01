@@ -70,6 +70,7 @@ const ViewAllCrops = () => {
 
     return (
         <div className="space-y-6">
+            <div className='flex justify-end'>
             <button
                 type="button"
                 onClick={() => navigate('/dashboard')}
@@ -78,6 +79,7 @@ const ViewAllCrops = () => {
                 <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {t('back_to_dashboard')}
             </button>
+            </div>
 
             {/* Search + filter card, with heading + add-new-crop button inside */}
             <div className={card}>

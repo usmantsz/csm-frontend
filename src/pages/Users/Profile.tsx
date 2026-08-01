@@ -31,7 +31,29 @@ function roleLabel(role: unknown, t: (key: string) => string): string {
     if (r === '1') return t('role_shop_owner');
     if (r === '2') return t('role_sub_administrator');
     if (r === '3') return t('team_member_role');
+    if (r === 'customer') return t('role_customer');
     return t('role_user');
+}
+
+// Tries multiple common field-naming conventions so this works whether the
+// logged-in account is an Admin, Team Member, Shop Owner, or Customer —
+// different portals/backends sometimes store the display name under
+// different keys (userNameF/userNameL, fullName, name, customerName, etc).
+function getDisplayName(u: Record<string, any> | null | undefined): string {
+    if (!u) return '';
+
+    const f = (u.userNameF as string) || (u.customerNameF as string) || (u.nameF as string) || '';
+    const l = (u.userNameL as string) || (u.customerNameL as string) || (u.nameL as string) || '';
+    const combined = `${f} ${l}`.trim();
+    if (combined) return combined;
+
+    const single =
+        (u.userName as string) ||
+        (u.customerName as string) ||
+        (u.fullName as string) ||
+        (u.name as string) ||
+        '';
+    return (single || '').trim();
 }
 
 const Profile = () => {
@@ -45,11 +67,9 @@ const Profile = () => {
     const isShopOwner = user?.userRole === 1 || user?.userRole === '1';
 
     const displayName = useMemo(() => {
-        const f = (dataUserLogin.userNameF as string) || '';
-        const l = (dataUserLogin.userNameL as string) || '';
-        const combined = `${f} ${l}`.trim();
+        const combined = getDisplayName(dataUserLogin);
         return combined || t('my_profile');
-    }, [dataUserLogin.userNameF, dataUserLogin.userNameL, t]);
+    }, [dataUserLogin, t]);
 
     const avatarSrc = dataUserLogin?.userProfileImage
         ? `${ServerSetting.serUrl}/profile/${dataUserLogin.userProfileImage}`
@@ -114,7 +134,7 @@ const Profile = () => {
                                 />
                             </div>
                             <div className="relative px-6 pb-6 pt-0 sm:px-8">
-                                <div className="-mt-14 flex flex-col gap-6 sm:-mt-16 sm:flex-row sm:items-end sm:justify-between">
+                                <div className="-mt-10 flex flex-col gap-6 sm:-mt-12 sm:flex-row sm:items-end sm:justify-between">
                                     <div className="flex flex-col items-center sm:flex-row sm:items-end sm:gap-5">
                                         <div className="relative shrink-0">
                                             <img
@@ -125,7 +145,7 @@ const Profile = () => {
                                             <Link
                                                 to="/users/user-account-settings"
                                                 className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-md transition hover:opacity-95"
-                                                title={t('edit')}
+                                                title={t('edit_profile')}
                                             >
                                                 <IconPencilPaper className="h-5 w-5" />
                                             </Link>

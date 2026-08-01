@@ -16,32 +16,37 @@ const QuickActionButton = ({
     description,
     color = 'primary',
 }: QuickActionButtonProps) => {
-    // Ab sab variants green family mein hain (halki shade difference ke sath),
-    // taake pura dashboard ek hi (green/agricultural) theme follow kare.
-    const colorClasses = {
-        primary:
-            'bg-green-50 hover:bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:text-green-300 dark:border-green-800',
-        success:
-            'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800',
-        warning:
-            'bg-lime-50 hover:bg-lime-100 text-lime-700 border-lime-200 dark:bg-lime-900/20 dark:hover:bg-lime-900/30 dark:text-lime-300 dark:border-lime-800',
-        info:
-            'bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-900/20 dark:hover:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800',
-    };
+    // Card ab white bg + shadow use karta hai (AgriculturalCard jaisa),
+    // green tint hata diya. Border halki rakhi hai taake white card page ke
+    // white background se merge na ho. color prop ab bhi accept hota hai
+    // (backward-compatible) lekin sab ek hi style follow karte hain, taake
+    // last (info) button bhi baaki jaisa hi dikhe.
+    const cardClasses =
+        'bg-white border-gray-100 text-stone-700 shadow-md hover:shadow-xl dark:bg-green-900/20 dark:border-green-800 dark:text-green-300 dark:shadow-none';
+
+    // Icon ka bg AgriculturalCard jaisa: light mode mein white + shadow,
+    // dark mode mein halka green tint, koi shadow nahi.
+    const iconBg =
+        'bg-white shadow-xl shadow-green-900/20 ring-1 ring-green-100 dark:bg-green-900/40 dark:shadow-none dark:ring-0 group-hover:shadow-2xl group-hover:shadow-green-900/30 dark:group-hover:bg-green-900/60';
+    const iconText = 'text-green-700 dark:text-green-300';
 
     return (
         <Link
             to={to}
-            className={`${colorClasses[color]} group rounded-2xl border-2 p-4 transition-all duration-200 hover:scale-105 hover:shadow-md`}
+            className={`${cardClasses} group rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 active:translate-y-0 active:shadow-md`}
         >
             <div className="flex items-center space-x-3">
-                <div className="text-2xl transition-transform group-hover:scale-110">
+                <span
+                    className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-2xl transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 ${iconBg} ${iconText}`}
+                >
                     {icon}
-                </div>
-                <div className="flex-1">
-                    <div className="text-sm font-semibold">{label}</div>
+                </span>
+                <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-semibold">{label}</div>
                     {description && (
-                        <div className="mt-1 text-xs opacity-70">{description}</div>
+                        <div className="mt-1 truncate text-xs text-stone-500 dark:text-green-400/70">
+                            {description}
+                        </div>
                     )}
                 </div>
             </div>
