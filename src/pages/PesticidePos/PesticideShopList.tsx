@@ -18,7 +18,7 @@ import IconXCircle from '../../components/Icon/IconXCircle';
 const card =
     'rounded-[2rem] border border-primary-200 bg-white/95 p-6 shadow-sm transition-shadow hover:shadow-md dark:border-primary-800 dark:bg-gray-900/85';
 const iconBadge =
-    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-light text-primary dark:bg-primary/20 dark:text-primary-light';
+    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white shadow-lg ring-1 ring-gray-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 dark:shadow-none dark:ring-0';
 const sectionHeading = 'text-lg font-semibold text-gray-900 dark:text-white';
 const actionChipWide =
     'inline-flex h-8 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold transition-colors';

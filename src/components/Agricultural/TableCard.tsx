@@ -27,14 +27,14 @@ interface TableCardProps {
 
 const ACCENTS = {
     blue: {
-        badge: 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300',
+        badge: 'bg-white text-primary-700 shadow-md ring-1 ring-gray-100 dark:bg-primary-900/30 dark:text-primary-300 dark:shadow-none dark:ring-0',
         ring: 'focus:border-primary-500 focus:ring-primary-500/20',
         spinner: 'border-primary border-t-transparent',
         emptyIcon: 'text-gray-400 dark:text-gray-500',
         stripe: 'rgba(45,134,89,0.02)',
     },
     green: {
-        badge: 'bg-success-light text-success dark:bg-success/20 dark:text-success-light',
+        badge: 'bg-white text-success shadow-md ring-1 ring-gray-100 dark:bg-success/20 dark:text-success-light dark:shadow-none dark:ring-0',
         ring: 'focus:border-success focus:ring-success/20',
         spinner: 'border-success border-t-transparent',
         emptyIcon: 'text-gray-400 dark:text-gray-500',

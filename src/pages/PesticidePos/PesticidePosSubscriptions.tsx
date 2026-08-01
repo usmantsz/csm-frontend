@@ -14,7 +14,7 @@ import IconMenuInvoice from '../../components/Icon/Menu/IconMenuInvoice';
 const card =
     'rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-900';
 const iconBadge =
-    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300';
+    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-gray-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 dark:shadow-none dark:ring-0';
 const sectionHeading = 'text-lg font-semibold text-gray-900 dark:text-white';
 
 const PesticidePosSubscriptions = () => {

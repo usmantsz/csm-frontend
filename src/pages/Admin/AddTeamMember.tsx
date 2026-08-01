@@ -15,7 +15,7 @@ import IconMenuUsers from '../../components/Icon/Menu/IconMenuUsers';
 const card =
     'rounded-[2rem] border border-white-dark/10 bg-white/95 shadow-sm transition-shadow hover:shadow-md dark:border-white/10 dark:bg-[#0b1526]/85';
 const iconBadge =
-    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary dark:bg-primary/20';
+    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-gray-100 text-primary dark:bg-primary/20 dark:shadow-none dark:ring-0';
 const subSectionHeading = 'text-lg font-semibold text-primary dark:text-primary-light';
 
 interface PermissionItem {
@@ -113,7 +113,7 @@ const AddTeamMember = () => {
             <button
                 type="button"
                 onClick={() => navigate('/admin/team')}
-                className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-green-700 shadow-md transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:shadow-none dark:hover:bg-green-700 dark:hover:text-white"
             >
                 <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {t('back_to_team_list')}
@@ -127,7 +127,7 @@ const AddTeamMember = () => {
                         <div className={`${card} overflow-hidden`}>
                             {/* Heading inside the card */}
                             <div className="flex items-center gap-3 border-b border-white-dark/10 p-6 dark:border-white/10 lg:px-8">
-                                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-success/10 text-success dark:bg-success/20">
+                                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-gray-100 text-success dark:bg-success/20 dark:shadow-none dark:ring-0">
                                     <IconMenuUsers className="w-5 h-5" />
                                 </span>
                                 <div>

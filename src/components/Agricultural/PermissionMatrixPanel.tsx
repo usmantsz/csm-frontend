@@ -19,8 +19,8 @@ export default function PermissionMatrixPanel() {
                 onClick={() => setOpen(!open)}
             >
                 <span className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-light text-primary dark:bg-primary/20 dark:text-primary-light">
-                        <span aria-hidden>📋</span>
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white shadow-xl ring-1 ring-gray-100 text-primary dark:bg-primary/20 dark:text-primary-light dark:shadow-none dark:ring-0">
+                           <span aria-hidden>📋</span>
                     </span>
                     <span className="font-semibold text-gray-900 dark:text-white">Who can access which page &amp; actions</span>
                 </span>

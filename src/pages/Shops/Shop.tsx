@@ -153,7 +153,7 @@ const Shop = () => {
                     />
                 ) : null}
                 <div
-                    className="h-10 w-10 rounded-full border-2 border-primary-200 bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center"
+                    className="h-10 w-10 rounded-full border-2 border-white shadow-md ring-1 ring-gray-100 bg-white dark:bg-primary-900/20 dark:border-primary-900/40 dark:shadow-none dark:ring-0 flex items-center justify-center"
                     style={{ display: shopBillImageTop ? 'none' : 'flex' }}
                 >
                     <IconShop className="w-5 h-5 text-primary-600" />
@@ -234,10 +234,10 @@ const Shop = () => {
                 <button
                     type="button"
                     onClick={() => handleViewShop(shop)}
-                    className="btn btn-sm btn-primary rounded-xl flex items-center gap-2"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
                     title={t('view_shop_details')}
                 >
-                    <IconEye className="w-4 h-4" />
+                    <IconEye className="w-5 h-5 text-white" duotone={false} />
                     {t('view')}
                 </button>
             </div>

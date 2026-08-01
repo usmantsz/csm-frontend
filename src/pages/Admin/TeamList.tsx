@@ -149,7 +149,7 @@ const TeamList = () => {
             <div className='flex justify-end w-full'>
                 <Link
                 to="/dashboard"
-                className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-green-700 shadow-md transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:shadow-none dark:hover:bg-green-700 dark:hover:text-white"
             >
                 <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {t('back_to_dashboard')}
@@ -161,7 +161,7 @@ const TeamList = () => {
                 {/* Heading + Add button */}
                 <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-success/10 text-success dark:bg-success/20">
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-gray-100 text-success dark:bg-success/20 dark:shadow-none dark:ring-0">
                             <IconMenuUsers className="w-5 h-5" />
                         </span>
                         <div>
@@ -202,7 +202,7 @@ const TeamList = () => {
                     </div>
                 ) : team.length === 0 ? (
                     <div className="py-16 text-center">
-                        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-50 dark:bg-white/5">
+                        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-gray-100 dark:bg-white/5 dark:shadow-none dark:ring-0">
                             <IconMenuUsers className="w-7 h-7 text-primary/60 dark:text-primary-light/60" />
                         </div>
                         <p className="text-gray-500 dark:text-gray-400">No team members. Add one to manage support and permissions.</p>

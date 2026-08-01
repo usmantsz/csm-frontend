@@ -18,7 +18,7 @@ import IconFile from '../components/Icon/IconFile';
 const card =
     'relative overflow-hidden rounded-[2rem] border border-gray-300 bg-white p-6 shadow-lg transition-shadow hover:shadow-xl dark:border-white/10 dark:bg-[#0e1726]';
 const iconBadge =
-    'inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300';
+    'inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-gray-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 dark:shadow-none dark:ring-0';
 const sectionHeading = 'text-lg font-semibold text-gray-900 dark:text-white';
 
 function parseRes(res: any): any {
