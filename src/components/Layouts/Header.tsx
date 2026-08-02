@@ -865,28 +865,54 @@ const Header = () => {
                         </>
                     )}
                     
-                    {/* Customer Role Menu Items – only for customer, not Sub Admin/Team */}
+                    {/* Customer Role Menu Items – mirrors what Sidebar.tsx shows for this role
+                        (Customers + Finance sections, since Sidebar's condition
+                        `!isTeamMember && userRole !== '0'` also matches 'customer') */}
                     {(userRole === 'customer') && (
                         <>
+                            {/* Customers */}
                             <li className="menu nav-item relative">
-                                <NavLink to="/customerbalance">
-                                    <button type="button" className="nav-link">
-                                        <div className="flex items-center sub-menu">
-                                            <IconMenuInvoice className="shrink-0" />
-                                            <span className="px-1">{t('my_balance')}</span>
-                                        </div>
-                                    </button>
-                                </NavLink>
+                                <button type="button" className="nav-link">
+                                    <div className="flex items-center">
+                                        <IconMenuUsers className="shrink-0" />
+                                        <span className="px-1" style={{ whiteSpace: "nowrap" }}>{t('customers')}</span>
+                                    </div>
+                                    <div className="right_arrow">
+                                        <IconCaretDown />
+                                    </div>
+                                </button>
+                                <ul className="sub-menu">
+                                    <li>
+                                        <NavLink to="/customerlist">{t('customer_list')}</NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink to="/addnewcustomer">{t('add_customer')}</NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink to="/customerbalance">{t('customer_balance')}</NavLink>
+                                    </li>
+                                </ul>
                             </li>
+
+                            {/* Finance */}
                             <li className="menu nav-item relative">
-                                <NavLink to="/users/profile">
-                                    <button type="button" className="nav-link">
-                                        <div className="flex items-center sub-menu">
-                                            <IconUser className="shrink-0" />
-                                            <span className="px-1">{t('my_profile')}</span>
-                                        </div>
-                                    </button>
-                                </NavLink>
+                                <button type="button" className="nav-link">
+                                    <div className="flex items-center">
+                                        <IconMenuInvoice className="shrink-0" />
+                                        <span className="px-1" style={{ whiteSpace: "nowrap" }}>{t('finance')}</span>
+                                    </div>
+                                    <div className="right_arrow">
+                                        <IconCaretDown />
+                                    </div>
+                                </button>
+                                <ul className="sub-menu">
+                                    <li>
+                                        <NavLink to="/finance">{t('finance_overview')}</NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink to="/expense-management">{t('shop_expenses')}</NavLink>
+                                    </li>
+                                </ul>
                             </li>
                         </>
                     )}

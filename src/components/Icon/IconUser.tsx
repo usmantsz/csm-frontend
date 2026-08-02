@@ -10,7 +10,7 @@ const IconUser: FC<IconUserProps> = ({ className, fill = false, duotone = true }
     return (
         <>
             {!fill ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} shapeRendering="geometricPrecision">
                     <circle cx="12" cy="6" r="4" stroke="currentColor" strokeWidth="1.5" />
                     <path
                         opacity={duotone ? '0.5' : '1'}
@@ -20,7 +20,7 @@ const IconUser: FC<IconUserProps> = ({ className, fill = false, duotone = true }
                     />
                 </svg>
             ) : (
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className={className}>
+                <svg viewBox="0 0 18 18" fill="none" className={className} shapeRendering="geometricPrecision">
                     <circle cx="9" cy="4.5" r="3" fill="currentColor" />
                     <path
                         opacity={duotone ? '0.5' : '1'}
