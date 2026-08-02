@@ -10,7 +10,7 @@ const IconCashBanknotes: FC<IconCashBanknotesProps> = ({ className, fill = false
     return (
         <>
             {!fill ? (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} shapeRendering="geometricPrecision">
                     <path
                         d="M2 10C2 7.17157 2 5.75736 2.87868 4.87868C3.75736 4 5.17157 4 8 4H13C15.8284 4 17.2426 4 18.1213 4.87868C19 5.75736 19 7.17157 19 10C19 12.8284 19 14.2426 18.1213 15.1213C17.2426 16 15.8284 16 13 16H8C5.17157 16 3.75736 16 2.87868 15.1213C2 14.2426 2 12.8284 2 10Z"
                         stroke="currentColor"
@@ -31,7 +31,7 @@ const IconCashBanknotes: FC<IconCashBanknotesProps> = ({ className, fill = false
                     <path opacity={duotone ? '0.5' : '1'} d="M5 12L5 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
             ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} shapeRendering="geometricPrecision">
                     <path
                         d="M8.50573 10.7144C8.50573 9.79392 9.2609 9.04772 10.1924 9.04772C11.124 9.04772 11.8792 9.79392 11.8792 10.7144C11.8792 11.6349 11.124 12.3811 10.1924 12.3811C9.2609 12.3811 8.50573 11.6349 8.50573 10.7144Z"
                         fill="currentColor"

@@ -238,7 +238,7 @@ const CustomerOverview = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="rounded-2xl bg-white dark:bg-white/5 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                                    <div className="w-12 shadow-gray-500/40 shadow-lg h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
                                         <IconCashBanknotes className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                                     </div>
                                     <div className="min-w-0">
@@ -249,7 +249,7 @@ const CustomerOverview = () => {
                             </div>
                             <div className="rounded-2xl bg-white dark:bg-white/5 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                                    <div className="w-12 h-12 shadow-gray-500/40 shadow-lg shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
                                         <IconTag className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                                     </div>
                                     <div className="min-w-0">
@@ -260,7 +260,7 @@ const CustomerOverview = () => {
                             </div>
                             <div className="rounded-2xl border-2 border-warning/30 bg-warning/5 dark:bg-warning/10 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-warning/15 flex items-center justify-center">
+                                    <div className="w-12 h-12 shadow-gray-500/40 shadow-lg shrink-0 rounded-xl bg-warning/15 flex items-center justify-center">
                                         <IconFile className="w-6 h-6 text-warning" />
                                     </div>
                                     <div className="min-w-0">
@@ -271,7 +271,7 @@ const CustomerOverview = () => {
                             </div>
                             <div className="rounded-2xl bg-white dark:bg-white/5 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                                    <div className="w-12 h-12 shadow-gray-500/40 shadow-lg shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
                                         <IconMenu className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                                     </div>
                                     <div className="min-w-0">
@@ -286,8 +286,8 @@ const CustomerOverview = () => {
                     {/* Profile (view only) */}
                     {profile && (
                         <div className="rounded-2xl bg-white dark:bg-white/5 p-6 shadow-lg shadow-black/10 dark:shadow-none">
-                            <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-stone-900 dark:text-white">
-                                <IconUser className="w-5 h-5 text-primary-600 dark:text-primary-400 shrink-0" />
+                            <h5 className="font-semibold  text-lg mb-4 flex items-center gap-2 text-stone-900 dark:text-white">
+                                <IconUser className="w-5 h-5 shadow-gray-500/40 shadow-lg text-primary-600 dark:text-primary-400 shrink-0" />
                                 {t('profile')} – {selectedShop.shopName}
                             </h5>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -325,9 +325,10 @@ const CustomerOverview = () => {
                                     <button
                                         type="button"
                                         onClick={() => setSelectedCropId(null)}
-                                        className="px-4 py-2 rounded-xl border-2 border-stone-300 dark:border-stone-600 bg-stone-100 dark:bg-white/5 text-stone-700 dark:text-stone-300 text-sm flex items-center gap-1 shrink-0"
+                                        className="px-4 py-2  rounded-xl border-2 border-stone-300 dark:border-stone-600 bg-stone-100 dark:bg-white/5 text-stone-700 dark:text-stone-300 text-sm flex items-center gap-1 shrink-0"
                                     >
-                                        <IconX className="w-4 h-4" /> {t('clear_filter')}
+
+                                        <IconX className="w-4 h-4 shadow-gray-500/40 shadow-lg" /> {t('clear_filter')}
                                     </button>
                                 )}
                             </div>

@@ -12,6 +12,9 @@ interface Crop {
     cropImage?: string;
 }
 
+const iconBadge =
+    'inline-flex shadow-gray-600/40 shadow-lg h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-primary-700 shadow-md ring-1 ring-gray-100 dark:bg-primary-900/30 dark:text-primary-300 dark:shadow-none dark:ring-0';
+
 const GetAssginShopCrops = () => {
     const { t } = useTranslation();
     const [cropData, setCropData] = useState<Crop[]>([]);
@@ -116,7 +119,7 @@ const GetAssginShopCrops = () => {
                         e.preventDefault();
                         navigate('/dashboard');
                     }}
-                    className="flex shrink-0 items-center gap-2 rounded-xl bg-emerald-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-green-300 dark:hover:bg-emerald-500/20"
+                    className="flex  shrink-0 items-center gap-2 rounded-xl bg-emerald-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-green-300 dark:hover:bg-emerald-500/20"
                 >
                     <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                     {t('back_to_dashboard')}
@@ -127,7 +130,7 @@ const GetAssginShopCrops = () => {
                 {/* Top row: title (left) + search bar (right) */}
                 <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
+                        <span className="flex shadow-gray-600/40 shadow-lg h-9 w-9 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
                             <span className="text-base">🌾</span>
                         </span>
                         <div>

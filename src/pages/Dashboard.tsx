@@ -27,7 +27,7 @@ import IconTrendingUp from '../components/Icon/IconTrendingUp';
 const card =
     'rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-900';
 const iconBadge =
-    'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-primary-700 shadow-md ring-1 ring-gray-100 dark:bg-primary-900/30 dark:text-primary-300 dark:shadow-none dark:ring-0';
+    'inline-flex shadow-gray-600/40 shadow-lg h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-primary-700 shadow-md ring-1 ring-gray-100 dark:bg-primary-900/30 dark:text-primary-300 dark:shadow-none dark:ring-0';
 const sectionHeading = 'text-lg font-semibold text-gray-900 dark:text-white';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -294,7 +294,7 @@ const Dashboard = () => {
             {/* Filters */}
             <div className={card}>
                 <div className="mb-4 flex items-center gap-3">
-                    <span className={iconBadge}>
+                    <span className= {iconBadge}>
                         <IconMenuDashboard className="w-5 h-5" />
                     </span>
                     <h5 className={sectionHeading}>{t('filter_year_quarter_crop')}</h5>

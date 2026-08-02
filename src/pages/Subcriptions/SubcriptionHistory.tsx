@@ -392,7 +392,7 @@ const SubscriptionHistory = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
     <div className="rounded-2xl border border-green-200 dark:border-green-800 bg-gradient-to-br from-primary/10 to-primary/5 p-5 flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+        <span className="inline-flex h-11 w-11 shadow-gray-500/40 shadow-lg shrink-0 items-center justify-center rounded-xl bg-white text-primary">
             <IconMenuInvoice className="w-5 h-5" />
         </span>
         <div className="min-w-0">
@@ -401,7 +401,7 @@ const SubscriptionHistory = () => {
         </div>
     </div>
     <div className="rounded-2xl border border-green-200 dark:border-green-800 bg-gradient-to-br from-success/10 to-success/5 p-5 flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-success/15 text-success">
+        <span className="inline-flex h-11 w-11 shadow-gray-500/40 shadow-lg shrink-0 items-center justify-center rounded-xl bg-white text-success">
             <IconCircleCheck className="w-5 h-5" />
         </span>
         <div className="min-w-0">
@@ -410,7 +410,7 @@ const SubscriptionHistory = () => {
         </div>
     </div>
     <div className="rounded-2xl border border-green-200 dark:border-green-800 bg-gradient-to-br from-danger/10 to-danger/5 p-5 flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-danger/15 text-danger">
+        <span className="inline-flex h-11 w-11 shadow-gray-500/40 shadow-lg shrink-0 items-center justify-center rounded-xl bg-danger/15 text-danger">
             <IconXCircle className="w-5 h-5" />
         </span>
         <div className="min-w-0">

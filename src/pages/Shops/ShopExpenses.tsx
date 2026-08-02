@@ -34,6 +34,13 @@ interface ExpenseSummary {
     totalCount: number;
 }
 
+// Fix for blurry/pixelated SVG icons inside flex-centered containers
+// (Chrome/Webkit sub-pixel positioning bug — icons render sharp only
+// after zoom because the browser recalculates layout on zoom).
+// transform: translateZ(0) forces the icon onto its own GPU layer,
+// which snaps it to the whole-pixel grid and keeps it crisp at all times.
+const iconCrisp: React.CSSProperties = { transform: 'translateZ(0)' };
+
 const ShopExpenses = () => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
@@ -410,8 +417,8 @@ const ShopExpenses = () => {
             <div className="rounded-2xl bg-white dark:bg-[#0e1726] border border-gray-300 dark:border-white/10 shadow-md p-6 mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
                     <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
-                            <IconCashBanknotes className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <span style={iconCrisp} className="flex h-9 w-9 shadow-sm items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
+                            <IconCashBanknotes duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                         </span>
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('shop_expenses_management')}</h3>
@@ -424,7 +431,7 @@ const ShopExpenses = () => {
                         onClick={handleAddExpense}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition whitespace-nowrap w-fit shadow-sm"
                     >
-                        <IconPlus className="w-4 h-4" />
+                        <IconPlus style={iconCrisp} className="w-4 h-4" />
                         {t('exp_add_expense') || 'Add Expense'}
                     </button>
                 </div>
@@ -433,8 +440,8 @@ const ShopExpenses = () => {
                     <div className="relative rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 p-5 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between mb-2">
                             <p className="text-sm text-gray-600 dark:text-gray-400">{t('exp_total_expenses') || 'Total Expenses'}</p>
-                            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
-                                <IconCashBanknotes className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span style={iconCrisp} className="flex h-9 w-9 shadow-sm items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
+                                <IconCashBanknotes duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </span>
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-emerald-300">
@@ -445,8 +452,8 @@ const ShopExpenses = () => {
                     <div className="relative rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 p-5 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between mb-2">
                             <p className="text-sm text-gray-600 dark:text-gray-400">{t('exp_today_expenses') || "Today's Expenses"}</p>
-                            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
-                                <IconCalendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span style={iconCrisp} className="flex h-9 w-9 shadow-sm items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
+                                <IconCalendar duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </span>
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-emerald-300">
@@ -457,8 +464,8 @@ const ShopExpenses = () => {
                     <div className="relative rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 p-5 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between mb-2">
                             <p className="text-sm text-gray-600 dark:text-gray-400">{t('exp_monthly_expenses') || 'Monthly Expenses'}</p>
-                            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
-                                <IconCalendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span style={iconCrisp} className="flex h-9 w-9 shadow-sm items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
+                                <IconCalendar duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </span>
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-emerald-300">
@@ -469,8 +476,8 @@ const ShopExpenses = () => {
                     <div className="relative rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 p-5 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between mb-2">
                             <p className="text-sm text-gray-600 dark:text-gray-400">{t('exp_total_records') || 'Total Records'}</p>
-                            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
-                                <IconCashBanknotes className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span style={iconCrisp} className="flex h-9 w-9 shadow-sm items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
+                                <IconCashBanknotes duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </span>
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-emerald-300">
@@ -484,7 +491,7 @@ const ShopExpenses = () => {
 <div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-400 dark:border-white/10 shadow-md p-5 mb-6">
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div className="relative w-full sm:w-80">
-            <IconSearch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <IconSearch style={iconCrisp} className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
                 type="text"
                 placeholder={t('exp_search_placeholder') || 'Search by remarks or amount...'}
@@ -499,7 +506,7 @@ const ShopExpenses = () => {
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 transition whitespace-nowrap w-fit shadow-sm"
         >
-            <FaFilter className="w-3.5 h-3.5" />
+            <FaFilter style={iconCrisp} className="w-3.5 h-3.5" />
             {showFilters ? (t('exp_hide_filters') || 'Hide Filters') : (t('exp_filter_by_date') || 'Filter by Date')}
             {hasActiveFilters && (
                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -587,8 +594,8 @@ const ShopExpenses = () => {
 <div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-400 dark:border-white/10 shadow-md p-5 sm:p-6">
     <div className="mb-5">
         <div className="flex items-center gap-3 mb-1">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
-                <IconCalendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span style={iconCrisp} className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
+                <IconCalendar duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </span>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('exp_history') || 'Expense History'}</h3>
         </div>
@@ -625,8 +632,8 @@ const ShopExpenses = () => {
                 >
                     <td className="px-4 py-3 max-w-xs">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-                                <IconCashBanknotes className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <div style={iconCrisp} className="w-8 h-8 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+                                <IconCashBanknotes duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </div>
                             <span
                                 className="text-gray-700 dark:text-gray-300 truncate"
@@ -638,7 +645,7 @@ const ShopExpenses = () => {
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                            <IconCalendar className="w-3.5 h-3.5 flex-shrink-0" />
+                            <IconCalendar style={iconCrisp} className="w-3.5 h-3.5 flex-shrink-0" />
                             <span>{formatDate(record.expenseYear, record.expeneMonth, record.expenseDate)}</span>
                         </div>
                     </td>
@@ -660,7 +667,7 @@ const ShopExpenses = () => {
                                 title="Edit"
                                 className="p-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 transition"
                             >
-                                <FaEdit className="w-3.5 h-3.5" />
+                                <FaEdit style={iconCrisp} className="w-3.5 h-3.5" />
                             </button>
                             <button
                                 type="button"
@@ -668,7 +675,7 @@ const ShopExpenses = () => {
                                 title="Delete"
                                 className="p-2 rounded-lg bg-red-500/10 border border-red-300 dark:border-transparent text-red-500 dark:text-red-400 hover:bg-red-500/20 transition"
                             >
-                                <FaTrash className="w-3.5 h-3.5" />
+                                <FaTrash style={iconCrisp} className="w-3.5 h-3.5" />
                             </button>
                         </div>
                     </td>
@@ -727,7 +734,7 @@ const ShopExpenses = () => {
                     onClick={() => setShowAddModal(false)}
                     className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition"
                 >
-                    <FaTimes className="w-4 h-4" />
+                    <FaTimes style={iconCrisp} className="w-4 h-4" />
                 </button>
             </div>
             <form onSubmit={handleSubmitExpense} className="space-y-4">
