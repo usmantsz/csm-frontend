@@ -413,7 +413,7 @@ const ShopExpenses = () => {
 
     return (
         <div>
-            {/* Summary Panel - heading replaced (Overview -> Shop Expenses Management), Add Expense button on right */}
+            {/* Summary Panel */}
             <div className="rounded-2xl bg-white dark:bg-[#0e1726] border border-gray-300 dark:border-white/10 shadow-md p-6 mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
                     <div className="flex items-center gap-3">
@@ -487,121 +487,123 @@ const ShopExpenses = () => {
                 </div>
             </div>
 
-{/* Filters Card */}
-<div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-400 dark:border-white/10 shadow-md p-5 mb-6">
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-        <div className="relative w-full sm:w-80">
-            <IconSearch style={iconCrisp} className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-                type="text"
-                placeholder={t('exp_search_placeholder') || 'Search by remarks or amount...'}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 rounded-lg bg-gray-50 dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-            />
+{/* Expenses Table Card — Search + Filters merged in, since they control this table's data */}
+<div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-400 dark:border-white/10 shadow-md p-5 sm:p-6">
+    <div className="flex items-center gap-3 mb-1">
+        <span style={iconCrisp} className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
+            <IconCalendar duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+        </span>
+        <div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('exp_history') || 'Expense History'}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-500">{t('exp_history_desc') || 'View and manage all your shop expenses'}</p>
         </div>
-
-        <button
-            type="button"
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 transition whitespace-nowrap w-fit shadow-sm"
-        >
-            <FaFilter style={iconCrisp} className="w-3.5 h-3.5" />
-            {showFilters ? (t('exp_hide_filters') || 'Hide Filters') : (t('exp_filter_by_date') || 'Filter by Date')}
-            {hasActiveFilters && (
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            )}
-        </button>
     </div>
 
-    {showFilters && (
-        <div className="pt-4 border-t border-gray-200 dark:border-white/10">
-            <p className="text-xs text-gray-500 dark:text-gray-500 mb-3">
-                {t('exp_filter_hint') || 'Filter by Year only, Month only, Date only, or any combination. All fields are optional.'}
-            </p>
-            <div className="flex flex-wrap items-end gap-3">
-                <div>
-                    <label className="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400">{t('exp_year') || 'Year'}</label>
-                    <input
-                        type="number"
-                        className="w-28 px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                        placeholder={t('exp_year_ph') || 'e.g. 2024'}
-                        min="2000"
-                        max="2100"
-                        value={filterYear}
-                        onChange={(e) => setFilterYear(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label className="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400">{t('exp_month') || 'Month'}</label>
-                    <input
-                        type="number"
-                        className="w-24 px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                        placeholder={t('exp_month_ph') || '1-12'}
-                        min="1"
-                        max="12"
-                        value={filterMonth}
-                        onChange={(e) => setFilterMonth(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label className="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400">{t('exp_date') || 'Date'}</label>
-                    <input
-                        type="number"
-                        className="w-24 px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                        placeholder={t('exp_date_ph') || '1-31'}
-                        min="1"
-                        max="31"
-                        value={filterDate}
-                        onChange={(e) => setFilterDate(e.target.value)}
-                    />
-                </div>
-                <button
-                    type="button"
-                    onClick={fetchFilteredExpenses}
-                    className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition shadow-sm"
-                >
-                    {t('exp_apply_filter') || 'Apply Filter'}
-                </button>
-                <button
-                    type="button"
-                    onClick={clearFilters}
-                    className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 transition"
-                >
-                    {t('exp_clear_all') || 'Clear All'}
-                </button>
+    {/* Search + Filter controls for the table below */}
+    <div className="mt-5 pt-5 border-t border-gray-200 dark:border-white/10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="relative w-full sm:w-80">
+                <IconSearch style={iconCrisp} className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                    type="text"
+                    placeholder={t('exp_search_placeholder') || 'Search by remarks or amount...'}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 rounded-lg bg-gray-50 dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                />
             </div>
 
-            {hasActiveFilters && (
-                <div className="mt-3 flex items-center gap-2 flex-wrap">
-                    <span className="text-xs text-gray-500">{t('exp_active') || 'Active:'}</span>
-                    {filterYear && (
-                        <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">{t('exp_year') || 'Year'}: {filterYear}</span>
-                    )}
-                    {filterMonth && (
-                        <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">{t('exp_month') || 'Month'}: {filterMonth}</span>
-                    )}
-                    {filterDate && (
-                        <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">{t('exp_date') || 'Date'}: {filterDate}</span>
-                    )}
-                </div>
-            )}
+            <button
+                type="button"
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 transition whitespace-nowrap w-fit shadow-sm"
+            >
+                <FaFilter style={iconCrisp} className="w-3.5 h-3.5" />
+                {showFilters ? (t('exp_hide_filters') || 'Hide Filters') : (t('exp_filter_by_date') || 'Filter by Date')}
+                {hasActiveFilters && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                )}
+            </button>
         </div>
-    )}
-</div>
 
-{/* Expenses Table */}
-<div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-400 dark:border-white/10 shadow-md p-5 sm:p-6">
-    <div className="mb-5">
-        <div className="flex items-center gap-3 mb-1">
-            <span style={iconCrisp} className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
-                <IconCalendar duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            </span>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('exp_history') || 'Expense History'}</h3>
-        </div>
-        <p className="text-sm text-gray-500 dark:text-gray-500 ml-12">{t('exp_history_desc') || 'View and manage all your shop expenses'}</p>
+        {showFilters && (
+            <div className="mt-4 pt-4 border-t border-dashed border-gray-200 dark:border-white/10">
+                <p className="text-xs text-gray-500 dark:text-gray-500 mb-3">
+                    {t('exp_filter_hint') || 'Filter by Year only, Month only, Date only, or any combination. All fields are optional.'}
+                </p>
+                <div className="flex flex-wrap items-end gap-3">
+                    <div>
+                        <label className="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400">{t('exp_year') || 'Year'}</label>
+                        <input
+                            type="number"
+                            className="w-28 px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                            placeholder={t('exp_year_ph') || 'e.g. 2024'}
+                            min="2000"
+                            max="2100"
+                            value={filterYear}
+                            onChange={(e) => setFilterYear(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400">{t('exp_month') || 'Month'}</label>
+                        <input
+                            type="number"
+                            className="w-24 px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                            placeholder={t('exp_month_ph') || '1-12'}
+                            min="1"
+                            max="12"
+                            value={filterMonth}
+                            onChange={(e) => setFilterMonth(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-1 text-xs font-medium text-gray-500 dark:text-gray-400">{t('exp_date') || 'Date'}</label>
+                        <input
+                            type="number"
+                            className="w-24 px-3 py-2 rounded-lg bg-gray-50 dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                            placeholder={t('exp_date_ph') || '1-31'}
+                            min="1"
+                            max="31"
+                            value={filterDate}
+                            onChange={(e) => setFilterDate(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        onClick={fetchFilteredExpenses}
+                        className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition shadow-sm"
+                    >
+                        {t('exp_apply_filter') || 'Apply Filter'}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={clearFilters}
+                        className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 transition"
+                    >
+                        {t('exp_clear_all') || 'Clear All'}
+                    </button>
+                </div>
+
+                {hasActiveFilters && (
+                    <div className="mt-3 flex items-center gap-2 flex-wrap">
+                        <span className="text-xs text-gray-500">{t('exp_active') || 'Active:'}</span>
+                        {filterYear && (
+                            <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">{t('exp_year') || 'Year'}: {filterYear}</span>
+                        )}
+                        {filterMonth && (
+                            <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">{t('exp_month') || 'Month'}: {filterMonth}</span>
+                        )}
+                        {filterDate && (
+                            <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">{t('exp_date') || 'Date'}: {filterDate}</span>
+                        )}
+                    </div>
+                )}
+            </div>
+        )}
     </div>
 
+    {/* Table area */}
+    <div className="mt-6 pt-1">
     {isLoading ? (
         <div className="flex justify-center items-center py-20">
             <span className="animate-[spin_1s_linear_infinite] border-4 border-gray-200 dark:border-white/10 border-t-emerald-500 rounded-full w-10 h-10 inline-block"></span>
@@ -719,6 +721,7 @@ const ShopExpenses = () => {
             </div>
         </>
     )}
+    </div>
 </div>
 
 {/* Add/Edit Expense Modal */}

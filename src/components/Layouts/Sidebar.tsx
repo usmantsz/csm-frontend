@@ -550,8 +550,8 @@ const Sidebar = () => {
                                 </>
                             )}
 
-                            {/* Customers – Shop Owner only (not Admin) */}
-                            {!isTeamMember && userRole !== '0' && (
+                            {/* Customers – Shop Owner ONLY (role '1'). Not shown for Admin, Team Member, or Customer portal. */}
+                            {userRole === '1' && (
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'customers' ? 'active' : ''} ${activeBtnClass(currentMenu === 'customers')} nav-link group !flex !w-full`} onClick={() => toggleMenu('customers')}>
                                     <div className="flex items-center">

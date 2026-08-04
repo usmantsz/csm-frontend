@@ -112,7 +112,7 @@ const GetAssginShopCrops = () => {
     return (
         <div className="mb-5 space-y-4">
             {/* Back button - outside card, top of page */}
-            <div className="flex justify-start">
+            <div className="flex justify-end">
                 <a
                     href="/dashboard"
                     onClick={(e) => {

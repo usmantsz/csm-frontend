@@ -207,9 +207,9 @@ const AddNewCustomer: React.FC = () => {
                     value={formData[name] as string}
                     onChange={handleChange}
                     placeholder={placeholder}
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-[#0e1726] border ${
+                    className={`autofill-fix w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-[#0e1726] border ${
                         errors[name] ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-emerald-500/40'
-                    } text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition`}
+                    } text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition`}
                 />
             </div>
             {helpText && !errors[name] && (
@@ -228,6 +228,51 @@ const AddNewCustomer: React.FC = () => {
 
             return (
         <div>
+            {/* Override browser autofill text color so it stays blue instead of the browser's default white/black */}
+            <style>{`
+                input.autofill-fix:-webkit-autofill,
+                input.autofill-fix:-webkit-autofill:hover,
+                input.autofill-fix:-webkit-autofill:focus,
+                input.autofill-fix:-webkit-autofill:active {
+                    -webkit-text-fill-color: #111827;
+                    caret-color: #111827;
+                    box-shadow: 0 0 0px 1000px #ffffff inset;
+                    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+                    border-color: #d1d5db;
+                    transition: background-color 5000s ease-in-out 0s;
+                }
+                .dark input.autofill-fix:-webkit-autofill,
+                .dark input.autofill-fix:-webkit-autofill:hover,
+                .dark input.autofill-fix:-webkit-autofill:focus,
+                .dark input.autofill-fix:-webkit-autofill:active {
+                    -webkit-text-fill-color: #ffffff;
+                    caret-color: #ffffff;
+                    box-shadow: 0 0 0px 1000px #0e1726 inset;
+                    -webkit-box-shadow: 0 0 0px 1000px #0e1726 inset;
+                    border-color: rgba(255, 255, 255, 0.1);
+                }
+                input.autofill-fix-pw:-webkit-autofill,
+                input.autofill-fix-pw:-webkit-autofill:hover,
+                input.autofill-fix-pw:-webkit-autofill:focus,
+                input.autofill-fix-pw:-webkit-autofill:active {
+                    -webkit-text-fill-color: #111827;
+                    caret-color: #111827;
+                    box-shadow: 0 0 0px 1000px #f9fafb inset;
+                    -webkit-box-shadow: 0 0 0px 1000px #f9fafb inset;
+                    border-color: #d1d5db;
+                    transition: background-color 5000s ease-in-out 0s;
+                }
+                .dark input.autofill-fix-pw:-webkit-autofill,
+                .dark input.autofill-fix-pw:-webkit-autofill:hover,
+                .dark input.autofill-fix-pw:-webkit-autofill:focus,
+                .dark input.autofill-fix-pw:-webkit-autofill:active {
+                    -webkit-text-fill-color: #ffffff;
+                    caret-color: #ffffff;
+                    box-shadow: 0 0 0px 1000px #171f2f inset;
+                    -webkit-box-shadow: 0 0 0px 1000px #171f2f inset;
+                    border-color: rgba(255, 255, 255, 0.1);
+                }
+            `}</style>
             {/* Back to Customer List - outside the card, top left */}
             <button
                             type="button"
@@ -283,10 +328,10 @@ const AddNewCustomer: React.FC = () => {
                                         name="cusPassword"
                                         value={formData.cusPassword}
                                         onChange={handleChange}
-                                        placeholder={t('enter_password')}
-                                        className={`w-full pl-10 pr-10 py-2.5 rounded-lg bg-gray-50 dark:bg-[#171f2f] border ${
+                                        placeholder={t('form_enter_password')}
+                                        className={`autofill-fix-pw w-full pl-10 pr-10 py-2.5 rounded-lg bg-gray-50 dark:bg-[#171f2f] border ${
                                             errors.cusPassword ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-emerald-500/40'
-                                        } text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition`}
+                                        } text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition`}
                                     />
                                     <button
                                         type="button"
@@ -331,9 +376,9 @@ const AddNewCustomer: React.FC = () => {
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
                                         placeholder={t('confirm_password_placeholder')}
-                                        className={`w-full pl-10 pr-10 py-2.5 rounded-lg bg-gray-50 dark:bg-[#171f2f] border ${
+                                        className={`autofill-fix-pw w-full pl-10 pr-10 py-2.5 rounded-lg bg-gray-50 dark:bg-[#171f2f] border ${
                                             errors.confirmPassword ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-emerald-500/40'
-                                        } text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition`}
+                                        } text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition`}
                                     />
                                     <button
                                         type="button"
@@ -386,7 +431,7 @@ const AddNewCustomer: React.FC = () => {
                                     rows={4}
                                     className={`w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-[#0e1726] border ${
                                         errors.cusAddress ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-emerald-500/40'
-                                    } text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition resize-none`}
+                                    } text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition resize-none`}
                                 />
                             </div>
                             {errors.cusAddress && (

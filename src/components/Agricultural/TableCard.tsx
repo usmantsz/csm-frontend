@@ -1,5 +1,7 @@
 import React from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+import { useSelector } from 'react-redux';
+import { IRootState } from '../../store';
 
 interface TableCardProps {
     title: string;
@@ -65,10 +67,27 @@ const TableCard: React.FC<TableCardProps> = ({
     idAccessor,
     accent = 'blue',
 }) => {
+    // Same source Header/Sidebar use to detect Urdu (RTL) mode.
+    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl';
+
     const safeData = Array.isArray(data) ? data : [];
     const safeColumns = Array.isArray(columns) ? columns : [];
     const theme = ACCENTS[accent];
     const isSearching = Boolean(onSearchChange && searchValue && searchValue.trim().length > 0);
+
+    // In RTL (Urdu) mode, flip physical 'left'/'right' alignment so columns
+    // read correctly in the mirrored layout. 'center' stays untouched.
+    const flipAlignment = (alignment?: string) => {
+        if (!isRtl) return alignment;
+        if (alignment === 'left') return 'right';
+        if (alignment === 'right') return 'left';
+        return alignment;
+    };
+
+    const rtlAwareColumns = safeColumns.map((col) => ({
+        ...col,
+        textAlignment: flipAlignment(col.textAlignment),
+    }));
 
     return (
         <div
@@ -94,7 +113,7 @@ const TableCard: React.FC<TableCardProps> = ({
             {onSearchChange && (
                 <div className="mb-6">
                     <div className="relative">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                        <div className="pointer-events-none absolute inset-y-0 ltr:left-0 rtl:right-0 flex items-center ltr:pl-3.5 rtl:pr-3.5">
                             <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -104,14 +123,14 @@ const TableCard: React.FC<TableCardProps> = ({
                             value={searchValue || ''}
                             onChange={(e) => onSearchChange(e.target.value)}
                             placeholder={searchPlaceholder}
-                            className={`form-input w-full rounded-2xl border-gray-300 pl-10 pr-10 transition-all duration-300 dark:border-gray-600 focus:ring-2 ${theme.ring}`}
+                            className={`form-input w-full rounded-2xl border-gray-300 ltr:pl-10 ltr:pr-10 rtl:pr-10 rtl:pl-10 transition-all duration-300 dark:border-gray-600 focus:ring-2 ${theme.ring}`}
                         />
                         {isSearching && (
                             <button
                                 type="button"
                                 onClick={() => onSearchChange('')}
                                 aria-label="Clear search"
-                                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300"
+                                className="absolute inset-y-0 ltr:right-0 rtl:left-0 flex items-center ltr:pr-3.5 rtl:pl-3.5 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300"
                             >
                                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -156,11 +175,14 @@ const TableCard: React.FC<TableCardProps> = ({
                     )}
                 </div>
             ) : (
-                <div className="datatables overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700">
+                <div
+                    className="datatables overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700"
+                    dir={isRtl ? 'rtl' : 'ltr'}
+                >
                     <DataTable
                         className="whitespace-nowrap table-hover"
                         records={safeData}
-                        columns={safeColumns}
+                        columns={rtlAwareColumns}
                         idAccessor={typeof idAccessor === 'string' ? idAccessor : undefined}
                         totalRecords={totalRecords || safeData.length}
                         recordsPerPage={pageSize}

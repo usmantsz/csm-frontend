@@ -238,7 +238,7 @@ const CustomerOverview = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="rounded-2xl bg-white dark:bg-white/5 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 shadow-gray-500/40 shadow-lg dark:shadow-none h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 shadow-gray-500/40 shadow-lg dark:shadow-none flex items-center justify-center">
                                         <IconCashBanknotes className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                                     </div>
                                     <div className="min-w-0">
@@ -249,7 +249,7 @@ const CustomerOverview = () => {
                             </div>
                             <div className="rounded-2xl bg-white dark:bg-white/5 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 h-12 shadow-gray-500/40 shadow-lg dark:shadow-none shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 shadow-gray-500/40 shadow-lg dark:shadow-none flex items-center justify-center">
                                         <IconTag className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                                     </div>
                                     <div className="min-w-0">
@@ -260,7 +260,7 @@ const CustomerOverview = () => {
                             </div>
                             <div className="rounded-2xl border-2 border-warning/30 bg-warning/5 dark:bg-warning/10 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 h-12 shadow-gray-500/40 shadow-lg dark:shadow-none shrink-0 rounded-xl bg-warning/15 flex items-center justify-center">
+                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-warning/15 shadow-gray-500/40 shadow-lg dark:shadow-none flex items-center justify-center">
                                         <IconFile className="w-6 h-6 text-warning" />
                                     </div>
                                     <div className="min-w-0">
@@ -271,7 +271,7 @@ const CustomerOverview = () => {
                             </div>
                             <div className="rounded-2xl bg-white dark:bg-white/5 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 h-12 shadow-gray-500/40 shadow-lg dark:shadow-none shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 shadow-gray-500/40 shadow-lg dark:shadow-none flex items-center justify-center">
                                         <IconMenu className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                                     </div>
                                     <div className="min-w-0">
@@ -283,201 +283,152 @@ const CustomerOverview = () => {
                         </div>
                     )}
 
-                    {/* Profile (view only) */}
-                    {profile && (
+                    {/* Profile + Crop filter — merged into one card, side by side on desktop */}
+                    {(profile || (dashboard?.crops && dashboard.crops.length > 0)) && (
                         <div className="rounded-2xl bg-white dark:bg-white/5 p-6 shadow-lg shadow-black/10 dark:shadow-none">
-                            <h5 className="font-semibold  text-lg mb-4 flex items-center gap-2 text-stone-900 dark:text-white">
-                                <IconUser className="w-5 h-5 text-primary-600 dark:text-primary-400 shrink-0" />
-                                {t('profile')} – {selectedShop.shopName}
-                            </h5>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                <p className="break-words"><span className="text-stone-500 dark:text-stone-400">{t('name')}:</span> <span className="font-medium">{profile.cusNameF} {profile.cusNameL}</span></p>
-                                <p className="break-words"><span className="text-stone-500 dark:text-stone-400">{t('phone')}:</span> <span className="font-medium">{profile.cusNumber || '–'}</span></p>
-                                <p className="break-words"><span className="text-stone-500 dark:text-stone-400">{t('cnic')}:</span> <span className="font-medium">{profile.cusCNIC || '–'}</span></p>
-                                <p className="sm:col-span-2 break-words"><span className="text-stone-500 dark:text-stone-400">{t('address')}:</span> <span className="font-medium">{profile.cusAddress || '–'}</span></p>
-                            </div>
-                        </div>
-                    )}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {profile && (
+                                    <div className="min-w-0">
+                                        <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-stone-900 dark:text-white">
+                                            <IconUser className="w-5 h-5 text-primary-600 dark:text-primary-400 shrink-0" />
+                                            <span className="truncate">{t('profile')} – {selectedShop.shopName}</span>
+                                        </h5>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                            <p className="break-words"><span className="text-stone-500 dark:text-stone-400">{t('name')}:</span> <span className="font-medium">{profile.cusNameF} {profile.cusNameL}</span></p>
+                                            <p className="break-words"><span className="text-stone-500 dark:text-stone-400">{t('phone')}:</span> <span className="font-medium">{profile.cusNumber || '–'}</span></p>
+                                            <p className="break-words"><span className="text-stone-500 dark:text-stone-400">{t('cnic')}:</span> <span className="font-medium">{profile.cusCNIC || '–'}</span></p>
+                                            <p className="sm:col-span-2 break-words"><span className="text-stone-500 dark:text-stone-400">{t('address')}:</span> <span className="font-medium">{profile.cusAddress || '–'}</span></p>
+                                        </div>
+                                    </div>
+                                )}
 
-                    {/* Crops in this shop – clickable */}
-                    {dashboard?.crops && dashboard.crops.length > 0 && (
-                        <div className="rounded-2xl bg-white dark:bg-white/5 p-6 shadow-lg shadow-black/10 dark:shadow-none">
-                            <h5 className="font-semibold text-lg mb-3 text-stone-900 dark:text-white">{t('crops_in_shop_hint')}</h5>
-                            <div className="flex flex-wrap gap-2">
-                                {dashboard.crops.map((c) => {
-                                    const isSelected = selectedCropId === c._id;
-                                    return (
-                                        <button
-                                            key={c._id}
-                                            type="button"
-                                            onClick={() => setSelectedCropId(isSelected ? null : c._id)}
-                                            className={`px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all duration-200 max-w-full truncate ${
-                                                isSelected
-                                                    ? 'border-primary-600 bg-primary-600 text-white'
-                                                    : 'border-primary-200 dark:border-white/10 bg-primary-50/40 dark:bg-primary-900/20 text-primary-600 dark:text-primary-300 hover:border-primary-500/50'
-                                            }`}
-                                        >
-                                            {c.cropName || c._id}
-                                        </button>
-                                    );
-                                })}
-                                {selectedCropId && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setSelectedCropId(null)}
-                                        className="px-4 py-2  rounded-xl border-2 border-stone-300 dark:border-stone-600 bg-stone-100 dark:bg-white/5 text-stone-700 dark:text-stone-300 text-sm flex items-center gap-1 shrink-0"
-                                    >
-
-                                        <IconX className="w-4 h-4 shadow-gray-500/40 shadow-lg" /> {t('clear_filter')}
-                                    </button>
+                                {dashboard?.crops && dashboard.crops.length > 0 && (
+                                    <div className={`min-w-0 ${profile ? 'lg:border-l lg:border-stone-200 dark:lg:border-white/10 lg:pl-6' : ''}`}>
+                                        <h5 className="font-semibold text-lg mb-3 text-stone-900 dark:text-white">{t('crops_in_shop_hint')}</h5>
+                                        <div className="flex flex-wrap gap-2">
+                                            {dashboard.crops.map((c) => {
+                                                const isSelected = selectedCropId === c._id;
+                                                return (
+                                                    <button
+                                                        key={c._id}
+                                                        type="button"
+                                                        onClick={() => setSelectedCropId(isSelected ? null : c._id)}
+                                                        className={`px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all duration-200 max-w-full truncate ${
+                                                            isSelected
+                                                                ? 'border-primary-600 bg-primary-600 text-white'
+                                                                : 'border-primary-200 dark:border-white/10 bg-primary-50/40 dark:bg-primary-900/20 text-primary-600 dark:text-primary-300 hover:border-primary-500/50'
+                                                        }`}
+                                                    >
+                                                        {c.cropName || c._id}
+                                                    </button>
+                                                );
+                                            })}
+                                            {selectedCropId && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setSelectedCropId(null)}
+                                                    className="px-4 py-2 rounded-xl border-2 border-stone-300 dark:border-stone-600 bg-stone-100 dark:bg-white/5 text-stone-700 dark:text-stone-300 text-sm flex items-center gap-1 shrink-0"
+                                                >
+                                                    <IconX className="w-4 h-4" /> {t('clear_filter')}
+                                                </button>
+                                            )}
+                                        </div>
+                                        {selectedCropId && selectedCropName && (
+                                            <p className="text-xs text-stone-500 dark:text-stone-400 mt-3">
+                                                {t('filtered_by')}: <span className="font-medium text-primary-600 dark:text-primary-400">{selectedCropName}</span> — {t('loan_list')} {t('and') || '&'} {t('vegetable_crop_order_list')} {t('below') || 'below'}
+                                            </p>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         </div>
                     )}
 
-                    {/* When crop selected: show orders & loans for that crop */}
-                    {selectedCropId && selectedCropName && (
-                        <div className="rounded-2xl bg-primary-50/40 dark:bg-primary-900/10 p-6 shadow-lg shadow-black/10 dark:shadow-none">
-                            <h5 className="font-semibold text-lg mb-4 text-primary-600 dark:text-primary-400 truncate">
-                                {t('orders_and_loans_for')}: {selectedCropName}
+                    {/* Loans + Orders — merged into one card, side by side, both respecting the crop filter above */}
+                    <div className="rounded-2xl bg-white dark:bg-white/5 p-6 shadow-lg shadow-black/10 dark:shadow-none">
+                        <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
+                            <h5 className="font-semibold text-lg flex items-center gap-2 text-stone-900 dark:text-white">
+                                <IconFile className="w-5 h-5 text-primary-600 dark:text-primary-400 shrink-0" />
+                                <span className="truncate">{t('loan_list')} {t('and') || '&'} {t('vegetable_crop_order_list')}</span>
                             </h5>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div className="min-w-0">
-                                    <h6 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-2">{t('orders')} ({filteredOrders.length})</h6>
-                                    {filteredOrders.length === 0 ? (
-                                        <p className="text-stone-500 dark:text-stone-400 text-sm">{t('no_orders_for_crop')}</p>
-                                    ) : (
-                                        <div className="overflow-x-auto">
-                                            <table className="table-auto w-full text-sm">
-                                                <thead>
-                                                    <tr className="border-b border-primary-200 dark:border-white/10">
-                                                        <th className="text-left py-2">{t('date')}</th>
-                                                        <th className="text-right py-2">{t('pcs')}</th>
-                                                        <th className="text-right py-2">{t('total')}</th>
+                            {selectedCropId && selectedCropName && (
+                                <span className="text-xs px-2.5 py-1 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium">
+                                    {t('filtered_by')}: {selectedCropName}
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Loans */}
+                            <div className="min-w-0">
+                                <h6 className="text-sm font-semibold text-warning mb-3 flex items-center gap-1.5">
+                                    {t('loans')} <span className="text-stone-400 dark:text-stone-500 font-normal">({filteredLoans.length})</span>
+                                </h6>
+                                {filteredLoans.length === 0 ? (
+                                    <p className="text-stone-500 dark:text-stone-400 text-sm">{selectedCropId ? t('no_loans_for_crop') : t('no_loans_in_shop')}</p>
+                                ) : (
+                                    <div className="overflow-x-auto">
+                                        <table className="table-auto w-full text-sm">
+                                            <thead>
+                                                <tr className="border-b border-primary-200 dark:border-white/10">
+                                                    <th className="text-left py-2">{t('crop')}</th>
+                                                    <th className="text-left py-2">{t('date')}</th>
+                                                    <th className="text-right py-2">{t('amount')}</th>
+                                                    <th className="text-right py-2">{t('paid')}</th>
+                                                    <th className="text-right py-2">{t('outstanding')}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {filteredLoans.map((l) => (
+                                                    <tr key={l._id} className="border-b border-primary-100 dark:border-white/5 hover:bg-primary-50/50 dark:hover:bg-white/[0.03]">
+                                                        <td className="py-2 truncate max-w-[100px]" title={getCropNameFromRef(l.finaceCropId)}>{getCropNameFromRef(l.finaceCropId)}</td>
+                                                        <td className="py-2 whitespace-nowrap">{formatDate(l.createdAt)}</td>
+                                                        <td className="text-right whitespace-nowrap">{formatRs(l.loanAmount)}</td>
+                                                        <td className="text-right whitespace-nowrap">{formatRs(l.loanPaidAmount)}</td>
+                                                        <td className="text-right font-medium whitespace-nowrap">{formatRs(l.outstanding)}</td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {filteredOrders.map((o) => (
-                                                        <tr key={o._id} className="border-b border-primary-100 dark:border-white/5">
-                                                            <td className="py-2">{formatDate(o.createdAt)}</td>
-                                                            <td className="text-right">{o.totalPisces ?? '–'}</td>
-                                                            <td className="text-right font-medium">{formatRs(o.totalPrice ?? 0)}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="min-w-0">
-                                    <h6 className="text-sm font-medium text-warning mb-2">{t('loans')} ({filteredLoans.length})</h6>
-                                    {filteredLoans.length === 0 ? (
-                                        <p className="text-stone-500 dark:text-stone-400 text-sm">{t('no_loans_for_crop')}</p>
-                                    ) : (
-                                        <div className="overflow-x-auto">
-                                            <table className="table-auto w-full text-sm">
-                                                <thead>
-                                                    <tr className="border-b border-primary-200 dark:border-white/10">
-                                                        <th className="text-left py-2">{t('date')}</th>
-                                                        <th className="text-right py-2">{t('amount')}</th>
-                                                        <th className="text-right py-2">{t('paid')}</th>
-                                                        <th className="text-right py-2">{t('outstanding')}</th>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Orders */}
+                            <div className="min-w-0 lg:border-l lg:border-stone-200 dark:lg:border-white/10 lg:pl-6">
+                                <h6 className="text-sm font-semibold text-primary-600 dark:text-primary-400 mb-3 flex items-center gap-1.5">
+                                    {t('orders')} <span className="text-stone-400 dark:text-stone-500 font-normal">({filteredOrders.length})</span>
+                                </h6>
+                                {filteredOrders.length === 0 ? (
+                                    <p className="text-stone-500 dark:text-stone-400 text-sm">{selectedCropId ? t('no_orders_for_crop') : t('no_orders_in_shop')}</p>
+                                ) : (
+                                    <div className="overflow-x-auto">
+                                        <table className="table-auto w-full text-sm">
+                                            <thead>
+                                                <tr className="border-b border-primary-200 dark:border-white/10">
+                                                    <th className="text-left py-2">{t('crop')}</th>
+                                                    <th className="text-left py-2">{t('date')}</th>
+                                                    <th className="text-right py-2">{t('pcs')}</th>
+                                                    <th className="text-right py-2">{t('total')}</th>
+                                                    <th className="text-right py-2">{t('return')}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {filteredOrders.map((o) => (
+                                                    <tr key={o._id} className="border-b border-primary-100 dark:border-white/5 hover:bg-primary-50/50 dark:hover:bg-white/[0.03]">
+                                                        <td className="py-2 truncate max-w-[100px]" title={getCropNameFromRef(o.vegetableOrderCropId)}>{getCropNameFromRef(o.vegetableOrderCropId)}</td>
+                                                        <td className="py-2 whitespace-nowrap">{formatDate(o.createdAt)}</td>
+                                                        <td className="text-right whitespace-nowrap">{o.totalPisces ?? '–'}</td>
+                                                        <td className="text-right font-medium whitespace-nowrap">{formatRs(o.totalPrice ?? 0)}</td>
+                                                        <td className="text-right whitespace-nowrap">{formatRs(o.retrunPayment ?? 0)}</td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {filteredLoans.map((l) => (
-                                                        <tr key={l._id} className="border-b border-primary-100 dark:border-white/5">
-                                                            <td className="py-2">{formatDate(l.createdAt)}</td>
-                                                            <td className="text-right">{formatRs(l.loanAmount)}</td>
-                                                            <td className="text-right">{formatRs(l.loanPaidAmount)}</td>
-                                                            <td className="text-right font-medium">{formatRs(l.outstanding)}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    )}
-                                </div>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    )}
-
-                    {/* Full Loan List */}
-                    <div className="rounded-2xl bg-white dark:bg-white/5 p-6 shadow-lg shadow-black/10 dark:shadow-none">
-                        <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-warning">
-                            <IconFile className="w-5 h-5 shrink-0" />
-                            <span className="truncate">{t('loan_list')} {selectedCropId ? `(${t('filtered_by')} ${selectedCropName})` : ''}</span>
-                        </h5>
-                        {loans.length === 0 ? (
-                            <p className="text-stone-500 dark:text-stone-400 text-sm">{t('no_loans_in_shop')}</p>
-                        ) : (
-                            <div className="overflow-x-auto">
-                                <table className="table-auto w-full text-sm">
-                                    <thead>
-                                        <tr className="border-b border-primary-200 dark:border-white/10">
-                                            <th className="text-left py-2">{t('crop')}</th>
-                                            <th className="text-left py-2">{t('date')}</th>
-                                            <th className="text-right py-2">{t('amount')}</th>
-                                            <th className="text-right py-2">{t('paid')}</th>
-                                            <th className="text-right py-2">{t('outstanding')}</th>
-                                            <th className="text-left py-2">{t('remarks')}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {filteredLoans.map((l) => (
-                                            <tr key={l._id} className="border-b border-primary-100 dark:border-white/5 hover:bg-primary-50/50 dark:hover:bg-white/[0.03]">
-                                                <td className="py-2">{getCropNameFromRef(l.finaceCropId)}</td>
-                                                <td className="py-2">{formatDate(l.createdAt)}</td>
-                                                <td className="text-right">{formatRs(l.loanAmount)}</td>
-                                                <td className="text-right">{formatRs(l.loanPaidAmount)}</td>
-                                                <td className="text-right font-medium">{formatRs(l.outstanding)}</td>
-                                                <td className="py-2 text-stone-600 dark:text-stone-400 max-w-[160px] truncate" title={l.finaceRemarks}>{l.finaceRemarks || '–'}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Full Order List (Vegetable / Crop orders) */}
-                    <div className="rounded-2xl bg-white dark:bg-white/5 p-6 shadow-lg shadow-black/10 dark:shadow-none">
-                        <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-primary-600 dark:text-primary-400">
-                            <IconMenu className="w-5 h-5 shrink-0" />
-                            <span className="truncate">{t('vegetable_crop_order_list')} {selectedCropId ? `(${t('filtered_by')} ${selectedCropName})` : ''}</span>
-                        </h5>
-                        {orders.length === 0 ? (
-                            <p className="text-stone-500 dark:text-stone-400 text-sm">{t('no_orders_in_shop')}</p>
-                        ) : (
-                            <div className="overflow-x-auto">
-                                <table className="table-auto w-full text-sm">
-                                    <thead>
-                                        <tr className="border-b border-primary-200 dark:border-white/10">
-                                            <th className="text-left py-2">{t('crop')}</th>
-                                            <th className="text-left py-2">{t('date')}</th>
-                                            <th className="text-right py-2">{t('pcs')}</th>
-                                            <th className="text-right py-2">{t('price_per_pc')}</th>
-                                            <th className="text-right py-2">{t('total')}</th>
-                                            <th className="text-right py-2">{t('commission')}</th>
-                                            <th className="text-right py-2">{t('return')}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {filteredOrders.map((o) => (
-                                            <tr key={o._id} className="border-b border-primary-100 dark:border-white/5 hover:bg-primary-50/50 dark:hover:bg-white/[0.03]">
-                                                <td className="py-2">{getCropNameFromRef(o.vegetableOrderCropId)}</td>
-                                                <td className="py-2">{formatDate(o.createdAt)}</td>
-                                                <td className="text-right">{o.totalPisces ?? '–'}</td>
-                                                <td className="text-right">{formatRs(o.pricePisce ?? 0)}</td>
-                                                <td className="text-right font-medium">{formatRs(o.totalPrice ?? 0)}</td>
-                                                <td className="text-right">{formatRs(o.commissioneTotal ?? 0)}</td>
-                                                <td className="text-right">{formatRs(o.retrunPayment ?? 0)}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
                     </div>
                 </>
             )}

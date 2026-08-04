@@ -499,7 +499,8 @@ const CustomerBalance = () => {
 
     return (
         <div>
-            <div className='mb-3'>
+            <div className='mb-3 flex justify-end'>
+                
                 <button
                     onClick={() => navigate('/customerlist')}
                     className="flex justify-right items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition whitespace-nowrap"
@@ -508,33 +509,8 @@ const CustomerBalance = () => {
                 </button>
             </div>
 
-{/* Summary Cards */}
-<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 shadow-sm p-5">
-        <p className="text-sm font-medium text-black dark:text-white mb-1">{t('shop_owes_to_customer')}</p>
-        <p className="text-2xl font-bold text-black dark:text-white">
-            Rs. {totalShopOwesToCustomer.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-        <p className="text-xs text-black/70 dark:text-white/80 mt-1">{t('total_shop_pay_customers')}</p>
-    </div>
-    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 shadow-sm p-5">
-        <p className="text-sm font-medium text-black dark:text-white mb-1">{t('customer_owes_to_shop')}</p>
-        <p className="text-2xl font-bold text-black dark:text-white">
-            Rs. {totalCustomerOwesToShop.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-        <p className="text-xs text-black/70 dark:text-white/80 mt-1">{t('total_customers_owe_shop')}</p>
-    </div>
-    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 shadow-sm p-5">
-        <p className="text-sm font-medium text-black dark:text-white mb-1">{t('return_amount_total_label')}</p>
-        <p className="text-2xl font-bold text-black dark:text-white">
-            Rs. {returnAmountTotalDisplay.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-        <p className="text-xs text-black/70 dark:text-white/80 mt-1">{t('return_amount_total_desc')}</p>
-    </div>
-</div>
-
             {/* Main Card */}
-            <div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-300 dark:border-white/10 shadow-sm p-5 sm:p-6">
+            <div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-300 dark:border-white/10 shadow-sm p-5 sm:p-6 mb-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3 mb-4">
                     <h3 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                         {t('customer_balance_title') || 'Customer Balance'}
@@ -593,6 +569,31 @@ const CustomerBalance = () => {
                     </div>
                 )}
             </div>
+
+{/* Summary Cards */}
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 shadow-sm p-5">
+        <p className="text-sm font-medium text-black dark:text-white mb-1">{t('shop_owes_to_customer')}</p>
+        <p className="text-2xl font-bold text-black dark:text-white">
+            Rs. {totalShopOwesToCustomer.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </p>
+        <p className="text-xs text-black/70 dark:text-white/80 mt-1">{t('total_shop_pay_customers')}</p>
+    </div>
+    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 shadow-sm p-5">
+        <p className="text-sm font-medium text-black dark:text-white mb-1">{t('customer_owes_to_shop')}</p>
+        <p className="text-2xl font-bold text-black dark:text-white">
+            Rs. {totalCustomerOwesToShop.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </p>
+        <p className="text-xs text-black/70 dark:text-white/80 mt-1">{t('total_customers_owe_shop')}</p>
+    </div>
+    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 shadow-sm p-5">
+        <p className="text-sm font-medium text-black dark:text-white mb-1">{t('return_amount_total_label')}</p>
+        <p className="text-2xl font-bold text-black dark:text-white">
+            Rs. {returnAmountTotalDisplay.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </p>
+        <p className="text-xs text-black/70 dark:text-white/80 mt-1">{t('return_amount_total_desc')}</p>
+    </div>
+</div>
 
             {/* Pay Modal */}
             <Modal
