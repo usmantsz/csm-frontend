@@ -269,12 +269,12 @@ const Sidebar = () => {
             >
                 <div className="bg-white dark:bg-black h-full">
                     <div className="flex justify-between items-center  py-3">
-                        <NavLink to="/dashboard" className="main-logo flex items-center shrink-0 gap-2">
+                        <div className="main-logo flex items-center shrink-0 gap-2">
                             <img src="/assets/images/commission-shop-logo.png" alt="Commission Shop" className="h-14 w-14 object-contain flex-none rounded-lg" />
                             <span className="text-xl ltr:ml-1 rtl:mr-1 font-bold align-middle lg:inline dark:text-white-light text-[#15803d] dark:text-[#4ade80] truncate max-w-[150px]">
                                 {userName || t('app_name')}
                             </span>
-                        </NavLink>
+                        </div>
 
                         <button
                             type="button"
