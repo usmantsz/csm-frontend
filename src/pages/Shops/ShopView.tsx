@@ -372,10 +372,11 @@ const ShopView = () => {
                                 {t('view_all_customers_desc')}
                             </p>
                             <button
+                                type="button"
                                 onClick={() => navigate(`/shop/${shopId}/customers`)}
-                                className="btn btn-primary rounded-xl mt-4"
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 mt-4"
                             >
-                                <IconUser className="w-4 h-4 mr-2" />
+                                <IconUser className="w-5 h-5 text-white" duotone={false} />
                                 {t('view_all_customers')}
                             </button>
                         </div>
@@ -388,10 +389,11 @@ const ShopView = () => {
                                 {t('view_finance_records_desc')}
                             </p>
                             <button
+                                type="button"
                                 onClick={() => navigate(`/shop/${shopId}/finance`)}
-                                className="btn btn-primary rounded-xl mt-4"
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 mt-4"
                             >
-                                <IconCashBanknotes className="w-4 h-4 mr-2" />
+                                <IconCashBanknotes className="w-5 h-5 text-white" duotone={false} />
                                 {t('view_finance_records')}
                             </button>
                         </div>

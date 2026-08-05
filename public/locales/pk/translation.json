@@ -248,6 +248,26 @@
   "select_subscription": "سبسکرپشن منتخب کریں",
   "update": "اپڈیٹ کریں",
 
+  "edit_subscription": "سبسکرپشن میں ترمیم",
+  "update_plan_details": "نیچے پلان کی تفصیلات اپڈیٹ کریں",
+  "subscription_name": "سبسکرپشن کا نام",
+  "subscription_name_placeholder": "سبسکرپشن کا نام درج کریں",
+  "description": "تفصیل",
+  "description_placeholder": "تفصیل درج کریں",
+  "duration": "مدت",
+  "duration_placeholder": "مدت درج کریں",
+  "days": "دن",
+  "price": "قیمت (روپے)",
+  "price_placeholder": "قیمت درج کریں",
+  "plan_status": "پلان کی حیثیت",
+  "enable_plan_status": "اس پلان کو دکانوں کے لیے دستیاب کرنے کے لیے فعال کریں",
+  "back": "واپس",
+  "cancel": "منسوخ کریں",
+  "save_changes": "تبدیلیاں محفوظ کریں",
+  "loading_subscription": "سبسکرپشن لوڈ ہو رہی ہے...",
+  "saving": "محفوظ ہو رہا ہے...",
+
+  
 
     "customer_dashboard": "کسٹمر ڈیش بورڈ",
     "dashboard": "ڈیش بورڈ",

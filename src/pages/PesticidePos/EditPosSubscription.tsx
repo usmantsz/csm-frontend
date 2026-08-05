@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import { ServerSetting } from '../../helperComponents/ServerSetting';
 import { Notification } from '../../helperComponents/Notification';
 import { useAuthToken } from '../../Hooks/useAuthToken';
-import PageHeader from '../../components/Agricultural/PageHeader';
+import IconArrowLeft from '../../components/Icon/IconArrowLeft';
 
 const EditPosSubscription = () => {
+    const { t } = useTranslation();
     const { id } = useParams<{ id: string }>();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -69,45 +71,130 @@ const EditPosSubscription = () => {
 
     if (loading && !form._id) {
         return (
-            <div className="panel text-center py-12">Loading...</div>
+            <div className="flex justify-center items-center h-screen">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary-600 border-t-transparent mx-auto mb-4"></div>
+                    <p className="text-lg font-semibold text-stone-600 dark:text-stone-400">Loading subscription...</p>
+                </div>
+            </div>
         );
     }
 
     return (
-        <div>
-            <ul className="flex space-x-2 rtl:space-x-reverse mb-6">
-                <li><Link to="/dashboard" className="text-primary hover:underline">Dashboard</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><Link to="/pesticide-pos/subscriptions" className="text-primary hover:underline">Subscription for POS</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><span>Edit Subscription</span></li>
-            </ul>
-            <PageHeader title="Edit POS Subscription" description={form.name} onBack={() => navigate(-1)} backLabel="Back" icon="📋" />
+        <div className="max-w-2xl mx-auto">
+            <div className="rounded-2xl border border-primary-200 dark:border-primary-900/40 bg-white dark:bg-[#0e1726] p-6 sm:p-8 shadow-sm">
+                {/* Header */}
+                <div className="flex items-center justify-between gap-4 pb-5 mb-6 border-b border-primary-100 dark:border-primary-900/30">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-50 dark:bg-primary-900/30 text-2xl">
+                            📋
+                        </span>
+                        <div className="min-w-0">
+                            <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-white truncate">
+                                {form.name || t('edit_subscription')}
+                            </h1>
+                            <p className="text-sm text-stone-500 dark:text-stone-400">{t('update_plan_details')}</p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/pesticide-pos/subscriptions')}
+                        className="flex items-center gap-2 rounded-2xl bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-300 dark:hover:bg-primary-900/50 shrink-0"
+                    >
+                        <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                        <span className="hidden sm:inline">{t('back')}</span>
+                    </button>
+                </div>
 
-            <form onSubmit={handleSubmit} className="panel max-w-xl space-y-4">
-                <div>
-                    <label className="form-label">Name *</label>
-                    <input type="text" className="form-input" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required />
-                </div>
-                <div>
-                    <label className="form-label">Description</label>
-                    <input type="text" className="form-input" value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
-                </div>
-                <div>
-                    <label className="form-label">Price (Rs.)</label>
-                    <input type="number" className="form-input" value={form.price} onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))} min="0" />
-                </div>
-                <div>
-                    <label className="form-label">Duration (days)</label>
-                    <input type="number" className="form-input" value={form.durationDays} onChange={(e) => setForm((p) => ({ ...p, durationDays: e.target.value }))} min="1" />
-                </div>
-                <div className="flex items-center gap-2">
-                    <input type="checkbox" id="isActive" checked={form.isActive} onChange={(e) => setForm((p) => ({ ...p, isActive: e.target.checked }))} />
-                    <label htmlFor="isActive">Active</label>
-                </div>
-                <div className="flex gap-2">
-                    <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
-                    <Link to="/pesticide-pos/subscriptions" className="btn btn-outline-secondary">Cancel</Link>
-                </div>
-            </form>
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div>
+                        <label className="form-label">{t('subscription_name')} *</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            placeholder={t('subscription_name_placeholder')}
+                            value={form.name}
+                            onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="form-label">{t('description')}</label>
+                        <textarea
+                            className="form-textarea min-h-[90px] resize-none"
+                            placeholder={t('description_placeholder')}
+                            value={form.description}
+                            onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="form-label">{t('price')}</label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm">Rs.</span>
+                                <input
+                                    type="number"
+                                    className="form-input pl-9"
+                                    placeholder={t('price_placeholder')}
+                                    value={form.price}
+                                    onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))}
+                                    min="0"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="form-label">{t('duration')}</label>
+                            <div className="relative">
+                                <input
+                                    type="number"
+                                    className="form-input pr-14"
+                                    placeholder={t('duration_placeholder')}
+                                    value={form.durationDays}
+                                    onChange={(e) => setForm((p) => ({ ...p, durationDays: e.target.value }))}
+                                    min="1"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm">{t('days')}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <label
+                        htmlFor="isActive"
+                        className="flex items-center justify-between gap-3 rounded-xl border border-primary-100 dark:border-primary-900/30 bg-primary-50/40 dark:bg-primary-900/10 px-4 py-3 cursor-pointer"
+                    >
+                        <div>
+                            <p className="text-sm font-semibold text-stone-700 dark:text-stone-200">{t('plan_status')}</p>
+                            <p className="text-xs text-stone-500 dark:text-stone-400">{t('enable_plan_status')}</p>
+                        </div>
+                        <input
+                            type="checkbox"
+                            id="isActive"
+                            checked={form.isActive}
+                            onChange={(e) => setForm((p) => ({ ...p, isActive: e.target.checked }))}
+                            className="w-5 h-5 accent-primary-600 shrink-0"
+                        />
+                    </label>
+
+                    <div className="flex items-center gap-3 pt-2 border-t border-primary-100 dark:border-primary-900/30 mt-2 pt-5">
+                        <button
+                            type="submit"
+                            disabled={saving}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            {saving ? 'Saving...' : t('save_changes')}
+                        </button>
+                        <Link
+                            to="/pesticide-pos/subscriptions"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-100 px-6 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:bg-stone-200 dark:bg-white/5 dark:text-stone-300 dark:hover:bg-white/10"
+                        >
+                            {t('cancel')}
+                        </Link>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };
