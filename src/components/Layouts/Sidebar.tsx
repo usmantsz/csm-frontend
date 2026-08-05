@@ -578,8 +578,8 @@ const Sidebar = () => {
                             </li>
                             )}
 
-                            {/* Finance – Shop Owner only (not Admin) */}
-                            {!isTeamMember && userRole !== '0' && (
+                            {/* Finance – Shop Owner (role '1'): dropdown with Finance Overview + Shop Expenses. */}
+                            {userRole === '1' && (
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'finance' ? 'active' : ''} ${activeBtnClass(currentMenu === 'finance')} nav-link group !flex !w-full`} onClick={() => toggleMenu('finance')}>
                                     <div className="flex items-center">
@@ -600,6 +600,23 @@ const Sidebar = () => {
                                         </li>
                                     </ul>
                                 </AnimateHeight>
+                            </li>
+                            )}
+
+                            {/* Finance – Customer portal: only Finance Overview exists, so a simple
+                                direct link (no dropdown/caret) instead of a single-item submenu. */}
+                            {!isTeamMember && userRole !== '0' && userRole !== '1' && (
+                            <li className="menu nav-item">
+                                <NavLink to="/finance">
+                                    {({ isActive }) => (
+                                        <button type="button" className={`${activeBtnClass(isActive)} nav-link group !flex !w-full`}>
+                                            <div className="flex items-center">
+                                                <IconMenuInvoice className={`${activeIconClass(isActive)} shrink-0`} />
+                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isActive)}`}>{t('finance')}</span>
+                                            </div>
+                                        </button>
+                                    )}
+                                </NavLink>
                             </li>
                             )}
 

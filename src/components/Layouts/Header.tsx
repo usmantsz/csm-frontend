@@ -865,54 +865,22 @@ const Header = () => {
                         </>
                     )}
                     
-                    {/* Customer Role Menu Items – mirrors what Sidebar.tsx shows for this role
-                        (Customers + Finance sections, since Sidebar's condition
-                        `!isTeamMember && userRole !== '0'` also matches 'customer') */}
+                    {/* Customer Role Menu Items – mirrors what Sidebar.tsx shows for this role.
+                        Customers section removed (Shop Owner only now, role '1') to match the
+                        Sidebar.tsx fix. Finance is a simple direct link (no dropdown) since
+                        Customer only has "Finance Overview" – "Shop Expenses" is Shop Owner ONLY (role '1'). */}
                     {(userRole === 'customer') && (
                         <>
-                            {/* Customers */}
+                            {/* Finance – single destination, no dropdown */}
                             <li className="menu nav-item relative">
-                                <button type="button" className="nav-link">
-                                    <div className="flex items-center">
-                                        <IconMenuUsers className="shrink-0" />
-                                        <span className="px-1" style={{ whiteSpace: "nowrap" }}>{t('customers')}</span>
-                                    </div>
-                                    <div className="right_arrow">
-                                        <IconCaretDown />
-                                    </div>
-                                </button>
-                                <ul className="sub-menu">
-                                    <li>
-                                        <NavLink to="/customerlist">{t('customer_list')}</NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink to="/addnewcustomer">{t('add_customer')}</NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink to="/customerbalance">{t('customer_balance')}</NavLink>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            {/* Finance */}
-                            <li className="menu nav-item relative">
-                                <button type="button" className="nav-link">
-                                    <div className="flex items-center">
-                                        <IconMenuInvoice className="shrink-0" />
-                                        <span className="px-1" style={{ whiteSpace: "nowrap" }}>{t('finance')}</span>
-                                    </div>
-                                    <div className="right_arrow">
-                                        <IconCaretDown />
-                                    </div>
-                                </button>
-                                <ul className="sub-menu">
-                                    <li>
-                                        <NavLink to="/finance">{t('finance_overview')}</NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink to="/expense-management">{t('shop_expenses')}</NavLink>
-                                    </li>
-                                </ul>
+                                <NavLink to="/finance">
+                                    <button type="button" className="nav-link">
+                                        <div className="flex items-center sub-menu">
+                                            <IconMenuInvoice className="shrink-0" />
+                                            <span className="px-1" style={{ whiteSpace: "nowrap" }}>{t('finance')}</span>
+                                        </div>
+                                    </button>
+                                </NavLink>
                             </li>
                         </>
                     )}
