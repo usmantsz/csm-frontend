@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setPageTitle } from "../../store/themeConfigSlice";
 import { Notification } from './../../helperComponents/Notification';
 import { ServerSetting } from './../../helperComponents/ServerSetting';
 import { useAuthToken } from './../../Hooks/useAuthToken';
 import { useNavigate } from "react-router-dom";
 import IconArrowLeft from '../../components/Icon/IconArrowLeft';
+
 interface SubscriptionForm {
     subName: string;
     subDescription: string;
@@ -23,6 +26,7 @@ interface FormErrors {
 
 const AddNewSubscription = () => {
     const { t } = useTranslation();
+    const dispatch = useDispatch();
     const { token } = useAuthToken();
     const navigate = useNavigate();
     const filedsName = {
@@ -36,6 +40,10 @@ const AddNewSubscription = () => {
     const [formData, setFormData] = useState<SubscriptionForm>(filedsName);
 
     const [errors, setErrors] = useState<FormErrors>({});
+
+    useEffect(() => {
+        dispatch(setPageTitle(t('add_new_subscription_page')));
+    }, [dispatch, t]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -131,6 +139,10 @@ const AddNewSubscription = () => {
             </div>
 
             <div className="rounded-2xl border border-[#ebedf2] bg-white dark:bg-black dark:border-[#191e3a] p-6 shadow-sm">
+            <div className="mb-5 pb-4 border-b border-[#ebedf2] dark:border-[#191e3a]">
+                <h2 className="text-xl font-semibold text-stone-800 dark:text-white">{t('add_new_subscription_page')}</h2>
+                <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">{t('add_new_subscription_desc')}</p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {renderInputField("subName", t('form_subscription_name'), "text", t('form_subscription_name'))}
                 {renderInputField("timeDuration", t('form_duration_months'), "number", t('form_duration_placeholder'))}

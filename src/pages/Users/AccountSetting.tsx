@@ -337,10 +337,10 @@ const AccountSetting = () => {
                                         />
                                         <label
                                             htmlFor="profileImage"
-                                            className="absolute bottom-0 right-0 md:right-4 bg-primary text-white rounded-full p-2 cursor-pointer hover:bg-primary-600 transition-colors"
+                                            className="absolute bottom-0 right-0 md:right-4 flex items-center justify-center bg-primary text-white rounded-full p-2 cursor-pointer hover:bg-primary-600 transition-colors"
                                             title={t('change_profile_picture')}
                                         >
-                                            <IconCamera className="w-4 h-4" />
+                                            <IconCamera className="w-5 h-5 shrink-0 text-white" duotone={false} />
                                         </label>
                                         <input
                                             id="profileImage"

@@ -102,14 +102,6 @@ const PesticideShopList = () => {
                         </span>
                         <h2 className={sectionHeading}>{t('pesticide_shop_list_page')}</h2>
                     </div>
-                    <button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 rounded-2xl bg-primary-light px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary-light/70 dark:bg-primary/20 dark:text-primary-light dark:hover:bg-primary/30"
-                    >
-                        <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
-                        {t('back')}
-                    </button>
                 </div>
 
                 {loading ? (

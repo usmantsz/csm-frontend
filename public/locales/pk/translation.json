@@ -248,6 +248,8 @@
   "select_subscription": "سبسکرپشن منتخب کریں",
   "update": "اپڈیٹ کریں",
 
+  "add_new_subscription_page": "نئی سبسکرپشن شامل کریں",
+  "add_new_subscription_desc": "نئی سبسکرپشن پلان بنائیں",
   "edit_subscription": "سبسکرپشن میں ترمیم",
   "update_plan_details": "نیچے پلان کی تفصیلات اپڈیٹ کریں",
   "subscription_name": "سبسکرپشن کا نام",

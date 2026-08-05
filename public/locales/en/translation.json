@@ -542,7 +542,8 @@
     "validation_duration_positive": "Duration must be a positive number.",
 
 
-
+  "add_new_subscription_page": "Add New Subscription",
+"add_new_subscription_desc": "Create a new subscription plan",
   "edit_subscription": "Edit Subscription",
   "update_plan_details": "Update plan details below",
   "subscription_name": "Subscription Name",
