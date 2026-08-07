@@ -86,7 +86,7 @@ const EditPosSubscription = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between gap-4 pb-5 mb-6 border-b border-primary-100 dark:border-primary-900/30">
                     <div className="flex items-center gap-3 min-w-0">
-                        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-50 dark:bg-primary-900/30 text-2xl">
+                        <span className="inline-flex h-12 bg-shadow-lg shadow-gray-600/40 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-50 dark:bg-primary-900/30 text-2xl">
                             📋
                         </span>
                         <div className="min-w-0">

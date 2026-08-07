@@ -10,7 +10,7 @@ import { Notification } from './../../helperComponents/Notification';
 import { useAuthToken } from './../../Hooks/useAuthToken';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import TableCard from './../../components/Agricultural/TableCard';
-import IconEye from '../../components/Icon/IconEye';
+import { FaEye } from 'react-icons/fa';
 import IconShop from '../../components/Icon/Menu/IconMenuShop';
 import IconArrowLeft from '../../components/Icon/IconArrowLeft';
 
@@ -135,115 +135,118 @@ const Shop = () => {
     };
 
     const columns = [
-    {
-        accessor: 'shopBillImageTop',
-        title: t('image'),
-        textAlignment: 'center',
-        render: ({ shopBillImageTop }: Shop) => (
-            <div className="flex items-center justify-center">
-                {shopBillImageTop ? (
-                    <img
-                        src={`${ServerSetting.serUrl}/shop/${shopBillImageTop}`}
-                        className="h-10 w-10 rounded-full object-cover border-2 border-primary-200"
-                        alt="Shop"
-                        onError={(e: any) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                        }}
-                    />
-                ) : null}
-                <div
-                    className="h-10 w-10 rounded-full border-2 border-white shadow-md ring-1 ring-gray-100 bg-white dark:bg-primary-900/20 dark:border-primary-900/40 dark:shadow-none dark:ring-0 flex items-center justify-center"
-                    style={{ display: shopBillImageTop ? 'none' : 'flex' }}
-                >
-                    <IconShop className="w-5 h-5 text-primary-600" />
+        {
+            accessor: 'shopBillImageTop',
+            title: t('image'),
+            textAlignment: 'center',
+            render: ({ shopBillImageTop }: Shop) => (
+                <div className="flex items-center justify-center">
+                    {shopBillImageTop ? (
+                        <img
+                            src={`${ServerSetting.serUrl}/shop/${shopBillImageTop}`}
+                            className="h-10 w-10 rounded-full object-cover border-2 border-primary-200"
+                            alt="Shop"
+                            onError={(e: any) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                            }}
+                        />
+                    ) : null}
+                    <div
+                        className="h-10 w-10 rounded-full border-2 border-primary-200 bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center"
+                        style={{ display: shopBillImageTop ? 'none' : 'flex' }}
+                    >
+                        <IconShop className="w-5 h-5 text-primary-600" />
+                    </div>
                 </div>
-            </div>
-        ),
-    },
-    {
-        accessor: 'shopName',
-        title: t('shop_name'),
-        sortable: true,
-        textAlignment: 'left',
-        render: ({ shopName }: Shop) => (
-            <div className="font-semibold text-primary-600 dark:text-primary-400 truncate max-w-[180px]" title={shopName}>
-                {shopName || '-'}
-            </div>
-        ),
-    },
-    {
-        accessor: 'shopRegistrationNumber',
-        title: t('registration_number'),
-        sortable: true,
-        textAlignment: 'center',
-        render: ({ shopRegistrationNumber }: Shop) => (
-            <span className="font-mono text-sm">{shopRegistrationNumber || '-'}</span>
-        ),
-    },
-    {
-        accessor: 'shopNumber',
-        title: t('phone_number'),
-        sortable: true,
-        textAlignment: 'center',
-        render: ({ shopNumber }: Shop) => (
-            <span className="font-mono">{shopNumber || '-'}</span>
-        ),
-    },
-    {
-        accessor: 'shopCity',
-        title: t('city'),
-        sortable: true,
-        textAlignment: 'left',
-        render: ({ shopCity, shopProvince }: Shop) => (
-            <div>
-                <div className="font-medium">{shopCity || '-'}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">{shopProvince || ''}</div>
-            </div>
-        ),
-    },
-    {
-        accessor: 'shopStatus',
-        title: t('status'),
-        sortable: true,
-        textAlignment: 'center',
-        render: ({ shopStatus }: Shop) => {
-            const isActive = String(shopStatus) === '0';
-            return (
-                <span className={`badge ${isActive ? 'badge-outline-success' : 'badge-outline-danger'}`}>
-                    {isActive ? t('active') : t('inactive')}
-                </span>
-            );
+            ),
         },
-    },
-    {
-        accessor: 'createdAt',
-        title: t('created_date'),
-        sortable: true,
-        textAlignment: 'center',
-        render: ({ createdAt }: Shop) => (
-            <span className="text-sm">{formatDate(createdAt)}</span>
-        ),
-    },
-    {
-        accessor: 'actions',
-        title: t('actions'),
-        textAlignment: 'center',
-        render: (shop: Shop) => (
-            <div className="flex items-center justify-center gap-2">
-                <button
-                    type="button"
-                    onClick={() => handleViewShop(shop)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
-                    title={t('view_shop_details')}
+        {
+            accessor: 'shopName',
+            title: t('shop_name'),
+            sortable: true,
+            textAlignment: 'left',
+            render: ({ shopName }: Shop) => (
+                <div className="font-semibold text-primary-600 dark:text-primary-400">
+                    {shopName || '-'}
+                </div>
+            ),
+        },
+        {
+            accessor: 'shopRegistrationNumber',
+            title: t('registration_number'),
+            sortable: true,
+            textAlignment: 'center',
+            render: ({ shopRegistrationNumber }: Shop) => (
+                <span className="font-mono text-sm" dir="ltr">{shopRegistrationNumber || '-'}</span>
+            ),
+        },
+        {
+            accessor: 'shopNumber',
+            title: t('phone_number'),
+            sortable: true,
+            textAlignment: 'center',
+            render: ({ shopNumber }: Shop) => (
+                <span className="font-mono" dir="ltr">{shopNumber || '-'}</span>
+            ),
+        },
+        {
+            accessor: 'shopCity',
+            title: t('city'),
+            sortable: true,
+            textAlignment: 'left',
+            render: ({ shopCity, shopProvince }: Shop) => (
+                <div>
+                    <div className="font-medium">{shopCity || '-'}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{shopProvince || ''}</div>
+                </div>
+            ),
+        },
+        {
+            accessor: 'shopStatus',
+            title: t('status'),
+            sortable: true,
+            textAlignment: 'center',
+            render: ({ shopStatus }: Shop) => (
+                <span
+                    className={`badge ${
+                        shopStatus === '0' || shopStatus === 0
+                            ? 'badge-outline-success'
+                            : 'badge-outline-danger'
+                    }`}
                 >
-                    <IconEye className="w-5 h-5 text-white" duotone={false} />
-                    {t('view')}
-                </button>
-            </div>
-        ),
-    },
-];
+                    {shopStatus === '0' || shopStatus === 0 ? t('active') : t('inactive')}
+                </span>
+            ),
+        },
+        {
+            accessor: 'createdAt',
+            title: t('created_date'),
+            sortable: true,
+            textAlignment: 'center',
+            render: ({ createdAt }: Shop) => (
+                <span className="text-sm">{formatDate(createdAt)}</span>
+            ),
+        },
+        {
+            accessor: 'actions',
+            title: t('actions'),
+            textAlignment: 'center',
+            render: (shop: Shop) => (
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={() => handleViewShop(shop)}
+                        className="btn btn-sm btn-primary flex items-center gap-2"
+                        title={t('view_shop_details')}
+                    >
+                        <FaEye className="w-4 h-4" />
+                        {t('view')}
+                    </button>
+                </div>
+            ),
+        },
+    ];
 
     return (
         <div>
@@ -265,11 +268,12 @@ const Shop = () => {
                 searchValue={search}
                 onSearchChange={setSearch}
                 searchPlaceholder={t('search_shop_placeholder')}
+                className="shadow-lg hover:shadow-xl transition-shadow"
                 actions={
                     <button
                         type="button"
                         onClick={() => navigate('/dashboard')}
-                        className="flex items-center gap-2 rounded-2xl bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-300 dark:hover:bg-primary-900/50"
+                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
                     >
                         <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                         {t('back_to_dashboard')}
