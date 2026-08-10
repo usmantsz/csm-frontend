@@ -475,7 +475,8 @@ const CustomerList = () => {
 
         return (
         <div className="min-h-screen">
-            <button
+            <div className='flex justify-end'>
+                <button
                             type="button"
                             onClick={() => navigate('/dashboard')}
                             className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
@@ -483,6 +484,8 @@ const CustomerList = () => {
                             <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                             {t('back_to_dashboard')}
             </button>
+            </div>
+            
             {/* Customer Table */}
             <div className="panel mt-4 bg-white dark:bg-[#0e1726] rounded-xl border border-gray-300 dark:border-white/10 shadow-sm p-4 sm:p-5">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
@@ -531,12 +534,12 @@ const CustomerList = () => {
                         )}
 
                         <Link
-                            to="/addnewcustomer"
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0e1726] text-white font-medium hover:bg-[#171f2f] transition whitespace-nowrap"
-                        >
-                            <IconPlus className="w-4 h-4" />
-                            {t('add_new_customer_btn')}
-                        </Link>
+    to="/addnewcustomer"
+    className="inline-flex items-center gap-2 rounded-2xl bg-[#16a34a] hover:bg-[#15803d] active:bg-[#166534] px-4 py-2 text-sm font-semibold text-white border-0 shadow-sm shadow-[#16a34a]/20 transition-colors"
+>
+    <IconPlus className="w-4 h-4" />
+    {t('add_new_customer_btn')}
+</Link>
                     </div>
                 </div>
 

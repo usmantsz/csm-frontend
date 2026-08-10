@@ -502,11 +502,11 @@ const CustomerBalance = () => {
             <div className='mb-3 flex justify-end'>
                 
                 <button
-                    onClick={() => navigate('/customerlist')}
-                    className="flex justify-right items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition whitespace-nowrap"
-                >
-                    ← {t('back_to_customer_list')}
-                </button>
+    onClick={() => navigate('/customerlist')}
+                            className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+>
+    ← {t('back_to_customer_list')}
+</button>
             </div>
 
             {/* Main Card */}
@@ -529,11 +529,11 @@ const CustomerBalance = () => {
                         </div>
 
                         <button
-                            onClick={addCustomer}
-                            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition whitespace-nowrap"
-                        >
-                            {t('add_new_customer')}
-                        </button>
+    onClick={addCustomer}
+    className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#16a34a] text-white font-medium hover:bg-[#15803d] transition whitespace-nowrap"
+>
+    {t('add_new_customer')}
+</button>
                     </div>
                 </div>
 

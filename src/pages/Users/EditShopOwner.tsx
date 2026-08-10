@@ -614,12 +614,12 @@ const EditShopOwner = () => {
         });
     }, [availableCrops, cropSearchQuery, cropTypeFilter]);
 
-    // ---- Shared style tokens (primary/green — matches the header/footer) ----
-    const cardWrapClass = 'border border-primary-200 dark:border-primary-800 rounded-2xl p-5 sm:p-6 bg-white dark:bg-gray-900/60';
-    const btnPrimary = 'btn rounded-xl !bg-primary !border-primary !text-white hover:!bg-primary/90 dark:!bg-primary dark:!border-primary dark:!text-white dark:hover:!bg-primary/90';
-    const btnOutlinePrimary = 'btn rounded-xl !border-primary !text-primary hover:!bg-primary/90 hover:!text-white dark:!border-primary-light dark:!text-primary-light dark:hover:!bg-primary-light dark:hover:!text-white';
-    const btnOutlineSecondary = 'btn rounded-xl !border-primary-200 !text-gray-600 hover:!bg-primary-50 hover:!text-gray-900 dark:!border-primary-800 dark:!text-gray-300 dark:hover:!bg-white/5';
-    const inputFocus = 'focus:!border-primary dark:focus:!border-primary-light';
+    // ---- Shared style tokens (normal, matches other admin pages) ----
+   const btnPrimary = 'btn btn-primary rounded-xl';
+   const cardWrapClass = 'border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-5 sm:p-6 bg-white dark:bg-black';
+    const btnOutlinePrimary = 'btn btn-outline-primary rounded-xl';
+    const btnOutlineSecondary = 'btn btn-outline-secondary rounded-xl';
+const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] rounded-xl';    const inputFocus = '';
 
     if (loading) {
         return (
@@ -630,8 +630,7 @@ const EditShopOwner = () => {
     }
 
     return (
-        <div className="rounded-2xl border border-primary-200 dark:border-primary-800 bg-white dark:bg-gray-900/85 p-5 sm:p-6 relative overflow-hidden shadow-sm">
-            <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-primary-light to-primary" />
+        <div className="rounded-2xl border border-[#ebedf2] dark:border-[#191e3a] bg-white dark:bg-black p-5 sm:p-6 relative overflow-hidden shadow-sm">
 
             <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
                 <h5 className="font-bold text-lg text-gray-900 dark:text-white truncate">Edit Shop Owner</h5>
@@ -640,7 +639,7 @@ const EditShopOwner = () => {
                 </Link>
             </div>
 
-            <ul className="flex font-semibold gap-1 border-b border-primary-200 dark:border-primary-800 mb-5 overflow-x-auto">
+            <ul className="flex font-semibold gap-1 border-b border-[#ebedf2] dark:border-[#191e3a] mb-5 overflow-x-auto">
                 <li>
                     <button
                         type="button"
@@ -715,7 +714,7 @@ const EditShopOwner = () => {
                                 <img
                                     src={userProfilePreview || 'https://static-00.iconduck.com/assets.00/user-2-account-icon-1024x1022-juiy5a5b.png'}
                                     alt="Profile"
-                                    className="w-24 h-24 mx-auto rounded-full object-cover border-2 border-primary-200 dark:border-primary-800"
+                                    className="w-24 h-24 mx-auto rounded-full object-cover border-2 border-[#ebedf2] dark:border-[#191e3a]"
                                 />
                                 <span className="text-xs text-primary dark:text-primary-light mt-1 block">Change photo</span>
                             </label>
@@ -791,7 +790,7 @@ const EditShopOwner = () => {
                                         <option value="2">Deleted</option>
                                     </select>
                                 ) : (
-                                    <div className="form-input bg-primary-50 dark:bg-white/5 cursor-not-allowed">
+                                    <div className="form-input bg-gray-50 dark:bg-white/5 cursor-not-allowed">
                                         {userForm.userStatus === '1' ? 'Active' : userForm.userStatus === '0' ? 'Blocked' : 'Deleted'}
                                     </div>
                                 )}
@@ -834,7 +833,7 @@ const EditShopOwner = () => {
                                     type="button"
                                     onClick={saveUser}
                                     disabled={savingUser}
-                                    className={btnPrimary}
+                                    className={btnSaveGreen}
                                 >
                                     {savingUser ? 'Saving...' : 'Save User Details'}
                                 </button>
@@ -866,7 +865,7 @@ const EditShopOwner = () => {
                                         <img
                                             src={shopImagePreview || 'https://cdn.iconscout.com/icon/free/png-256/free-logo-icon-download-in-svg-png-gif-file-formats--emblem-label-round-arrows-elements-pack-sign-symbols-icons-2882300.png'}
                                             alt="Shop"
-                                            className="w-24 h-24 mx-auto rounded-lg object-cover border-2 border-primary-200 dark:border-primary-800"
+                                            className="w-24 h-24 mx-auto rounded-lg object-cover border-2 border-[#ebedf2] dark:border-[#191e3a]"
                                         />
                                         <span className="text-xs text-primary dark:text-primary-light mt-1 block">Change image</span>
                                     </label>
@@ -943,7 +942,7 @@ const EditShopOwner = () => {
                                             type="button"
                                             onClick={saveShop}
                                             disabled={savingShop}
-                                            className={btnPrimary}
+                                            className={btnSaveGreen}
                                         >
                                             {savingShop ? 'Saving...' : 'Save Shop Details'}
                                         </button>
@@ -963,7 +962,7 @@ const EditShopOwner = () => {
                             <span className="animate-[spin_2s_linear_infinite] border-4 border-[#f1f2f3] border-l-primary dark:border-l-primary-light rounded-full w-8 h-8 inline-block" />
                         </div>
                     ) : activeSubscription ? (
-                        <div className="mb-6 p-4 border border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-white/[0.03] rounded-2xl">
+                        <div className="mb-6 p-4 border border-[#ebedf2] dark:border-[#191e3a] bg-gray-50 dark:bg-white/[0.03] rounded-2xl">
                             <div className="flex flex-wrap justify-between items-start gap-3 mb-3">
                                 <h4 className="font-semibold text-gray-900 dark:text-white">Current Subscription</h4>
                                 {(activeSubscription.status === 'expired' || activeSubscription.isExpired) && (
@@ -1005,7 +1004,7 @@ const EditShopOwner = () => {
                         <h4 className="font-semibold mb-4 text-gray-900 dark:text-white">Change Subscription</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {subscriptions.map((sub: any) => (
-                                <div key={sub._id} className="flex flex-col min-w-0 border border-primary-200 dark:border-primary-800 rounded-2xl p-4 bg-white dark:bg-gray-900/40 transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                                <div key={sub._id} className="flex flex-col min-w-0 border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-4 bg-white dark:bg-black transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
                                     <div className="flex items-start justify-between gap-2 mb-3">
                                         <h5 className="font-semibold text-gray-900 dark:text-white truncate" title={sub.subName}>{sub.subName}</h5>
                                         <span className="shrink-0 whitespace-nowrap inline-flex items-center rounded-lg bg-primary-light dark:bg-primary/20 px-2.5 py-1 text-sm font-bold text-primary dark:text-primary-light">
@@ -1058,7 +1057,7 @@ const EditShopOwner = () => {
                                 ) : assignedCrops.length > 0 ? (
                                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                         {assignedCrops.map((crop: any) => (
-                                            <div key={crop._id} className="min-w-0 border border-primary-200 dark:border-primary-800 rounded-2xl p-3 text-center relative bg-white dark:bg-gray-900/40">
+                                            <div key={crop._id} className="min-w-0 border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-3 text-center relative bg-white dark:bg-black">
                                                 <img
                                                     src={`${ServerSetting.serUrl}/crop/${crop.cropImage}`}
                                                     alt={crop.cropName}
@@ -1111,10 +1110,10 @@ const EditShopOwner = () => {
                                             <div
                                                 key={crop._id}
                                                 onClick={() => toggleCropSelection(crop._id)}
-                                                className={`min-w-0 border rounded-2xl p-3 text-center cursor-pointer transition-all duration-200 bg-white dark:bg-gray-900/40 ${
+                                                className={`min-w-0 border rounded-2xl p-3 text-center cursor-pointer transition-all duration-200 bg-white dark:bg-black ${
                                                     selectedCropsToAdd.includes(crop._id)
                                                         ? 'border-primary dark:border-primary-light shadow-lg scale-105'
-                                                        : 'border-primary-200 dark:border-primary-800'
+                                                        : 'border-[#ebedf2] dark:border-[#191e3a]'
                                                 }`}
                                             >
                                                 <img
@@ -1150,7 +1149,7 @@ const EditShopOwner = () => {
             {/* Payment details popup for Renew / Subscribe */}
             {showPaymentModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
-                    <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl border border-primary-200 dark:border-primary-800 shadow-xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
+                    <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl border border-[#ebedf2] dark:border-[#191e3a] shadow-xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
                         <h5 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
                             {paymentModalType === 'renew' ? 'Renew Subscription – Payment Details' : 'New Subscription – Payment Details'}
                         </h5>

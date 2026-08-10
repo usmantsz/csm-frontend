@@ -381,12 +381,12 @@ const ConnectionsPanel = ({ targetType, targetLabel }: Props) => {
                     <h2 className="text-lg font-bold text-gray-800 dark:text-white">{t('connect_with_target', { label: targetLabel })}</h2>
                 </div>
                 <button
-                    type="button"
-                    onClick={() => { setModalOpen(true); setCnic(''); setLookupResult(null); setError(''); }}
-                    className="btn bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white border-0 px-5 py-2.5 rounded-xl font-medium shadow-sm shadow-emerald-600/20 transition-colors"
-                >
-                    {t('add_new')}
-                </button>
+    type="button"
+    onClick={() => { setModalOpen(true); setCnic(''); setLookupResult(null); setError(''); }}
+    className="btn bg-[#16a34a] hover:bg-[#15803d] active:bg-[#166534] text-white border-0 px-5 py-2.5 rounded-xl font-medium shadow-sm shadow-[#16a34a]/20 transition-colors"
+>
+    {t('add_new')}
+</button>
             </div>
 
             {blockedList.length > 0 && (

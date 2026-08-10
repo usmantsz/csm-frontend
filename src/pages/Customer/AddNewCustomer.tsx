@@ -274,6 +274,7 @@ const AddNewCustomer: React.FC = () => {
                 }
             `}</style>
             {/* Back to Customer List - outside the card, top left */}
+            <div className="flex justify-end"> 
             <button
                             type="button"
                             onClick={() => navigate('/customerlist')}
@@ -282,6 +283,8 @@ const AddNewCustomer: React.FC = () => {
                             <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                             {t('back_to_customer_list')}
             </button>
+            </div>
+            
 
             {/* Form Card */}
             <div className="rounded-xl mt-4 bg-white dark:bg-[#0e1726] border border-gray-300 dark:border-white/10 shadow-sm p-6 sm:p-8">

@@ -231,6 +231,36 @@ const Sidebar = () => {
         overflow: hidden !important;
     }
 
+    /* ---- Sub-menu (dropdown) link active/click state ----
+       Previously these links only had "text-gray-500" with no explicit
+       active-state color, so in dark mode the text stayed gray even after
+       being clicked/selected. Now: green in light mode, white in dark mode. */
+    .sidebar .sub-menu li a.active,
+    .dark .sidebar .sub-menu li a.active {
+        color: #16a34a !important;
+        font-weight: 600 !important;
+    }
+    .sidebar .sub-menu li a:hover,
+    .dark .sidebar .sub-menu li a:hover {
+        color: #16a34a !important;
+    }
+
+    /* ---- Dropdown TOGGLE buttons (Shop Owners, Team, Finance, Support, etc.) ----
+       These get a plain "active" class (not just "cs-active") when their
+       dropdown is open. Some global/template CSS was winning over our
+       Tailwind !text-white on this specific class, so force it here with
+       higher specificity for both light and dark mode. */
+    .sidebar .cs-sidebar-nav .nav-link.active,
+    .sidebar .cs-sidebar-nav .nav-link.active span,
+    .sidebar .cs-sidebar-nav .nav-link.active svg,
+    .sidebar .cs-sidebar-nav .nav-link.active .cs-caret,
+    .dark .sidebar .cs-sidebar-nav .nav-link.active,
+    .dark .sidebar .cs-sidebar-nav .nav-link.active span,
+    .dark .sidebar .cs-sidebar-nav .nav-link.active svg,
+    .dark .sidebar .cs-sidebar-nav .nav-link.active .cs-caret {
+        color: #ffffff !important;
+    }
+
     /* ---- Collapsed sidebar state: icons centered, equal green padding both sides ---- */
     @container cs-sidebar (max-width: 100px) {
         .cs-sidebar-nav {

@@ -418,7 +418,7 @@ const ShopExpenses = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
                     <div className="flex items-center gap-3">
                         <span style={iconCrisp} className="flex h-9 w-9 shadow-sm items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
-                            <IconCashBanknotes duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                            <IconCashBanknotes className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                         </span>
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('shop_expenses_management')}</h3>
@@ -429,7 +429,7 @@ const ShopExpenses = () => {
                     <button
                         type="button"
                         onClick={handleAddExpense}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition whitespace-nowrap w-fit shadow-sm"
+    className="inline-flex items-center gap-2 rounded-2xl bg-[#16a34a] hover:bg-[#15803d] active:bg-[#166534] px-4 py-2 text-sm font-semibold text-white border-0 shadow-sm shadow-[#16a34a]/20 transition-colors"
                     >
                         <IconPlus style={iconCrisp} className="w-4 h-4" />
                         {t('exp_add_expense') || 'Add Expense'}
@@ -441,7 +441,7 @@ const ShopExpenses = () => {
                         <div className="flex items-start justify-between mb-2">
                             <p className="text-sm text-gray-600 dark:text-gray-400">{t('exp_total_expenses') || 'Total Expenses'}</p>
                             <span style={iconCrisp} className="flex h-9 w-9 shadow-sm items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
-                                <IconCashBanknotes duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                <IconCashBanknotes className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </span>
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-emerald-300">
@@ -453,7 +453,7 @@ const ShopExpenses = () => {
                         <div className="flex items-start justify-between mb-2">
                             <p className="text-sm text-gray-600 dark:text-gray-400">{t('exp_today_expenses') || "Today's Expenses"}</p>
                             <span style={iconCrisp} className="flex h-9 w-9 shadow-sm items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
-                                <IconCalendar duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                <IconCalendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </span>
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-emerald-300">
@@ -465,7 +465,7 @@ const ShopExpenses = () => {
                         <div className="flex items-start justify-between mb-2">
                             <p className="text-sm text-gray-600 dark:text-gray-400">{t('exp_monthly_expenses') || 'Monthly Expenses'}</p>
                             <span style={iconCrisp} className="flex h-9 w-9 shadow-sm items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
-                                <IconCalendar duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                <IconCalendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </span>
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-emerald-300">
@@ -477,7 +477,7 @@ const ShopExpenses = () => {
                         <div className="flex items-start justify-between mb-2">
                             <p className="text-sm text-gray-600 dark:text-gray-400">{t('exp_total_records') || 'Total Records'}</p>
                             <span style={iconCrisp} className="flex h-9 w-9 shadow-sm items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/20 shrink-0">
-                                <IconCashBanknotes duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                <IconCashBanknotes className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </span>
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-emerald-300">
@@ -491,7 +491,7 @@ const ShopExpenses = () => {
 <div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-400 dark:border-white/10 shadow-md p-5 sm:p-6">
     <div className="flex items-center gap-3 mb-1">
         <span style={iconCrisp} className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10">
-            <IconCalendar duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <IconCalendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
         </span>
         <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('exp_history') || 'Expense History'}</h3>
@@ -635,7 +635,7 @@ const ShopExpenses = () => {
                     <td className="px-4 py-3 max-w-xs">
                         <div className="flex items-center gap-2">
                             <div style={iconCrisp} className="w-8 h-8 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-                                <IconCashBanknotes duotone={false} className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                <IconCashBanknotes className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </div>
                             <span
                                 className="text-gray-700 dark:text-gray-300 truncate"
