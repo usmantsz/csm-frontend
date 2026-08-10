@@ -518,6 +518,7 @@
     "add_new_crop_desc": "Create a new crop. Set name, type, and upload image.",
     "back_to_all_crops": "Back to All Crops",
     "edit_crop_page": "Edit Crop",
+    "edit_crop": "Edit Crop",
     "update_crop_details": "Update Crop Details",
     "loading": "Loading...",
     "updating": "Updating...",
