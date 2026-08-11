@@ -530,10 +530,10 @@ const CreateUserShopOwner = () => {
                             type="button"
                             onClick={() => toggleTabs(step.id)}
                             className={`inline-flex flex-1 sm:flex-none items-center justify-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${tabs === step.id
-                                ? 'bg-primary text-white shadow-md shadow-primary/30'
+                                ? '!bg-[#16a34a] text-white shadow-md shadow-green-600/30'
                                 : idx < stepIndex
-                                    ? 'bg-primary/10 text-primary dark:bg-primary/20 hover:bg-primary/20 dark:hover:bg-primary/30'
-                                    : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20'
+                                    ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-800/30'
+                                    : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20'
                                 }`}
                         >
                             <IconWrap><step.icon className="w-full h-full" /></IconWrap>
@@ -765,7 +765,7 @@ const CreateUserShopOwner = () => {
                                     <div className="sm:col-span-2 mt-2 flex justify-end">
                                         <button
                                             type="button"
-                                            className="flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary/90"
+                                            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 !bg-[#16a34a] hover:!bg-[#15803d]"
                                             onClick={handleSubmit}
                                         >
                                             Save &amp; Next →
@@ -901,7 +901,7 @@ const CreateUserShopOwner = () => {
                                     <div className="sm:col-span-2 mt-2 flex justify-end">
                                         <button
                                             type="button"
-                                            className="flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary/90"
+                                            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 !bg-[#16a34a] hover:!bg-[#15803d]"
                                             onClick={handleSubmitShop}
                                         >
                                             Save Shop Details &amp; Next →
@@ -946,7 +946,7 @@ const CreateUserShopOwner = () => {
                                             <div className="p-5 pt-3">
                                                 <button
                                                     type="button"
-                                                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+                                                    className="flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition-colors !bg-[#16a34a] hover:!bg-[#15803d]"
                                                     onClick={() => selectSubcription(sub._id, sub.timeDuration)}
                                                 >
                                                     Select Plan
@@ -1031,7 +1031,7 @@ const CreateUserShopOwner = () => {
                                         </p>
                                         <button
                                             type="button"
-                                            className="flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary/90"
+                                            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 !bg-[#16a34a] hover:!bg-[#15803d]"
                                             onClick={handleSubmitCrop}
                                         >
                                             Save &amp; Finish →

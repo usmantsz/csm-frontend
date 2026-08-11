@@ -441,7 +441,7 @@ const SubscriptionHistory = () => {
                 actions={
                     <div className="flex flex-wrap items-center gap-2">
                         {!isShopOwner && (
-                            <button type="button" onClick={() => { setShowFindByCNIC(true); setFindResult(null); setCnicInput(''); setShowChangePlanForm(false); }} className="btn btn-primary btn-sm rounded-xl">
+                            <button type="button" onClick={() => { setShowFindByCNIC(true); setFindResult(null); setCnicInput(''); setShowChangePlanForm(false); }} className="btn btn-sm rounded-xl shadow-none flex items-center !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]">
 <IconUser duotone={false} className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5" />                                {t('find_by_cnic')}
                             </button>
                         )}

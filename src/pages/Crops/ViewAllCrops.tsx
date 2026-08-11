@@ -203,7 +203,7 @@ const ViewAllCrops = () => {
                                     <button
                                         type="button"
                                         onClick={() => navigate(`/editcrop/${crop._id}`)}
-                                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+                                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#16a34a] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
                                     >
                                         <IconPencil className="w-5 h-5 shrink-0 text-white" />
                                         {t('edit_crop')}

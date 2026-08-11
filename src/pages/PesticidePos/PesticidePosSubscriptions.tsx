@@ -94,7 +94,11 @@ const PesticidePosSubscriptions = () => {
                         </span>
                         <h5 className={sectionHeading}>{t('pos_subscriptions_list_title')}</h5>
                     </div>
-                    <button type="button" className="btn btn-primary rounded-2xl" onClick={() => setShowAdd(!showAdd)}>
+                    <button
+                        type="button"
+                        className="inline-flex items-center gap-2 rounded-2xl bg-[#16a34a] hover:bg-[#15803d] active:bg-[#166534] px-4 py-2 text-sm font-semibold text-white border-0 shadow-sm shadow-[#16a34a]/20 transition-colors"
+                        onClick={() => setShowAdd(!showAdd)}
+                    >
                         {showAdd ? t('cancel') : t('btn_add_subscription')}
                     </button>
                 </div>

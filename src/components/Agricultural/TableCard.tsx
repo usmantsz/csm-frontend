@@ -70,7 +70,20 @@ const TableCard: React.FC<TableCardProps> = ({
     }));
 
     return (
-        <div className={`panel !rounded-[2rem] overflow-hidden ${className}`}>
+        <div className={`panel !rounded-[2rem] overflow-hidden commission-table-card ${className}`}>
+            <style>{`
+                .commission-table-card .mantine-Pagination-control[data-active="true"],
+                .commission-table-card .mantine-Pagination-control[data-active] {
+                    background-color: #16a34a !important;
+                    border-color: #16a34a !important;
+                    color: #fff !important;
+                }
+                .commission-table-card .mantine-Pagination-control[data-active="true"]:hover,
+                .commission-table-card .mantine-Pagination-control[data-active]:hover {
+                    background-color: #15803d !important;
+                    border-color: #15803d !important;
+                }
+            `}</style>
             {/* Header - light/white new design */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6 pb-5 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3">

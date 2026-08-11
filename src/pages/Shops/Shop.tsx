@@ -237,7 +237,7 @@ const Shop = () => {
                     <button
                         type="button"
                         onClick={() => handleViewShop(shop)}
-                        className="btn btn-sm flex items-center gap-2 !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]"
+                        className="btn btn-sm flex items-center gap-2 !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] !shadow-none"
                         title={t('view_shop_details')}
                     >
                         <FaEye className="w-4 h-4" />

@@ -344,18 +344,11 @@ const UserShopOwner = () => {
                 searchPlaceholder={t('search_placeholder')}
                 actions={
                     <>
-                        <button
-                            type="button"
-                            onClick={() => navigate('/dashboard')}
-                            className="flex items-center gap-2 rounded-2xl bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30"
-                        >
-                            <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
-                            {t('back_to_dashboard')}
-                        </button>
+
                         <Link
                             to="/creatshopowner"
                             onClick={addCustomer}
-                            className="flex items-center gap-2 rounded-2xl bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+                            className="inline-flex items-center gap-2 rounded-2xl bg-[#16a34a] hover:bg-[#15803d] active:bg-[#166534] px-4 py-2 text-sm font-semibold text-white border-0 shadow-sm shadow-[#16a34a]/20 transition-colors"
                         >
                             {t('add_shop_owner_btn')}
                         </Link>

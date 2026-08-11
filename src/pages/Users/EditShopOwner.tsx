@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { ServerSetting } from '../../helperComponents/ServerSetting';
 import { Notification } from '../../helperComponents/Notification';
@@ -51,12 +52,13 @@ const initialShopErrors = {
 };
 
 const EditShopOwner = () => {
+    const { t } = useTranslation();
     const { userId } = useParams<{ userId: string }>();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { token } = useAuthToken();
     const { userRole } = useUserPermissions();
-    
+
     // Only Admin (0) and Sub Admin (2) can change user status (Block/Delete)
     const canChangeStatus = canPerformRestrictedActions(userRole);
 
@@ -64,7 +66,7 @@ const EditShopOwner = () => {
     const [savingUser, setSavingUser] = useState(false);
     const [savingShop, setSavingShop] = useState(false);
     const [activeTab, setActiveTab] = useState<'user' | 'shop' | 'subscription' | 'crops'>('user');
-    
+
     // Subscription state
     const [activeSubscription, setActiveSubscription] = useState<any>(null);
     const [subscriptions, setSubscriptions] = useState<any[]>([]);
@@ -73,7 +75,7 @@ const EditShopOwner = () => {
     const [paymentModalType, setPaymentModalType] = useState<'renew' | 'subscribe'>('renew');
     const [paymentForm, setPaymentForm] = useState({ paymentMethod: 'bank', remarks: '', transactionId: '' });
     const [pendingSubscribe, setPendingSubscribe] = useState<{ subId: string; months: number } | null>(null);
-    
+
     // Crops state
     const [allCrops, setAllCrops] = useState<any[]>([]);
     const [assignedCrops, setAssignedCrops] = useState<any[]>([]);
@@ -99,8 +101,8 @@ const EditShopOwner = () => {
     const [hasShop, setHasShop] = useState(false);
 
     useEffect(() => {
-        dispatch(setPageTitle('Edit Shop Owner'));
-    }, [dispatch]);
+        dispatch(setPageTitle(t('edit_shop_owner')));
+    }, [dispatch, t]);
 
     useEffect(() => {
         console.log('[EditShopOwner] Mounted with userId:', userId, 'token:', !!token);
@@ -112,14 +114,14 @@ const EditShopOwner = () => {
             setLoading(false);
             if (!userId) {
                 console.error('[EditShopOwner] Missing userId');
-                Notification({ text: 'User ID is missing.', color: 'danger' });
+                Notification({ text: t('user_id_missing'), color: 'danger' });
             }
             if (!token) {
                 console.error('[EditShopOwner] Missing token');
             }
         }
     }, [userId, token]);
-    
+
     useEffect(() => {
         if (activeTab === 'subscription' && userId && token) {
             fetchActiveSubscription();
@@ -182,7 +184,7 @@ const EditShopOwner = () => {
                     setUserProfilePreview(`${ServerSetting.serUrl}/profile/${u.userProfileImage}`);
                 }
             } else {
-                Notification({ text: userRes.data.message || 'User not found.', color: 'danger' });
+                Notification({ text: userRes.data.message || t('user_not_found'), color: 'danger' });
                 navigate('/shopowner');
                 return;
             }
@@ -208,7 +210,7 @@ const EditShopOwner = () => {
             }
         } catch (err: any) {
             console.error('Fetch error:', err);
-            Notification({ text: err.response?.data?.message || 'Failed to load data.', color: 'danger' });
+            Notification({ text: err.response?.data?.message || t('failed_load_data'), color: 'danger' });
             navigate('/shopowner');
         } finally {
             setLoading(false);
@@ -224,7 +226,7 @@ const EditShopOwner = () => {
             setUserErrors((prev) => ({ ...prev, userProfileImage: '' }));
         } else {
             setUserForm((prev) => ({ ...prev, [name]: value }));
-            setUserErrors((prev) => ({ ...prev, [name]: value.trim() ? '' : 'This field is required' }));
+            setUserErrors((prev) => ({ ...prev, [name]: value.trim() ? '' : t('field_required') }));
         }
     };
 
@@ -237,32 +239,32 @@ const EditShopOwner = () => {
             setShopErrors((prev) => ({ ...prev, [name]: '' }));
         } else {
             setShopForm((prev) => ({ ...prev, [name]: value }));
-            setShopErrors((prev) => ({ ...prev, [name]: value.trim() ? '' : 'This field is required' }));
+            setShopErrors((prev) => ({ ...prev, [name]: value.trim() ? '' : t('field_required') }));
         }
     };
 
     const validateUser = () => {
         const e = { ...initialUserErrors };
-        if (!userForm.userNameF.trim()) e.userNameF = 'This field is required';
-        if (!userForm.userNameL.trim()) e.userNameL = 'This field is required';
-        if (!userForm.userPhone.trim()) e.userPhone = 'This field is required';
-        if (!userForm.userEmail.trim()) e.userEmail = 'This field is required';
-        if (!userForm.userCNIC.trim()) e.userCNIC = 'This field is required';
-        if (!userForm.userProvince.trim()) e.userProvince = 'This field is required';
-        if (!userForm.userCity.trim()) e.userCity = 'This field is required';
-        if (!userForm.userAdress.trim()) e.userAdress = 'This field is required';
+        if (!userForm.userNameF.trim()) e.userNameF = t('field_required');
+        if (!userForm.userNameL.trim()) e.userNameL = t('field_required');
+        if (!userForm.userPhone.trim()) e.userPhone = t('field_required');
+        if (!userForm.userEmail.trim()) e.userEmail = t('field_required');
+        if (!userForm.userCNIC.trim()) e.userCNIC = t('field_required');
+        if (!userForm.userProvince.trim()) e.userProvince = t('field_required');
+        if (!userForm.userCity.trim()) e.userCity = t('field_required');
+        if (!userForm.userAdress.trim()) e.userAdress = t('field_required');
         setUserErrors(e);
         return !Object.values(e).some((v) => v);
     };
 
     const validateShop = () => {
         const e = { ...initialShopErrors };
-        if (!shopForm.shopName.trim()) e.shopName = 'This field is required';
-        if (!shopForm.shopNumber.trim()) e.shopNumber = 'This field is required';
-        if (!shopForm.shopAddress.trim()) e.shopAddress = 'This field is required';
-        if (!shopForm.shopProvince.trim()) e.shopProvince = 'This field is required';
-        if (!shopForm.shopCity.trim()) e.shopCity = 'This field is required';
-        if (!shopForm.shopRegistrationNumber.trim()) e.shopRegistrationNumber = 'This field is required';
+        if (!shopForm.shopName.trim()) e.shopName = t('field_required');
+        if (!shopForm.shopNumber.trim()) e.shopNumber = t('field_required');
+        if (!shopForm.shopAddress.trim()) e.shopAddress = t('field_required');
+        if (!shopForm.shopProvince.trim()) e.shopProvince = t('field_required');
+        if (!shopForm.shopCity.trim()) e.shopCity = t('field_required');
+        if (!shopForm.shopRegistrationNumber.trim()) e.shopRegistrationNumber = t('field_required');
         setShopErrors(e);
         return !Object.values(e).some((v) => v);
     };
@@ -290,12 +292,12 @@ const EditShopOwner = () => {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
             });
             if (res.data.status === 200) {
-                showSuccess('User details updated successfully.');
+                showSuccess(t('user_updated_success'));
             } else {
-                showError(res.data.message || 'Failed to update user.');
+                showError(res.data.message || t('user_update_failed'));
             }
         } catch (err: any) {
-            showError(err.response?.data?.message || 'Error updating user.');
+            showError(err.response?.data?.message || t('user_update_error'));
         } finally {
             setSavingUser(false);
         }
@@ -321,13 +323,13 @@ const EditShopOwner = () => {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
             });
             if (res.data.status === 200) {
-                showSuccess('Shop details updated successfully.');
+                showSuccess(t('shop_updated_success'));
                 fetchUserAndShop();
             } else {
-                showError(res.data.message || 'Failed to update shop.');
+                showError(res.data.message || t('shop_update_failed'));
             }
         } catch (err: any) {
-            showError(err.response?.data?.message || 'Error updating shop.');
+            showError(err.response?.data?.message || t('shop_update_error'));
         } finally {
             setSavingShop(false);
         }
@@ -360,10 +362,9 @@ const EditShopOwner = () => {
             console.log('[EditShopOwner] Subscription response status:', res.data.status);
             console.log('[EditShopOwner] Subscription response data:', res.data.data);
             console.log('[EditShopOwner] Full response:', res.data);
-            
+
             if (res.data.status === 200 && res.data.data) {
                 const subData = res.data.data;
-                // Handle both formats: from subscriptions collection or from history
                 console.log('[EditShopOwner] Setting subscription data:', {
                     hasSubId: !!subData.subId,
                     subIdType: typeof subData.subId,
@@ -383,7 +384,6 @@ const EditShopOwner = () => {
             console.error('[EditShopOwner] Error fetching active subscription:', err);
             console.error('[EditShopOwner] Error response:', err.response?.data);
             console.error('[EditShopOwner] Error status:', err.response?.status);
-            // Don't set to null on error, keep previous value if any
             if (err.response?.status === 404) {
                 setActiveSubscription(null);
             }
@@ -409,13 +409,12 @@ const EditShopOwner = () => {
         if (!userId || !token) return;
         setLoadingCrops(true);
         try {
-            // Get subId from activeSubscription (could be subId or subIdHistory)
             const subId = activeSubscription?.subId?._id || activeSubscription?.subId || null;
             console.log('[EditShopOwner] Fetching assigned crops for userId:', userId, 'subId:', subId);
-            
+
             const res = await axios.post(`${ServerSetting.serUrl}/api/getAssignedCrops`, {
                 userId,
-                ...(subId && { subId }), // Only include subId if it exists
+                ...(subId && { subId }),
             }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -462,14 +461,14 @@ const EditShopOwner = () => {
                 transactionId: paymentForm.transactionId,
             }, { headers: { Authorization: `Bearer ${token}` } });
             if (res.data.status === 200 || res.data.status === 201) {
-                showSuccess('Subscription added successfully. Payment details recorded.');
+                showSuccess(t('subscription_added_success'));
                 await fetchActiveSubscription();
                 if (activeTab === 'crops') setTimeout(() => fetchAssignedCrops(), 1000);
             } else {
-                showError(res.data.message || 'Failed to add subscription.');
+                showError(res.data.message || t('subscription_add_failed'));
             }
         } catch (err: any) {
-            showError(err.response?.data?.message || 'Error adding subscription.');
+            showError(err.response?.data?.message || t('subscription_add_error'));
         } finally {
             setLoadingSubscription(false);
             setPendingSubscribe(null);
@@ -487,7 +486,7 @@ const EditShopOwner = () => {
         if (!userId || !token || !activeSubscription) return;
         const subId = activeSubscription.subId?._id || activeSubscription.subId;
         if (!subId) {
-            showError('Subscription ID not found. Cannot renew.');
+            showError(t('subscription_id_not_found_renew'));
             return;
         }
         const months = activeSubscription.subId?.timeDuration || activeSubscription.timeDuration || 1;
@@ -503,14 +502,14 @@ const EditShopOwner = () => {
                 transactionId: paymentForm.transactionId,
             }, { headers: { Authorization: `Bearer ${token}` } });
             if (res.data.status === 200) {
-                showSuccess('Subscription renewed successfully. Payment details recorded.');
+                showSuccess(t('subscription_renewed_success'));
                 await fetchActiveSubscription();
                 if (activeTab === 'crops') setTimeout(() => fetchAssignedCrops(), 1000);
             } else {
-                showError(res.data.message || 'Failed to renew subscription.');
+                showError(res.data.message || t('subscription_renew_failed'));
             }
         } catch (err: any) {
-            showError(err.response?.data?.message || 'Error renewing subscription.');
+            showError(err.response?.data?.message || t('subscription_renew_error'));
         } finally {
             setLoadingSubscription(false);
         }
@@ -525,10 +524,9 @@ const EditShopOwner = () => {
         if (!userId || !token) return;
         setLoadingCrops(true);
         try {
-            // Get subId from activeSubscription (could be subId or subIdHistory)
             const subId = activeSubscription?.subId?._id || activeSubscription?.subId;
             if (!subId) {
-                showError('Subscription ID not found. Please ensure user has an active subscription.');
+                showError(t('subscription_id_not_found_crops'));
                 setLoadingCrops(false);
                 return;
             }
@@ -542,14 +540,14 @@ const EditShopOwner = () => {
             });
             console.log('[EditShopOwner] Remove crops response:', res.data);
             if (res.data.status === 200) {
-                showSuccess('Crops removed successfully.');
+                showSuccess(t('crops_removed_success'));
                 await fetchAssignedCrops();
             } else {
-                showError(res.data.message || 'Failed to remove crops.');
+                showError(res.data.message || t('crops_remove_failed'));
             }
         } catch (err: any) {
             console.error('[EditShopOwner] Error removing crops:', err);
-            showError(err.response?.data?.message || 'Error removing crops.');
+            showError(err.response?.data?.message || t('crops_remove_error'));
         } finally {
             setLoadingCrops(false);
         }
@@ -557,13 +555,12 @@ const EditShopOwner = () => {
 
     const addCrops = async () => {
         if (!userId || !token || selectedCropsToAdd.length === 0) {
-            Notification({ text: 'Please select crops to add.', color: 'warning' });
+            Notification({ text: t('select_crops_to_add'), color: 'warning' });
             return;
         }
-        // Get subId from activeSubscription (could be subId or subIdHistory)
         const subId = activeSubscription?.subId?._id || activeSubscription?.subId;
         if (!subId) {
-            showError('Subscription ID not found. Please ensure user has an active subscription.');
+            showError(t('subscription_id_not_found_crops'));
             return;
         }
         setLoadingCrops(true);
@@ -578,15 +575,15 @@ const EditShopOwner = () => {
             });
             console.log('[EditShopOwner] Add crops response:', res.data);
             if (res.data.status === 200) {
-                showSuccess('Crops added successfully.');
+                showSuccess(t('crops_added_success'));
                 setSelectedCropsToAdd([]);
                 await fetchAssignedCrops();
             } else {
-                showError(res.data.message || 'Failed to add crops.');
+                showError(res.data.message || t('crops_add_failed'));
             }
         } catch (err: any) {
             console.error('[EditShopOwner] Error adding crops:', err);
-            showError(err.response?.data?.message || 'Error adding crops.');
+            showError(err.response?.data?.message || t('crops_add_error'));
         } finally {
             setLoadingCrops(false);
         }
@@ -615,11 +612,12 @@ const EditShopOwner = () => {
     }, [availableCrops, cropSearchQuery, cropTypeFilter]);
 
     // ---- Shared style tokens (normal, matches other admin pages) ----
-   const btnPrimary = 'btn btn-primary rounded-xl';
-   const cardWrapClass = 'border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-5 sm:p-6 bg-white dark:bg-black';
+    const btnPrimary = 'btn btn-primary rounded-xl';
+    const cardWrapClass = 'border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-5 sm:p-6 bg-white dark:bg-black';
     const btnOutlinePrimary = 'btn btn-outline-primary rounded-xl';
     const btnOutlineSecondary = 'btn btn-outline-secondary rounded-xl';
-const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] rounded-xl';    const inputFocus = '';
+    const btnSaveGreen = 'btn shadow-none flex items-center gap-2 !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] rounded-xl';
+    const inputFocus = '';
 
     if (loading) {
         return (
@@ -633,9 +631,9 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
         <div className="rounded-2xl border border-[#ebedf2] dark:border-[#191e3a] bg-white dark:bg-black p-5 sm:p-6 relative overflow-hidden shadow-sm">
 
             <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-                <h5 className="font-bold text-lg text-gray-900 dark:text-white truncate">Edit Shop Owner</h5>
+                <h5 className="font-bold text-2xl text-gray-900 dark:text-white truncate">{t('edit_shop_owner')}</h5>
                 <Link to="/shopowner" className={`${btnOutlineSecondary} btn-sm shrink-0`}>
-                    Back to List
+                    {t('back_to_list')}
                 </Link>
             </div>
 
@@ -648,7 +646,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                     >
                         <span className="flex items-center gap-2">
                             <IconHome className="w-5 h-5 shrink-0" />
-                            User Details
+                            {t('user_details')}
                         </span>
                     </button>
                 </li>
@@ -660,7 +658,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                     >
                         <span className="flex items-center gap-2">
                             <IconMenuShop className="w-5 h-5 shrink-0" />
-                            Shop Details
+                            {t('shop_details')}
                         </span>
                     </button>
                 </li>
@@ -675,7 +673,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                     >
                         <span className="flex items-center gap-2">
                             <IconUser className="w-5 h-5 shrink-0" />
-                            Subscription
+                            {t('subscription')}
                         </span>
                     </button>
                 </li>
@@ -690,7 +688,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                     >
                         <span className="flex items-center gap-2">
                             <IconPhone className="w-5 h-5 shrink-0" />
-                            Crops
+                            {t('crops')}
                         </span>
                     </button>
                 </li>
@@ -698,10 +696,10 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
 
             {activeTab === 'user' && (
                 <div className={cardWrapClass}>
-                    <h6 className="text-lg font-bold mb-5 text-gray-900 dark:text-white">General Information</h6>
+                    <h6 className="text-lg font-bold mb-5 text-gray-900 dark:text-white">{t('general_information')}</h6>
                     <div className="flex flex-col sm:flex-row gap-6">
                         <div className="w-full sm:w-32 shrink-0 mx-auto sm:mx-0">
-                            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 text-center sm:text-left">Profile Image</label>
+                            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 text-center sm:text-left">{t('profile_image')}</label>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -716,68 +714,68 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                     alt="Profile"
                                     className="w-24 h-24 mx-auto rounded-full object-cover border-2 border-[#ebedf2] dark:border-[#191e3a]"
                                 />
-                                <span className="text-xs text-primary dark:text-primary-light mt-1 block">Change photo</span>
+                                <span className="text-xs text-primary dark:text-primary-light mt-1 block">{t('change_photo')}</span>
                             </label>
                         </div>
                         <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="min-w-0">
-                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">First Name</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('first_name')}</label>
                                 <input
                                     name="userNameF"
                                     value={userForm.userNameF}
                                     onChange={handleUserChange}
                                     className={`form-input w-full ${inputFocus} ${userErrors.userNameF ? 'border-danger' : ''}`}
-                                    placeholder="First Name"
+                                    placeholder={t('first_name')}
                                 />
                                 {userErrors.userNameF && <p className="text-danger text-xs mt-1">{userErrors.userNameF}</p>}
                             </div>
                             <div className="min-w-0">
-                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Last Name</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('last_name')}</label>
                                 <input
                                     name="userNameL"
                                     value={userForm.userNameL}
                                     onChange={handleUserChange}
                                     className={`form-input w-full ${inputFocus} ${userErrors.userNameL ? 'border-danger' : ''}`}
-                                    placeholder="Last Name"
+                                    placeholder={t('last_name')}
                                 />
                                 {userErrors.userNameL && <p className="text-danger text-xs mt-1">{userErrors.userNameL}</p>}
                             </div>
                             <div className="min-w-0">
-                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Email</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('email')}</label>
                                 <input
                                     name="userEmail"
                                     type="email"
                                     value={userForm.userEmail}
                                     onChange={handleUserChange}
                                     className={`form-input w-full ${inputFocus} ${userErrors.userEmail ? 'border-danger' : ''}`}
-                                    placeholder="email@example.com"
+                                    placeholder={t('email_placeholder')}
                                 />
                                 {userErrors.userEmail && <p className="text-danger text-xs mt-1">{userErrors.userEmail}</p>}
                             </div>
                             <div className="min-w-0">
-                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Phone</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('phone')}</label>
                                 <input
                                     name="userPhone"
                                     value={userForm.userPhone}
                                     onChange={handleUserChange}
                                     className={`form-input w-full ${inputFocus} ${userErrors.userPhone ? 'border-danger' : ''}`}
-                                    placeholder="3000000000"
+                                    placeholder={t('phone_placeholder')}
                                 />
                                 {userErrors.userPhone && <p className="text-danger text-xs mt-1">{userErrors.userPhone}</p>}
                             </div>
                             <div className="min-w-0">
-                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">CNIC</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('cnic')}</label>
                                 <input
                                     name="userCNIC"
                                     value={userForm.userCNIC}
                                     onChange={handleUserChange}
                                     className={`form-input w-full ${inputFocus} ${userErrors.userCNIC ? 'border-danger' : ''}`}
-                                    placeholder="353200000000"
+                                    placeholder={t('cnic_placeholder')}
                                 />
                                 {userErrors.userCNIC && <p className="text-danger text-xs mt-1">{userErrors.userCNIC}</p>}
                             </div>
                             <div className="min-w-0">
-                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Status</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('status')}</label>
                                 {canChangeStatus ? (
                                     <select
                                         name="userStatus"
@@ -785,46 +783,46 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                         onChange={handleUserChange}
                                         className={`form-select w-full ${inputFocus}`}
                                     >
-                                        <option value="1">Active</option>
-                                        <option value="0">Blocked</option>
-                                        <option value="2">Deleted</option>
+                                        <option value="1">{t('active')}</option>
+                                        <option value="0">{t('blocked')}</option>
+                                        <option value="2">{t('deleted')}</option>
                                     </select>
                                 ) : (
                                     <div className="form-input bg-gray-50 dark:bg-white/5 cursor-not-allowed">
-                                        {userForm.userStatus === '1' ? 'Active' : userForm.userStatus === '0' ? 'Blocked' : 'Deleted'}
+                                        {userForm.userStatus === '1' ? t('active') : userForm.userStatus === '0' ? t('blocked') : t('deleted')}
                                     </div>
                                 )}
                             </div>
                             <div className="min-w-0">
-                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Province</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('province')}</label>
                                 <input
                                     name="userProvince"
                                     value={userForm.userProvince}
                                     onChange={handleUserChange}
                                     className={`form-input w-full ${inputFocus} ${userErrors.userProvince ? 'border-danger' : ''}`}
-                                    placeholder="Province"
+                                    placeholder={t('province')}
                                 />
                                 {userErrors.userProvince && <p className="text-danger text-xs mt-1">{userErrors.userProvince}</p>}
                             </div>
                             <div className="min-w-0">
-                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">City</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('city')}</label>
                                 <input
                                     name="userCity"
                                     value={userForm.userCity}
                                     onChange={handleUserChange}
                                     className={`form-input w-full ${inputFocus} ${userErrors.userCity ? 'border-danger' : ''}`}
-                                    placeholder="City"
+                                    placeholder={t('city')}
                                 />
                                 {userErrors.userCity && <p className="text-danger text-xs mt-1">{userErrors.userCity}</p>}
                             </div>
                             <div className="sm:col-span-2 min-w-0">
-                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Address</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('address')}</label>
                                 <input
                                     name="userAdress"
                                     value={userForm.userAdress}
                                     onChange={handleUserChange}
                                     className={`form-input w-full ${inputFocus} ${userErrors.userAdress ? 'border-danger' : ''}`}
-                                    placeholder="Full address"
+                                    placeholder={t('full_address_placeholder')}
                                 />
                                 {userErrors.userAdress && <p className="text-danger text-xs mt-1">{userErrors.userAdress}</p>}
                             </div>
@@ -835,7 +833,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                     disabled={savingUser}
                                     className={btnSaveGreen}
                                 >
-                                    {savingUser ? 'Saving...' : 'Save User Details'}
+                                    {savingUser ? t('saving') : t('save_user_details')}
                                 </button>
                             </div>
                         </div>
@@ -845,14 +843,14 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
 
             {activeTab === 'shop' && (
                 <div className={cardWrapClass}>
-                    <h6 className="text-lg font-bold mb-5 text-gray-900 dark:text-white">Shop Information</h6>
+                    <h6 className="text-lg font-bold mb-5 text-gray-900 dark:text-white">{t('shop_information')}</h6>
                     {!hasShop ? (
-                        <p className="text-gray-500 dark:text-gray-400">No shop linked to this user. Shop is created during initial registration.</p>
+                        <p className="text-gray-500 dark:text-gray-400">{t('no_shop_linked')}</p>
                     ) : (
                         <>
                             <div className="flex flex-col sm:flex-row gap-6">
                                 <div className="w-full sm:w-32 shrink-0 mx-auto sm:mx-0">
-                                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 text-center sm:text-left">Shop Bill / Logo</label>
+                                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 text-center sm:text-left">{t('shop_bill_logo')}</label>
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -867,73 +865,73 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                             alt="Shop"
                                             className="w-24 h-24 mx-auto rounded-lg object-cover border-2 border-[#ebedf2] dark:border-[#191e3a]"
                                         />
-                                        <span className="text-xs text-primary dark:text-primary-light mt-1 block">Change image</span>
+                                        <span className="text-xs text-primary dark:text-primary-light mt-1 block">{t('change_image')}</span>
                                     </label>
                                 </div>
                                 <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="min-w-0">
-                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Shop Name</label>
+                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('shop_name')}</label>
                                         <input
                                             name="shopName"
                                             value={shopForm.shopName}
                                             onChange={handleShopChange}
                                             className={`form-input w-full ${inputFocus} ${shopErrors.shopName ? 'border-danger' : ''}`}
-                                            placeholder="Shop Name"
+                                            placeholder={t('shop_name')}
                                         />
                                         {shopErrors.shopName && <p className="text-danger text-xs mt-1">{shopErrors.shopName}</p>}
                                     </div>
                                     <div className="min-w-0">
-                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Registration (License) No.</label>
+                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('registration_license_no')}</label>
                                         <input
                                             name="shopRegistrationNumber"
                                             value={shopForm.shopRegistrationNumber}
                                             onChange={handleShopChange}
                                             className={`form-input w-full ${inputFocus} ${shopErrors.shopRegistrationNumber ? 'border-danger' : ''}`}
-                                            placeholder="0000000"
+                                            placeholder={t('registration_placeholder')}
                                         />
                                         {shopErrors.shopRegistrationNumber && <p className="text-danger text-xs mt-1">{shopErrors.shopRegistrationNumber}</p>}
                                     </div>
                                     <div className="min-w-0">
-                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Phone</label>
+                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('phone')}</label>
                                         <input
                                             name="shopNumber"
                                             value={shopForm.shopNumber}
                                             onChange={handleShopChange}
                                             className={`form-input w-full ${inputFocus} ${shopErrors.shopNumber ? 'border-danger' : ''}`}
-                                            placeholder="3000000000"
+                                            placeholder={t('phone_placeholder')}
                                         />
                                         {shopErrors.shopNumber && <p className="text-danger text-xs mt-1">{shopErrors.shopNumber}</p>}
                                     </div>
                                     <div className="min-w-0">
-                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Province</label>
+                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('province')}</label>
                                         <input
                                             name="shopProvince"
                                             value={shopForm.shopProvince}
                                             onChange={handleShopChange}
                                             className={`form-input w-full ${inputFocus} ${shopErrors.shopProvince ? 'border-danger' : ''}`}
-                                            placeholder="Province"
+                                            placeholder={t('province')}
                                         />
                                         {shopErrors.shopProvince && <p className="text-danger text-xs mt-1">{shopErrors.shopProvince}</p>}
                                     </div>
                                     <div className="min-w-0">
-                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">City</label>
+                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('city')}</label>
                                         <input
                                             name="shopCity"
                                             value={shopForm.shopCity}
                                             onChange={handleShopChange}
                                             className={`form-input w-full ${inputFocus} ${shopErrors.shopCity ? 'border-danger' : ''}`}
-                                            placeholder="City"
+                                            placeholder={t('city')}
                                         />
                                         {shopErrors.shopCity && <p className="text-danger text-xs mt-1">{shopErrors.shopCity}</p>}
                                     </div>
                                     <div className="sm:col-span-2 min-w-0">
-                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Address</label>
+                                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">{t('address')}</label>
                                         <input
                                             name="shopAddress"
                                             value={shopForm.shopAddress}
                                             onChange={handleShopChange}
                                             className={`form-input w-full ${inputFocus} ${shopErrors.shopAddress ? 'border-danger' : ''}`}
-                                            placeholder="Shop address"
+                                            placeholder={t('shop_address_placeholder')}
                                         />
                                         {shopErrors.shopAddress && <p className="text-danger text-xs mt-1">{shopErrors.shopAddress}</p>}
                                     </div>
@@ -944,7 +942,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                             disabled={savingShop}
                                             className={btnSaveGreen}
                                         >
-                                            {savingShop ? 'Saving...' : 'Save Shop Details'}
+                                            {savingShop ? t('saving') : t('save_shop_details')}
                                         </button>
                                     </div>
                                 </div>
@@ -956,7 +954,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
 
             {activeTab === 'subscription' && (
                 <div className={cardWrapClass}>
-                    <h6 className="text-lg font-bold mb-5 text-gray-900 dark:text-white">Subscription Management</h6>
+                    <h6 className="text-lg font-bold mb-5 text-gray-900 dark:text-white">{t('subscription_management')}</h6>
                     {loadingSubscription ? (
                         <div className="flex justify-center py-8">
                             <span className="animate-[spin_2s_linear_infinite] border-4 border-[#f1f2f3] border-l-primary dark:border-l-primary-light rounded-full w-8 h-8 inline-block" />
@@ -964,7 +962,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                     ) : activeSubscription ? (
                         <div className="mb-6 p-4 border border-[#ebedf2] dark:border-[#191e3a] bg-gray-50 dark:bg-white/[0.03] rounded-2xl">
                             <div className="flex flex-wrap justify-between items-start gap-3 mb-3">
-                                <h4 className="font-semibold text-gray-900 dark:text-white">Current Subscription</h4>
+                                <h4 className="font-semibold text-gray-900 dark:text-white">{t('current_subscription')}</h4>
                                 {(activeSubscription.status === 'expired' || activeSubscription.isExpired) && (
                                     <button
                                         type="button"
@@ -972,55 +970,55 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                         disabled={loadingSubscription}
                                         className="btn btn-success btn-sm rounded-xl"
                                     >
-                                        {loadingSubscription ? 'Renewing...' : 'Renew & Activate'}
+                                        {loadingSubscription ? t('renewing') : t('renew_activate')}
                                     </button>
                                 )}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700 dark:text-gray-300">
-                                <p className="break-words"><strong>Plan:</strong> {activeSubscription.subId?.subName || activeSubscription.subNameHistory || 'N/A'}</p>
-                                <p className="break-words"><strong>Price:</strong> {activeSubscription.subId?.subPrice || activeSubscription.subPriceHistory || 'N/A'} PKR</p>
-                                <p className="break-words"><strong>Crop Limit:</strong> {activeSubscription.subId?.subCrop || 'N/A'}</p>
-                                <p><strong>Status:</strong> 
+                                <p className="break-words"><strong>{t('plan')}:</strong> {activeSubscription.subId?.subName || activeSubscription.subNameHistory || t('not_available')}</p>
+                                <p className="break-words"><strong>{t('price')}:</strong> {activeSubscription.subId?.subPrice || activeSubscription.subPriceHistory || t('not_available')} {t('pkr')}</p>
+                                <p className="break-words"><strong>{t('crop_limit')}:</strong> {activeSubscription.subId?.subCrop || t('not_available')}</p>
+                                <p><strong>{t('status')}:</strong>
                                     <span className={`badge ml-2 ${activeSubscription.status === 'active' && !activeSubscription.isExpired ? 'badge-outline-success' : 'badge-outline-danger'}`}>
-                                        {activeSubscription.status === 'active' && !activeSubscription.isExpired ? 'Active' : 'Expired'}
+                                        {activeSubscription.status === 'active' && !activeSubscription.isExpired ? t('active') : t('expired')}
                                     </span>
                                 </p>
-                                <p><strong>Start Date:</strong> {activeSubscription.startDate ? new Date(activeSubscription.startDate).toLocaleDateString() : 'N/A'}</p>
-                                <p><strong>Expire Date:</strong> {activeSubscription.expireDate ? new Date(activeSubscription.expireDate).toLocaleDateString() : 'N/A'}</p>
-                                {activeSubscription.timeDuration && <p><strong>Duration:</strong> {activeSubscription.timeDuration} months</p>}
+                                <p><strong>{t('start_date')}:</strong> {activeSubscription.startDate ? new Date(activeSubscription.startDate).toLocaleDateString() : t('not_available')}</p>
+                                <p><strong>{t('expire_date')}:</strong> {activeSubscription.expireDate ? new Date(activeSubscription.expireDate).toLocaleDateString() : t('not_available')}</p>
+                                {activeSubscription.timeDuration && <p><strong>{t('duration')}:</strong> {activeSubscription.timeDuration} {t('months')}</p>}
                             </div>
                             {(activeSubscription.status === 'expired' || activeSubscription.isExpired) && (
                                 <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
                                     <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                                        <strong>⚠️ Subscription Expired:</strong> This subscription has expired. Click "Renew & Activate" to reactivate it.
+                                        <strong>⚠️ {t('subscription_expired_title')}:</strong> {t('subscription_expired_text')}
                                     </p>
                                 </div>
                             )}
                         </div>
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400 mb-4">No subscription found for this user.</p>
+                        <p className="text-gray-500 dark:text-gray-400 mb-4">{t('no_subscription_found')}</p>
                     )}
                     <div className="mt-6">
-                        <h4 className="font-semibold mb-4 text-gray-900 dark:text-white">Change Subscription</h4>
+                        <h4 className="font-semibold mb-4 text-gray-900 dark:text-white">{t('change_subscription')}</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {subscriptions.map((sub: any) => (
                                 <div key={sub._id} className="flex flex-col min-w-0 border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-4 bg-white dark:bg-black transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
                                     <div className="flex items-start justify-between gap-2 mb-3">
                                         <h5 className="font-semibold text-gray-900 dark:text-white truncate" title={sub.subName}>{sub.subName}</h5>
                                         <span className="shrink-0 whitespace-nowrap inline-flex items-center rounded-lg bg-primary-light dark:bg-primary/20 px-2.5 py-1 text-sm font-bold text-primary dark:text-primary-light">
-                                            {sub.subPrice} PKR
+                                            {sub.subPrice} {t('pkr')}
                                         </span>
                                     </div>
                                     <div className="text-sm mb-3 text-gray-600 dark:text-gray-400 line-clamp-3" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(sub.subDescription || '') }} />
-                                    <p className="text-sm mb-2 text-gray-600 dark:text-gray-400">Crops: {sub.subCrop}</p>
-                                    {sub.timeDuration && <p className="text-sm mb-3 text-gray-600 dark:text-gray-400">Duration: {sub.timeDuration} months</p>}
+                                    <p className="text-sm mb-2 text-gray-600 dark:text-gray-400">{t('crops')}: {sub.subCrop}</p>
+                                    {sub.timeDuration && <p className="text-sm mb-3 text-gray-600 dark:text-gray-400">{t('duration')}: {sub.timeDuration} {t('months')}</p>}
                                     <button
                                         type="button"
                                         onClick={() => changeSubscription(sub._id, sub.timeDuration || 1)}
                                         disabled={loadingSubscription || (activeSubscription?.subId?._id === sub._id || activeSubscription?.subId === sub._id)}
                                         className={`${btnOutlinePrimary} w-full btn-sm mt-auto`}
                                     >
-                                        {loadingSubscription ? 'Processing...' : (activeSubscription?.subId?._id === sub._id || activeSubscription?.subId === sub._id) ? 'Current Plan' : 'Select Plan'}
+                                        {loadingSubscription ? t('processing') : (activeSubscription?.subId?._id === sub._id || activeSubscription?.subId === sub._id) ? t('current_plan') : t('select_plan')}
                                     </button>
                                 </div>
                             ))}
@@ -1031,10 +1029,10 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
 
             {activeTab === 'crops' && (
                 <div className={cardWrapClass}>
-                    <h6 className="text-lg font-bold mb-5 text-gray-900 dark:text-white">Crops Management</h6>
+                    <h6 className="text-lg font-bold mb-5 text-gray-900 dark:text-white">{t('crops_management')}</h6>
                     {!activeSubscription ? (
                         <div className="mb-4">
-                            <p className="text-gray-500 dark:text-gray-400 mb-2">No subscription found. Please activate a subscription first to manage crops.</p>
+                            <p className="text-gray-500 dark:text-gray-400 mb-2">{t('no_subscription_for_crops')}</p>
                             <button
                                 type="button"
                                 onClick={() => {
@@ -1043,13 +1041,13 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                 }}
                                 className={`${btnPrimary} btn-sm`}
                             >
-                                Go to Subscription Tab
+                                {t('go_to_subscription_tab')}
                             </button>
                         </div>
                     ) : (
                         <>
                             <div className="mb-6">
-                                <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Currently Assigned Crops ({assignedCrops.length})</h4>
+                                <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">{t('currently_assigned_crops')} ({assignedCrops.length})</h4>
                                 {loadingCrops ? (
                                     <div className="flex justify-center py-4">
                                         <span className="animate-[spin_2s_linear_infinite] border-4 border-[#f1f2f3] border-l-primary dark:border-l-primary-light rounded-full w-8 h-8 inline-block" />
@@ -1070,23 +1068,23 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                                     disabled={loadingCrops}
                                                     className="btn btn-outline-danger btn-sm rounded-xl mt-2 w-full"
                                                 >
-                                                    Remove
+                                                    {t('remove')}
                                                 </button>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-gray-500 dark:text-gray-400">No crops assigned yet.</p>
+                                    <p className="text-gray-500 dark:text-gray-400">{t('no_crops_assigned')}</p>
                                 )}
                             </div>
                             <div className="mt-6">
-                                <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Add New Crops</h4>
+                                <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">{t('add_new_crops')}</h4>
                                 <div className="flex flex-wrap items-center gap-3 mb-4">
                                     <div className="flex-1 min-w-[200px] relative">
                                         <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
                                         <input
                                             type="text"
-                                            placeholder="Search crops by name..."
+                                            placeholder={t('search_crops_placeholder')}
                                             value={cropSearchQuery}
                                             onChange={(e) => setCropSearchQuery(e.target.value)}
                                             className={`form-input pl-10 w-full ${inputFocus}`}
@@ -1103,7 +1101,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                             ))}
                                         </select>
                                     </div>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{filteredAvailableCrops.length} of {availableCrops.length} available</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{filteredAvailableCrops.length} {t('of')} {availableCrops.length} {t('available')}</span>
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                     {filteredAvailableCrops.map((crop: any) => (
@@ -1123,7 +1121,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                                 />
                                                 <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{crop.cropName}</p>
                                                 {selectedCropsToAdd.includes(crop._id) && (
-                                                    <span className="badge badge-success mt-1">Selected</span>
+                                                    <span className="badge badge-success mt-1">{t('selected')}</span>
                                                 )}
                                             </div>
                                     ))}
@@ -1136,7 +1134,7 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                                             disabled={loadingCrops}
                                             className={btnPrimary}
                                         >
-                                            {loadingCrops ? 'Adding...' : `Add ${selectedCropsToAdd.length} Crop(s)`}
+                                            {loadingCrops ? t('adding') : `${t('add_crops_button')} ${selectedCropsToAdd.length} ${t('crop_unit')}`}
                                         </button>
                                     </div>
                                 )}
@@ -1151,40 +1149,40 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
                     <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl border border-[#ebedf2] dark:border-[#191e3a] shadow-xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
                         <h5 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                            {paymentModalType === 'renew' ? 'Renew Subscription – Payment Details' : 'New Subscription – Payment Details'}
+                            {paymentModalType === 'renew' ? t('renew_subscription_payment_details') : t('new_subscription_payment_details')}
                         </h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                            Payment method, remarks aur transaction ID enter karein. Ye history mein record hoga.
+                            {t('payment_details_instructions')}
                         </p>
                         <div className="space-y-4">
                             <div>
-                                <label className="form-label text-gray-700 dark:text-gray-300">Payment Method</label>
+                                <label className="form-label text-gray-700 dark:text-gray-300">{t('payment_method')}</label>
                                 <select
                                     className={`form-select w-full ${inputFocus}`}
                                     value={paymentForm.paymentMethod}
                                     onChange={e => setPaymentForm(f => ({ ...f, paymentMethod: e.target.value }))}
                                 >
-                                    <option value="bank">Bank</option>
-                                    <option value="cash">Cash</option>
-                                    <option value="mobile_wallet">Mobile Wallet</option>
+                                    <option value="bank">{t('bank')}</option>
+                                    <option value="cash">{t('cash')}</option>
+                                    <option value="mobile_wallet">{t('mobile_wallet')}</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="form-label text-gray-700 dark:text-gray-300">Remarks</label>
+                                <label className="form-label text-gray-700 dark:text-gray-300">{t('remarks')}</label>
                                 <input
                                     type="text"
                                     className={`form-input w-full ${inputFocus}`}
-                                    placeholder="Remarks (optional)"
+                                    placeholder={t('remarks_placeholder')}
                                     value={paymentForm.remarks}
                                     onChange={e => setPaymentForm(f => ({ ...f, remarks: e.target.value }))}
                                 />
                             </div>
                             <div>
-                                <label className="form-label text-gray-700 dark:text-gray-300">Transaction ID</label>
+                                <label className="form-label text-gray-700 dark:text-gray-300">{t('transaction_id')}</label>
                                 <input
                                     type="text"
                                     className={`form-input w-full ${inputFocus}`}
-                                    placeholder="Transaction ID (optional)"
+                                    placeholder={t('transaction_id_placeholder')}
                                     value={paymentForm.transactionId}
                                     onChange={e => setPaymentForm(f => ({ ...f, transactionId: e.target.value }))}
                                 />
@@ -1192,10 +1190,10 @@ const btnSaveGreen = 'btn flex items-center gap-2 !bg-[#16a34a] !text-white !bor
                         </div>
                         <div className="flex flex-wrap gap-2 mt-6 justify-end">
                             <button type="button" className={`${btnOutlineSecondary} flex-1 sm:flex-none`} onClick={() => { setShowPaymentModal(false); setPendingSubscribe(null); }}>
-                                Cancel
+                                {t('cancel')}
                             </button>
                             <button type="button" className={`${btnPrimary} flex-1 sm:flex-none`} onClick={handlePaymentModalConfirm}>
-                                {paymentModalType === 'renew' ? 'Renew & Save' : 'Subscribe & Save'}
+                                {paymentModalType === 'renew' ? t('renew_save') : t('subscribe_save')}
                             </button>
                         </div>
                     </div>

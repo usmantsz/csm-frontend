@@ -261,6 +261,30 @@ const Sidebar = () => {
         color: #ffffff !important;
     }
 
+    /* ---- Dashboard link is NOT a dropdown toggle, so it must never pick up
+       the generic ".nav-link.active" white-text rule above. Force it black
+       in light mode / theme-dark text in dark mode, always, with higher
+       specificity than the rule above. ---- */
+    .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link,
+    .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link span,
+    .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.active,
+    .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.active span {
+        color: #000000 !important;
+    }
+    .dark .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link,
+    .dark .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link span,
+    .dark .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.active,
+    .dark .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.active span {
+        color: #e0e6ed !important;
+    }
+    /* But when Dashboard route itself is actually active (green pill / cs-active), text should be white */
+    .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.cs-active,
+    .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.cs-active span,
+    .dark .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.cs-active,
+    .dark .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.cs-active span {
+        color: #ffffff !important;
+    }
+
     /* ---- Collapsed sidebar state: icons centered, equal green padding both sides ---- */
     @container cs-sidebar (max-width: 100px) {
         .cs-sidebar-nav {
@@ -319,7 +343,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <NavLink to="/dashboard">
                                     {({ isActive }) => (
-                                        <button type="button" className={`${currentMenu === 'dashboard' ? 'active' : ''} ${activeBtnClass(isActive)} nav-link group !flex !w-full`} onClick={() => toggleMenu('dashboard')}>
+                                        <button type="button" className={`${activeBtnClass(isActive)} nav-link group !flex !w-full`}>
                                             <div className="flex items-center">
                                                 <IconMenuDashboard className={`${activeIconClass(isActive)} shrink-0`} />
                                                 <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isActive)}`}>{t('dashboard')}</span>
