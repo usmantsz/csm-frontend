@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 import { ServerSetting } from "./../../helperComponents/ServerSetting";
 import { useAuthToken } from "./../../Hooks/useAuthToken";
 import { useShopId } from "./../../Hooks/useShopId";
@@ -9,8 +10,6 @@ import { useDispatch } from "react-redux";
 import { setPageTitle } from "./../../store/themeConfigSlice";
 import FormField from "./../../components/Agricultural/FormField";
 import { showError, showSuccess, showLoading, closeAlert, confirmCreate } from "../../utils/sweetAlert";
-import IconArrowLeft from "../../components/Icon/IconArrowLeft";
-import PageHeader from "../../components/Agricultural/PageHeader";
 import IconCreditCard from "../../components/Icon/IconCreditCard";
 import IconUser from "../../components/Icon/IconUser";
 import IconPhone from "../../components/Icon/IconPhone";
@@ -46,6 +45,7 @@ interface DanaMandiOrderForm {
 }
 
 const AddDanaMandiOrder: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { token, user } = useAuthToken();
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ const AddDanaMandiOrder: React.FC = () => {
   const { userId, cropId } = useParams<{ userId: string; cropId: string }>();
 
   useEffect(() => {
-    dispatch(setPageTitle('Add Dana Mandi Order'));
+    dispatch(setPageTitle(t('create_new_dana_mandi_order')));
   }, [dispatch]);
 
   // Get shopId from URL (admin view), user object, or useShopId hook
@@ -102,9 +102,9 @@ const AddDanaMandiOrder: React.FC = () => {
   // ✅ Search Customer by CNIC - Check if customer exists in shop owner's shop
   const handleCnicBlur = async () => {
     if (!cnic || !cnic.trim()) return;
-    
+
     if (!userShopId) {
-      showError('Shop ID is missing. Please ensure you have a shop assigned.');
+      showError(t('shop_id_missing'));
       return;
     }
 
@@ -122,7 +122,7 @@ const AddDanaMandiOrder: React.FC = () => {
 
       if (shopCustomersResponse.data.status === 200) {
         const shopCustomers = shopCustomersResponse.data.data || [];
-        
+
         // Find customer by CNIC in shop's customers
         const foundCustomer = shopCustomers.find(
           (cus: any) => cus.cusCNIC?.toString().trim() === cnic.trim()
@@ -135,13 +135,13 @@ const AddDanaMandiOrder: React.FC = () => {
             setCustomerBalance(null);
             setFormData((prev) => ({ ...prev, danaMandiOrderCusId: "" }));
             showError(
-              "This customer has been deleted. Please contact admin to restore.",
-              "Customer Not Available"
+              t('customer_deleted_contact_admin_restore'),
+              t('customer_not_available')
             );
           } else {
             setCustomer(foundCustomer);
             setFormData((prev) => ({ ...prev, danaMandiOrderCusId: foundCustomer._id }));
-            showSuccess("Customer found successfully!");
+            showSuccess(t('customer_found_success'));
             // Fetch customer balance
             await fetchCustomerBalance(foundCustomer._id);
           }
@@ -150,15 +150,15 @@ const AddDanaMandiOrder: React.FC = () => {
           setCustomerBalance(null);
           setFormData((prev) => ({ ...prev, danaMandiOrderCusId: "" }));
           showError(
-            "Your shop has no customer registered with this CNIC number. Please register the customer first.",
-            "Customer Not Found"
+            t('shop_no_customer_with_cnic'),
+            t('customer_not_found')
           );
         }
       } else {
         setCustomer(null);
         setCustomerBalance(null);
         setFormData((prev) => ({ ...prev, danaMandiOrderCusId: "" }));
-        showError(shopCustomersResponse.data.message || "Error fetching shop customers.");
+        showError(shopCustomersResponse.data.message || t('error_fetch_customers'));
       }
     } catch (error: any) {
       console.error("Error checking customer:", error);
@@ -166,7 +166,7 @@ const AddDanaMandiOrder: React.FC = () => {
       setCustomerBalance(null);
       setFormData((prev) => ({ ...prev, danaMandiOrderCusId: "" }));
       showError(
-        error.response?.data?.message || "Error checking customer. Please try again."
+        error.response?.data?.message || t('error_checking_customer_retry')
       );
     } finally {
       setCheckingCustomer(false);
@@ -268,16 +268,16 @@ const AddDanaMandiOrder: React.FC = () => {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof DanaMandiOrderForm, string>> = {};
-    
-    if (!formData.danaMandiOrderUserId) newErrors.danaMandiOrderUserId = "User ID is required";
-    if (!formData.danaMandiOrderBapariId) newErrors.danaMandiOrderBapariId = "Buyer name is required";
-    if (!formData.danaMandiOrderCusId) newErrors.danaMandiOrderCusId = "Customer is required";
-    if (!formData.danaMandiOrderCropId) newErrors.danaMandiOrderCropId = "Crop ID is required";
-    if (!formData.priceCrop) newErrors.priceCrop = "Price per Mann is required";
-    if (!formData.weightMann) newErrors.weightMann = "Weight (Mann) is required";
-    if (!formData.commissioneRate) newErrors.commissioneRate = "Commission rate is required";
-    if (!formData.mazdoriRate) newErrors.mazdoriRate = "Mazdoori rate is required";
-    
+
+    if (!formData.danaMandiOrderUserId) newErrors.danaMandiOrderUserId = t('user_id_missing');
+    if (!formData.danaMandiOrderBapariId) newErrors.danaMandiOrderBapariId = t('buyer_name_required');
+    if (!formData.danaMandiOrderCusId) newErrors.danaMandiOrderCusId = t('customer_field_required');
+    if (!formData.danaMandiOrderCropId) newErrors.danaMandiOrderCropId = t('crop_id_required');
+    if (!formData.priceCrop) newErrors.priceCrop = t('price_per_mann_required');
+    if (!formData.weightMann) newErrors.weightMann = t('weight_mann_required');
+    if (!formData.commissioneRate) newErrors.commissioneRate = t('commission_rate_required');
+    if (!formData.mazdoriRate) newErrors.mazdoriRate = t('mazdoori_rate_required');
+
     return newErrors;
   };
 
@@ -285,17 +285,17 @@ const AddDanaMandiOrder: React.FC = () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      showError("Please fill all required fields.");
+      showError(t('please_fill_required_fields'));
       return;
     }
 
     // Show confirmation dialog
-    const confirmed = await confirmCreate('this Dana Mandi order');
+    const confirmed = await confirmCreate(t('dana_mandi_order_lower'));
     if (!confirmed) return;
 
     setLoading(true);
     setErrors({});
-    showLoading('Creating order...');
+    showLoading(t('creating_order_loading'));
 
     try {
       const response = await axios.post(
@@ -306,19 +306,19 @@ const AddDanaMandiOrder: React.FC = () => {
 
       if (response.data.status === 200) {
         closeAlert();
-        showSuccess(response.data.message || "Order created successfully!");
+        showSuccess(response.data.message || t('order_created_success'));
         setTimeout(() => {
           navigate("/dana-mandi-order-list");
         }, 1500);
       } else {
         closeAlert();
-        showError(response.data.message || "Failed to create order.");
+        showError(response.data.message || t('failed_create_order'));
       }
     } catch (error: any) {
       console.error("Error creating order:", error);
       closeAlert();
       showError(
-        error.response?.data?.message || "Failed to create order. Please try again."
+        error.response?.data?.message || t('error_creating_order_retry')
       );
     } finally {
       setLoading(false);
@@ -327,25 +327,16 @@ const AddDanaMandiOrder: React.FC = () => {
 
   return (
     <div>
-      {/* Header Section */}
-      <PageHeader
-        title="Add Dana Mandi Order"
-        description="Create a new order receipt for your shop"
-        backTo={userId && cropId ? `/crop-receipt-list/${userId}/${cropId}` : '/getassginshopcrops'}
-        backLabel="Back to Receipt List"
-        icon="📄"
-      />
-
       {/* Form Card */}
-      <div className="panel">
+      <div className="panel shadow-sm">
         {/* CNIC Search Section */}
-        <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-blue-200 dark:border-gray-600">
+        <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl border border-green-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-shadow duration-300">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-            <IconCreditCard className="w-5 h-5 mr-2 text-primary-600" />
-            Search Customer by CNIC
+            <IconCreditCard className="w-5 h-5 mr-2 text-green-600" />
+            {t('search_customer_by_cnic')}
           </h3>
           <FormField
-            label="Customer CNIC"
+            label={t('customer_cnic_field')}
             name="cnic"
             type="text"
             value={cnic}
@@ -358,31 +349,31 @@ const AddDanaMandiOrder: React.FC = () => {
               }
             }}
             onBlur={handleCnicBlur}
-            placeholder="Enter 13-digit CNIC number"
+            placeholder={t('enter_13_digit_cnic')}
             icon={<IconCreditCard className="w-5 h-5" />}
-            helpText="Enter customer CNIC to search in your shop's customers"
+            helpText={t('cnic_search_shop_hint')}
             disabled={checkingCustomer || loading}
           />
           {checkingCustomer && (
-            <div className="mt-2 text-sm text-primary-600 flex items-center">
-              <span className="animate-spin border-2 border-primary-600 border-t-transparent rounded-full w-4 h-4 inline-block mr-2"></span>
-              Checking customer...
+            <div className="mt-2 text-sm text-green-600 flex items-center">
+              <span className="animate-spin border-2 border-green-600 border-t-transparent rounded-full w-4 h-4 inline-block mr-2"></span>
+              {t('checking_customer')}
             </div>
           )}
         </div>
 
         {/* Customer Info Card */}
         {customer && (
-          <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-green-200 dark:border-gray-600">
+          <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl border border-green-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-shadow duration-300">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
               <IconUser className="w-5 h-5 mr-2 text-green-600" />
-              Customer Information
+              {t('customer_information')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center">
                 <IconUser className="w-5 h-5 mr-2 text-gray-500" />
                 <div>
-                  <p className="text-xs text-gray-500">Name</p>
+                  <p className="text-xs text-gray-500">{t('name')}</p>
                   <p className="font-semibold text-gray-800 dark:text-white">
                     {customer.cusNameF} {customer.cusNameL}
                   </p>
@@ -391,7 +382,7 @@ const AddDanaMandiOrder: React.FC = () => {
               <div className="flex items-center">
                 <IconCreditCard className="w-5 h-5 mr-2 text-gray-500" />
                 <div>
-                  <p className="text-xs text-gray-500">CNIC</p>
+                  <p className="text-xs text-gray-500">{t('cnic')}</p>
                   <p className="font-semibold text-gray-800 dark:text-white font-mono">
                     {customer.cusCNIC}
                   </p>
@@ -400,7 +391,7 @@ const AddDanaMandiOrder: React.FC = () => {
               <div className="flex items-center">
                 <IconPhone className="w-5 h-5 mr-2 text-gray-500" />
                 <div>
-                  <p className="text-xs text-gray-500">Phone</p>
+                  <p className="text-xs text-gray-500">{t('phone')}</p>
                   <p className="font-semibold text-gray-800 dark:text-white font-mono">
                     {customer.cusNumber}
                   </p>
@@ -409,7 +400,7 @@ const AddDanaMandiOrder: React.FC = () => {
               <div className="flex items-center">
                 <IconMapPin className="w-5 h-5 mr-2 text-gray-500" />
                 <div>
-                  <p className="text-xs text-gray-500">Address</p>
+                  <p className="text-xs text-gray-500">{t('address')}</p>
                   <p className="font-semibold text-gray-800 dark:text-white">
                     {customer.cusAddress}
                   </p>
@@ -422,176 +413,176 @@ const AddDanaMandiOrder: React.FC = () => {
         {/* Order Details Section */}
         <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-6 flex items-center">
-            <IconCashBanknotes className="w-5 h-5 mr-2 text-primary-600" />
-            Order Details
+            <IconCashBanknotes className="w-5 h-5 mr-2 text-green-600" />
+            {t('create_receipt')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
-              label="Buyer Name"
+              label={t('buyer_name')}
               name="danaMandiOrderBapariId"
               type="text"
               value={formData.danaMandiOrderBapariId}
               onChange={handleChange}
               error={errors.danaMandiOrderBapariId}
-              placeholder="Enter buyer name"
+              placeholder={t('enter_buyer_name_ph')}
               required
               icon={<IconUser className="w-5 h-5" />}
             />
 
             <FormField
-              label="Price per Mann"
+              label={t('price_per_mann')}
               name="priceCrop"
               type="number"
               value={formData.priceCrop}
               onChange={handleChange}
               error={errors.priceCrop}
-              placeholder="Enter price per mann"
+              placeholder={t('enter_price_per_mann_ph')}
               required
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Weight (Mann)"
+              label={t('weight_mann_field')}
               name="weightMann"
               type="number"
               value={formData.weightMann}
               onChange={handleChange}
               error={errors.weightMann}
-              placeholder="Enter weight in mann"
+              placeholder={t('enter_weight_mann_ph')}
               required
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Extra Weight (Kg)"
+              label={t('extra_weight_kg_field')}
               name="weightKg"
               type="number"
               value={formData.weightKg}
               onChange={handleChange}
               error={errors.weightKg}
-              placeholder="Enter extra weight in kg"
+              placeholder={t('enter_extra_weight_kg_ph')}
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Mala Khata Name"
+              label={t('mala_khata_name_field')}
               name="malaKhataName"
               type="text"
               value={formData.malaKhataName}
               onChange={handleChange}
               error={errors.malaKhataName}
-              placeholder="Enter mala khata name"
+              placeholder={t('enter_mala_khata_name_ph')}
               icon={<IconUser className="w-5 h-5" />}
             />
 
             <FormField
-              label="Mala Khata Mann"
+              label={t('mala_khata_mann_field')}
               name="malaKhataMan"
               type="number"
               value={formData.malaKhataMan}
               onChange={handleChange}
               error={errors.malaKhataMan}
-              placeholder="Enter mala khata mann"
+              placeholder={t('enter_mala_khata_mann_ph')}
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Mala Khata Kg"
+              label={t('mala_khata_kg_field')}
               name="malaKhataKg"
               type="number"
               value={formData.malaKhataKg}
               onChange={handleChange}
               error={errors.malaKhataKg}
-              placeholder="Enter mala khata kg"
+              placeholder={t('enter_mala_khata_kg_ph')}
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Mala Khata Payment"
+              label={t('mala_khata_payment_field')}
               name="malaKhataPayment"
               type="number"
               value={formData.malaKhataPayment}
               onChange={handleChange}
               error={errors.malaKhataPayment}
-              placeholder="Auto-calculated"
+              placeholder={t('auto_calculated_ph')}
               readOnly
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Rent Delivery"
+              label={t('rent_delivery_field')}
               name="RentDelivery"
               type="number"
               value={formData.RentDelivery}
               onChange={handleChange}
               error={errors.RentDelivery}
-              placeholder="Enter rent delivery"
+              placeholder={t('enter_rent_delivery_ph')}
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Commission Rate (%)"
+              label={t('commission_rate_field')}
               name="commissioneRate"
               type="number"
               value={formData.commissioneRate}
               onChange={handleChange}
               error={errors.commissioneRate}
-              placeholder="Enter commission rate"
+              placeholder={t('enter_commission_rate_ph')}
               required
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Commission Total"
+              label={t('commission_total_field')}
               name="commissioneTotal"
               type="number"
               value={formData.commissioneTotal}
               onChange={handleChange}
               error={errors.commissioneTotal}
-              placeholder="Auto-calculated"
+              placeholder={t('auto_calculated_ph')}
               readOnly
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Mazdoori Rate (%)"
+              label={t('mazdoori_rate_field')}
               name="mazdoriRate"
               type="number"
               value={formData.mazdoriRate}
               onChange={handleChange}
               error={errors.mazdoriRate}
-              placeholder="Enter mazdoori rate"
+              placeholder={t('enter_mazdoori_rate_ph')}
               required
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Mazdoori Total"
+              label={t('mazdoori_total_field')}
               name="mazdoriTotal"
               type="number"
               value={formData.mazdoriTotal}
               onChange={handleChange}
               error={errors.mazdoriTotal}
-              placeholder="Auto-calculated"
+              placeholder={t('auto_calculated_ph')}
               readOnly
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <FormField
-              label="Total Price"
+              label={t('total_price_field')}
               name="totalPrice"
               type="number"
               value={formData.totalPrice}
               onChange={handleChange}
               error={errors.totalPrice}
-              placeholder="Auto-calculated"
+              placeholder={t('auto_calculated_ph')}
               readOnly
               icon={<IconCashBanknotes className="w-5 h-5" />}
             />
 
             <div>
               <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">
-                Pisces Type <span className="text-red-500">*</span>
+                {t('pisces_type_field')} <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
@@ -601,13 +592,13 @@ const AddDanaMandiOrder: React.FC = () => {
                   name="piscesTypeId"
                   value={formData.piscesTypeId}
                   onChange={handleChange}
-                  className={`form-select w-full pl-10 ${errors.piscesTypeId ? 'border-danger focus:ring-danger' : 'border-gray-300 dark:border-gray-600 focus:ring-primary-500'} transition-all duration-300 focus:ring-2 focus:border-primary-500`}
+                  className={`form-select w-full pl-10 ${errors.piscesTypeId ? 'border-danger focus:ring-danger' : 'border-gray-300 dark:border-gray-600 focus:ring-green-500'} transition-all duration-300 focus:ring-2 focus:border-green-500`}
                   disabled={loading}
                 >
-                  <option value="">Select Pisces Type</option>
-                  <option value="bag50">50 Kg Bag</option>
-                  <option value="bag80">80 Kg Bag</option>
-                  <option value="bag100">100 Kg Bag</option>
+                  <option value="">{t('select_pisces_type_ph')}</option>
+                  <option value="bag50">{t('bag_50kg')}</option>
+                  <option value="bag80">{t('bag_80kg')}</option>
+                  <option value="bag100">{t('bag_100kg')}</option>
                 </select>
               </div>
               {errors.piscesTypeId && (
@@ -615,27 +606,27 @@ const AddDanaMandiOrder: React.FC = () => {
               )}
             </div>
 
-            <p className="text-sm text-amber-600 dark:text-amber-400 mb-2">Return Payment sirf tab enable hota hai jab customer ka shop par balance ho (Customer Owes to Shop &gt; 0).</p>
+            <p className="text-sm text-amber-600 dark:text-amber-400 mb-2">{t('return_payment_enable_hint')}</p>
             <FormField
-              label="Return Payment"
+              label={t('return_payment_field')}
               name="retrunPayment"
               type="number"
               value={formData.retrunPayment}
               onChange={handleChange}
               error={errors.retrunPayment}
-              placeholder="Enter return payment"
+              placeholder={t('enter_return_payment_ph')}
               icon={<IconCashBanknotes className="w-5 h-5" />}
               disabled={!customerBalance || (Number(customerBalance?.blance) || 0) <= 0}
             />
 
             <FormField
-              label="After Return Payment"
+              label={t('after_return_payment_field')}
               name="afterRetrunPayemnt"
               type="number"
               value={formData.afterRetrunPayemnt}
               onChange={handleChange}
               error={errors.afterRetrunPayemnt}
-              placeholder="Auto-calculated"
+              placeholder={t('auto_calculated_ph')}
               readOnly
               icon={<IconCashBanknotes className="w-5 h-5" />}
               disabled={!customerBalance || (Number(customerBalance?.blance) || 0) <= 0}
@@ -645,45 +636,45 @@ const AddDanaMandiOrder: React.FC = () => {
             {customer && (
               <div className="md:col-span-2">
                 {loadingBalance ? (
-                  <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-yellow-200 dark:border-gray-600">
+                  <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl border border-yellow-200 dark:border-gray-600 shadow-md">
                     <div className="flex items-center justify-center">
                       <span className="animate-spin border-2 border-yellow-600 border-t-transparent rounded-full w-5 h-5 inline-block mr-2"></span>
-                      <span className="text-gray-600 dark:text-gray-300">Loading balance...</span>
+                      <span className="text-gray-600 dark:text-gray-300">{t('loading_balance')}</span>
                     </div>
                   </div>
                 ) : customerBalance !== null && (
-                  <div className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border-2 border-yellow-200 dark:border-yellow-800">
+                  <div className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl border-2 border-yellow-200 dark:border-yellow-800 shadow-md hover:shadow-lg transition-shadow duration-300">
                     <h3 className="text-lg font-bold text-yellow-700 dark:text-yellow-400 mb-4 flex items-center">
-                      <IconCashBanknotes className="w-6 h-6 mr-2" /> Customer Balance Information
+                      <IconCashBanknotes className="w-6 h-6 mr-2" /> {t('customer_balance_information')}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {/* Customer Owes to Shop */}
-                      <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-red-200 dark:border-red-800">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Customer Owes to Shop</p>
+                      <div className="p-4 bg-white dark:bg-gray-800 rounded-xl border-2 border-red-200 dark:border-red-800 shadow-sm hover:shadow-md transition-shadow duration-300">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('customer_owes_to_shop')}</p>
                         <p className="text-2xl font-bold flex items-center text-red-600 dark:text-red-400">
                           <IconTrendingUp className="w-6 h-6 inline-block mr-1" />
                           Rs. {(customerBalance.cusBlane || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Amount customer needs to pay
+                          {t('amount_customer_needs_to_pay')}
                         </p>
                       </div>
-                      
+
                       {/* Shop Owes to Customer */}
-                      <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-green-200 dark:border-green-800">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Shop Owes to Customer</p>
+                      <div className="p-4 bg-white dark:bg-gray-800 rounded-xl border-2 border-green-200 dark:border-green-800 shadow-sm hover:shadow-md transition-shadow duration-300">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('shop_owes_to_customer')}</p>
                         <p className="text-2xl font-bold flex items-center text-green-600 dark:text-green-400">
                           <IconTrendingUp className="w-6 h-6 inline-block mr-1 rotate-180" />
                           Rs. {(customerBalance.blance || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Amount shop needs to pay
+                          {t('amount_shop_needs_to_pay')}
                         </p>
                       </div>
-                      
+
                       {/* Net Balance */}
-                      <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-blue-200 dark:border-blue-800">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Net Balance</p>
+                      <div className="p-4 bg-white dark:bg-gray-800 rounded-xl border-2 border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-shadow duration-300">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('net_balance_field')}</p>
                         {(() => {
                           const netBalance = (customerBalance.cusBlane || 0) - (customerBalance.blance || 0);
                           return (
@@ -702,27 +693,27 @@ const AddDanaMandiOrder: React.FC = () => {
                                 )}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                {netBalance >= 0 ? 'Customer owes to shop' : 'Shop owes to customer'}
+                                {netBalance >= 0 ? t('customer_owes_to_shop') : t('shop_owes_to_customer')}
                               </p>
                             </>
                           );
                         })()}
                       </div>
                     </div>
-                    
+
                     {/* After This Order Projection */}
                     {formData.afterRetrunPayemnt && (
-                      <div className="mt-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">After This Order:</p>
+                      <div className="mt-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-xl border border-yellow-200 dark:border-yellow-800 shadow-sm">
+                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('after_this_order_label')}</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <div>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Order Amount:</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">{t('order_amount_label')}</p>
                             <p className="text-lg font-semibold text-gray-800 dark:text-white">
                               Rs. {parseFloat(formData.afterRetrunPayemnt as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Projected Net Balance:</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">{t('projected_net_balance_label')}</p>
                             {(() => {
                               const orderAmount = parseFloat(formData.afterRetrunPayemnt as string || '0');
                               const currentNet = (customerBalance.cusBlane || 0) - (customerBalance.blance || 0);
@@ -747,14 +738,14 @@ const AddDanaMandiOrder: React.FC = () => {
                         </div>
                       </div>
                     )}
-                    
-                    <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+
+                    <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl shadow-sm">
                       <p className="text-sm text-gray-700 dark:text-gray-300">
-                        <strong>Note:</strong> 
-                        <br />• <strong>Customer Owes:</strong> Amount customer needs to pay to shop (cusBlane)
-                        <br />• <strong>Shop Owes:</strong> Amount shop needs to pay to customer (blance)
-                        <br />• <strong>Net Balance:</strong> Overall balance (Customer Owes - Shop Owes)
-                        <br />• This order amount will be added to customer's balance.
+                        <strong>{t('balance_note_title')}</strong>
+                        <br />• <strong>{t('customer_owes_to_shop')}:</strong> {t('balance_note_customer_owes')}
+                        <br />• <strong>{t('shop_owes_to_customer')}:</strong> {t('balance_note_shop_owes')}
+                        <br />• <strong>{t('net_balance_field')}:</strong> {t('balance_note_net_balance')}
+                        <br />• {t('balance_note_order_add')}
                       </p>
                     </div>
                   </div>
@@ -765,98 +756,98 @@ const AddDanaMandiOrder: React.FC = () => {
         </div>
 
         {/* Payment Summary - Detailed Breakdown */}
-        <div className="mt-8 p-6 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-gray-800 dark:to-gray-700 rounded-lg border-2 border-primary-200 dark:border-primary-800">
-          <h3 className="text-xl font-bold text-primary-700 dark:text-primary-400 mb-6 flex items-center">
+        <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-emerald-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl border-2 border-green-200 dark:border-green-800 shadow-md hover:shadow-lg transition-shadow duration-300">
+          <h3 className="text-xl font-bold text-green-700 dark:text-green-400 mb-6 flex items-center">
             <IconCashBanknotes className="w-6 h-6 mr-2" />
-            Payment Breakdown & Total Amount
+            {t('payment_breakdown_title')}
           </h3>
-          
+
           {/* Total Price (Before Deductions) */}
-          <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+          <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm">
             <div className="flex justify-between items-center">
-              <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Price (Before Deductions)</p>
-              <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+              <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">{t('total_price_before_deductions')}</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                 Rs. {parseFloat(formData.totalPrice as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Calculated from: (Price per Mann × Weight Mann) + (Price per Kg × Weight Kg)
+              {t('total_price_calc_formula')}
             </p>
           </div>
 
           {/* Deductions Section */}
           <div className="mb-4">
-            <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">Deductions:</h4>
+            <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">{t('deductions_label')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Rent Delivery</p>
+              <div className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('rent_delivery_field')}</p>
                 <p className="text-lg font-semibold text-gray-800 dark:text-white">
                   Rs. {parseFloat(formData.RentDelivery as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
-              <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Mala Khata Payment</p>
+              <div className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('mala_khata_payment_field')}</p>
                 <p className="text-lg font-semibold text-gray-800 dark:text-white">
                   Rs. {parseFloat(formData.malaKhataPayment as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
-              <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Commission Total</p>
+              <div className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('commission_total_field')}</p>
                 <p className="text-lg font-semibold text-gray-800 dark:text-white">
                   Rs. {parseFloat(formData.commissioneTotal as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  ({formData.commissioneRate}% of Total Price)
+                  ({formData.commissioneRate}% {t('of_total_price')})
                 </p>
               </div>
-              <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Mazdoori Total</p>
+              <div className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('mazdoori_total_field')}</p>
                 <p className="text-lg font-semibold text-gray-800 dark:text-white">
                   Rs. {parseFloat(formData.mazdoriTotal as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  ({formData.mazdoriRate}% of Total Price)
+                  ({formData.mazdoriRate}% {t('of_total_price')})
                 </p>
               </div>
             </div>
           </div>
 
           {/* Calculation Summary */}
-          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm">
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-700 dark:text-gray-300">Total Price:</span>
+                <span className="text-gray-700 dark:text-gray-300">{t('total_price_field')}:</span>
                 <span className="font-semibold text-gray-800 dark:text-white">
                   Rs. {parseFloat(formData.totalPrice as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-700 dark:text-gray-300">- Rent Delivery:</span>
+                <span className="text-gray-700 dark:text-gray-300">- {t('rent_delivery_field')}:</span>
                 <span className="font-semibold text-red-600 dark:text-red-400">
                   - Rs. {parseFloat(formData.RentDelivery as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-700 dark:text-gray-300">- Mala Khata Payment:</span>
+                <span className="text-gray-700 dark:text-gray-300">- {t('mala_khata_payment_field')}:</span>
                 <span className="font-semibold text-red-600 dark:text-red-400">
                   - Rs. {parseFloat(formData.malaKhataPayment as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-700 dark:text-gray-300">- Commission Total:</span>
+                <span className="text-gray-700 dark:text-gray-300">- {t('commission_total_field')}:</span>
                 <span className="font-semibold text-red-600 dark:text-red-400">
                   - Rs. {parseFloat(formData.commissioneTotal as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-700 dark:text-gray-300">- Mazdoori Total:</span>
+                <span className="text-gray-700 dark:text-gray-300">- {t('mazdoori_total_field')}:</span>
                 <span className="font-semibold text-red-600 dark:text-red-400">
                   - Rs. {parseFloat(formData.mazdoriTotal as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
               {parseFloat(formData.retrunPayment as string || '0') > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-gray-700 dark:text-gray-300">- Return Payment:</span>
+                  <span className="text-gray-700 dark:text-gray-300">- {t('return_payment_field')}:</span>
                   <span className="font-semibold text-red-600 dark:text-red-400">
                     - Rs. {parseFloat(formData.retrunPayment as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -864,8 +855,8 @@ const AddDanaMandiOrder: React.FC = () => {
               )}
               <hr className="my-2 border-gray-300 dark:border-gray-600" />
               <div className="flex justify-between items-center pt-2">
-                <p className="text-lg font-bold text-gray-800 dark:text-white">Final Amount (After Return Payment):</p>
-                <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                <p className="text-lg font-bold text-gray-800 dark:text-white">{t('final_amount_after_return')}</p>
+                <p className="text-3xl font-bold text-green-600 dark:text-green-400">
                   Rs. {parseFloat(formData.afterRetrunPayemnt as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
@@ -879,7 +870,7 @@ const AddDanaMandiOrder: React.FC = () => {
             to="/dana-mandi-order-list"
             className="btn btn-outline-primary"
           >
-            Cancel
+            {t('cancel')}
           </Link>
           <button
             type="button"
@@ -890,12 +881,12 @@ const AddDanaMandiOrder: React.FC = () => {
             {loading ? (
               <>
                 <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5 inline-block mr-2"></span>
-                Creating...
+                {t('creating_order')}
               </>
             ) : (
               <>
                 <IconCashBanknotes className="w-5 h-5 mr-2" />
-                Create Order
+                {t('create_order_btn')}
               </>
             )}
           </button>

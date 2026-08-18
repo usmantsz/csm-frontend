@@ -478,8 +478,8 @@ const Sidebar = () => {
                                         </button>
                                         <AnimateHeight duration={300} height={currentMenu === 'employees' ? 'auto' : 0}>
                                             <ul className="sub-menu text-gray-500">
-                                                <li><NavLink to="/shopowner">All Shop Owners</NavLink></li>
-                                                <li><NavLink to="/creatshopowner">Create Shop Owner</NavLink></li>
+                                                <li><NavLink to="/shopowner">{t('all_shop_owners')}</NavLink></li>
+                                                <li><NavLink to="/creatshopowner">{t('create_shop_owner')}</NavLink></li>
                                             </ul>
                                         </AnimateHeight>
                                     </li>
@@ -533,8 +533,8 @@ const Sidebar = () => {
                                         </button>
                                         <AnimateHeight duration={300} height={currentMenu === 'team' ? 'auto' : 0}>
                                             <ul className="sub-menu text-gray-500">
-                                                <li><NavLink to="/admin/team">Team Members</NavLink></li>
-                                                <li><NavLink to="/admin/team/add">Add Team Member</NavLink></li>
+                                                <li><NavLink to="/admin/team">{t('team_members')}</NavLink></li>
+                                                <li><NavLink to="/admin/team/add">{t('add_team_member')}</NavLink></li>
                                             </ul>
                                         </AnimateHeight>
                                     </li>

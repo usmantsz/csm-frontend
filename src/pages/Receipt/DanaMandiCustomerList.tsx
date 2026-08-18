@@ -6,11 +6,11 @@ import axios from "axios";
 import { ServerSetting } from "./../../helperComponents/ServerSetting";
 import { Notification } from "./../../helperComponents/Notification";
 import { FaEye } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { useShopId } from "./../../Hooks/useShopId";
 import { useShopIdFromUrl } from "./../../Hooks/useShopIdFromUrl";
 import { useAuthToken } from "./../../Hooks/useAuthToken";
 import IconArrowLeft from "../../components/Icon/IconArrowLeft";
-import PageHeader from "../../components/Agricultural/PageHeader";
 
 interface DanaMandiCustomer {
   _id: string;
@@ -22,30 +22,31 @@ interface DanaMandiCustomer {
 }
 
 const DanaMandiCustomerList = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { token, user } = useAuthToken();
   const { shopId: urlShopId, isViewingAsAdmin } = useShopIdFromUrl();
   const { shopId: userShopId } = useShopId();
   const { userId, cropId } = useParams<{ userId: string; cropId: string }>();
   const isAdmin = user?.userRole === 'Admin' || user?.userRole === 'admin' || user?.userRole === '0';
-  
+
   // State for shopId fetched from userId
   const [shopId, setShopId] = useState<string | null>(urlShopId || userShopId);
   const [fetchingShopId, setFetchingShopId] = useState(false);
-  
+
   // If shopId is missing and we have userId, try to fetch shopId from userId (for admin direct access)
   useEffect(() => {
     const fetchShopIdFromUserId = async () => {
       // If we already have shopId, don't fetch
       if (shopId) return;
-      
+
       // Only fetch if we have userId and token
       if (!userId || !token) return;
-      
+
       // For admin: always try to fetch from userId if shopId is missing
       // For shop owner: only fetch if urlShopId is also missing
       if (!isAdmin && urlShopId) return;
-      
+
       setFetchingShopId(true);
       try {
         console.log('DanaMandiCustomerList: Fetching shopId from userId:', userId);
@@ -76,31 +77,31 @@ const DanaMandiCustomerList = () => {
         setFetchingShopId(false);
       }
     };
-    
+
     fetchShopIdFromUserId();
   }, [userId, token, isAdmin, shopId, urlShopId]);
-  
+
   // Update shopId when urlShopId changes
   useEffect(() => {
     if (urlShopId) {
       setShopId(urlShopId);
     }
   }, [urlShopId]);
-  
+
   // Update shopId when userShopId changes (for shop owner)
   useEffect(() => {
     if (!isAdmin && userShopId && !urlShopId) {
       setShopId(userShopId);
     }
   }, [userShopId, isAdmin, urlShopId]);
-  
+
   // Determine if admin is viewing (admin user + userId in URL params means admin is viewing shop owner's data)
   const isAdminViewing = isAdmin && !!userId && userId !== user?._id;
 
   // Fetch crop details to determine crop type
   useEffect(() => {
     if (!cropId || !token) return;
-    
+
     axios
       .get(`${ServerSetting.serUrl}/api/viewcrop/${cropId}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -110,8 +111,8 @@ const DanaMandiCustomerList = () => {
           const crop = res.data.data;
           setCropDetails(crop);
           const cropType = String(crop.cropType || '').toLowerCase().trim();
-          const isSabzi = cropType === 'sabzi mandi' || 
-                         cropType === 'sabzimandi' || 
+          const isSabzi = cropType === 'sabzi mandi' ||
+                         cropType === 'sabzimandi' ||
                          cropType === '1' ||
                          cropType.includes('sabzi');
           setIsSabziMandi(isSabzi);
@@ -167,14 +168,14 @@ const DanaMandiCustomerList = () => {
       }
       return;
     }
-    
+
     // Wait for crop details to be fetched
     if (cropDetails === null) {
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     if (isSabziMandi) {
       // Fetch customers from Vegetable Orders
       axios
@@ -197,7 +198,7 @@ const DanaMandiCustomerList = () => {
               if (order.vegetableOrderCusId) {
                 let cusId: string;
                 let customer: any = null;
-                
+
                 if (typeof order.vegetableOrderCusId === 'object' && order.vegetableOrderCusId !== null) {
                   // Customer is already populated
                   cusId = order.vegetableOrderCusId._id || order.vegetableOrderCusId.toString();
@@ -206,7 +207,7 @@ const DanaMandiCustomerList = () => {
                   // Customer is just an ID string
                   cusId = order.vegetableOrderCusId.toString();
                 }
-                
+
                 if (cusId && !customerMap.has(cusId) && customer) {
                   customerMap.set(cusId, customer);
                 }
@@ -215,31 +216,31 @@ const DanaMandiCustomerList = () => {
             const customers = Array.from(customerMap.values());
             setInitialRecords(customers);
             console.log('DanaMandiCustomerList: Extracted', customers.length, 'unique customers from', orders.length, 'vegetable orders');
-            
+
             // Get shop and crop info
             if (orders.length > 0) {
               const firstOrder = orders[0];
               setShopInfo({
                 cropName: (typeof firstOrder.vegetableOrderCropId === 'object' && firstOrder.vegetableOrderCropId !== null)
-                  ? firstOrder.vegetableOrderCropId?.cropName 
-                  : cropDetails?.cropName || 'N/A',
+                  ? firstOrder.vegetableOrderCropId?.cropName
+                  : cropDetails?.cropName || t('na'),
                 shopName: (typeof firstOrder.vegetableOrderShopId === 'object' && firstOrder.vegetableOrderShopId !== null)
-                  ? firstOrder.vegetableOrderShopId?.shopName 
-                  : 'N/A',
+                  ? firstOrder.vegetableOrderShopId?.shopName
+                  : t('na'),
                 shopRegistrationNumber: (typeof firstOrder.vegetableOrderShopId === 'object' && firstOrder.vegetableOrderShopId !== null)
-                  ? firstOrder.vegetableOrderShopId?.shopRegistrationNumber 
-                  : 'N/A',
+                  ? firstOrder.vegetableOrderShopId?.shopRegistrationNumber
+                  : t('na'),
               });
             } else {
               setShopInfo({
-                cropName: cropDetails?.cropName || 'N/A',
-                shopName: 'N/A',
-                shopRegistrationNumber: 'N/A',
+                cropName: cropDetails?.cropName || t('na'),
+                shopName: t('na'),
+                shopRegistrationNumber: t('na'),
               });
             }
           } else {
             Notification({
-              text: res.data.message || "Failed to fetch customers",
+              text: res.data.message || t('failed_to_fetch_customers'),
               color: "danger",
             });
           }
@@ -247,7 +248,7 @@ const DanaMandiCustomerList = () => {
         })
         .catch((err) => {
           console.error("Error fetching vegetable order customers:", err);
-          Notification({ text: "Error fetching customers", color: "danger" });
+          Notification({ text: t('error_fetching_customers'), color: "danger" });
           setIsLoading(false);
         });
     } else {
@@ -273,7 +274,7 @@ const DanaMandiCustomerList = () => {
             });
           } else {
             Notification({
-              text: res.data.message || "Failed to fetch customers",
+              text: res.data.message || t('failed_to_fetch_customers'),
               color: "danger",
             });
           }
@@ -281,7 +282,7 @@ const DanaMandiCustomerList = () => {
         })
         .catch((err) => {
           console.error("Error fetching customers:", err);
-          Notification({ text: "Error fetching customers", color: "danger" });
+          Notification({ text: t('error_fetching_customers'), color: "danger" });
           setIsLoading(false);
         });
     }
@@ -306,43 +307,50 @@ const DanaMandiCustomerList = () => {
 
   return (
     <div>
-      {/* Page Header */}
-      <PageHeader
-        title="Customer List"
-        description={shopInfo?.cropName ? `Customers for ${shopInfo.cropName}` : 'View customers for this crop'}
-        backTo={userId && cropId ? `/cropmenu/${userId}/${cropId}` : '/getassginshopcrops'}
-        backLabel="Back to Crop Menu"
-        icon="👥"
-      />
+      {/* Back button - top right, outside card */}
+      <div className="flex justify-end mb-4">
+        <button
+          type="button"
+          onClick={() =>
+            navigate(
+              userId && cropId ? `/cropmenu/${userId}/${cropId}` : '/getassginshopcrops'
+            )
+          }
+                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+        >
+          <span>←</span> {t('back_to_crop_menu')}
+        </button>
+      </div>
+
       {/* Admin View Badge */}
       {(isAdminViewing || (isAdmin && isViewingAsAdmin)) && (
         <div className="mb-4">
           <div className="panel bg-warning-100 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-lg px-4 py-2 flex items-center gap-3">
-            <span className="badge badge-lg bg-warning text-white">👑 Admin View</span>
-            <span className="text-sm text-warning-700 dark:text-warning-300">Viewing customers as administrator</span>
+            <span className="badge badge-lg bg-warning text-white">👑 {t('admin_view')}</span>
+            <span className="text-sm text-warning-700 dark:text-warning-300">{t('viewing_customers_as_admin')}</span>
             <button
               onClick={() => navigate(shopId ? `/shop/view/${shopId}` : '/shop')}
               className="btn btn-sm btn-outline-warning ltr:ml-auto rtl:mr-auto"
             >
               <IconArrowLeft className="w-4 h-4 mr-1" />
-              Back to Shop View
+              {t('back_to_shop_view')}
             </button>
           </div>
         </div>
       )}
 
-      <div className="panel mt-6">
+      <div className="panel mt-6 shadow-md dark:shadow-none">
         {/* Shop Info Section */}
         {shopInfo && (
           <div className="mb-5 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow flex gap-8">
             <p>
-              <strong>Crop:</strong> {shopInfo.cropName}
+              <strong>{t('crop')}:</strong> {shopInfo.cropName}
             </p>
             <p>
-              <strong>Shop:</strong> {shopInfo.shopName}
+              <strong>{t('shop')}:</strong> {shopInfo.shopName}
             </p>
             <p>
-              <strong>Reg #:</strong> {shopInfo.shopRegistrationNumber}
+              <strong>{t('reg_number')}:</strong> {shopInfo.shopRegistrationNumber}
             </p>
           </div>
         )}
@@ -350,11 +358,11 @@ const DanaMandiCustomerList = () => {
         <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
           <div className="flex items-center gap-3">
             <h5 className="font-semibold text-lg dark:text-white-light">
-              {isSabziMandi ? 'Sabzi Mandi Customers List' : 'Dana Mandi Customers List'}
+              {isSabziMandi ? t('sabzi_mandi_customers_list') : t('dana_mandi_customers_list')}
             </h5>
             {(isAdminViewing || (isAdmin && isViewingAsAdmin)) && (
               <span className="badge badge-outline-primary">
-                Admin View
+                {t('admin_view')}
               </span>
             )}
           </div>
@@ -362,7 +370,7 @@ const DanaMandiCustomerList = () => {
             <input
               type="text"
               className="form-input w-auto"
-              placeholder="Search by CNIC or Phone..."
+              placeholder={t('search_by_cnic_phone_placeholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -382,15 +390,15 @@ const DanaMandiCustomerList = () => {
               columns={[
                 {
                   accessor: "name",
-                  title: "Name",
+                  title: t('name'),
                   render: (customer) =>
                     `${customer.cusNameF} ${customer.cusNameL}`,
                 },
-                { accessor: "cusCNIC", title: "CNIC" },
-                { accessor: "cusNumber", title: "Phone" },
+                { accessor: "cusCNIC", title: t('cnic') },
+                { accessor: "cusNumber", title: t('phone') },
                 {
                   accessor: "action",
-                  title: "Action",
+                  title: t('action'),
                   render: (customer) => (
                     <button
                       className="text-blue-500 hover:text-blue-700"
@@ -415,7 +423,7 @@ const DanaMandiCustomerList = () => {
               onSortStatusChange={setSortStatus}
               minHeight={200}
               paginationText={({ from, to, totalRecords }) =>
-                `Showing ${from} to ${to} of ${totalRecords} entries`
+                t('pagination_showing', { from, to, totalRecords })
               }
             />
           </div>

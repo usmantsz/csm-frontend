@@ -13,7 +13,6 @@ import { showError, showSuccess, showLoading, closeAlert, confirmCreate, confirm
 import IconArrowLeft from "../../components/Icon/IconArrowLeft";
 import IconUser from "../../components/Icon/IconUser";
 import IconCashBanknotes from "../../components/Icon/IconCashBanknotes";
-import PageHeader from "../../components/Agricultural/PageHeader";
 import IconNotes from "../../components/Icon/IconNotes";
 import IconCreditCard from "../../components/Icon/IconCreditCard";
 import IconPhone from "../../components/Icon/IconPhone";
@@ -52,8 +51,8 @@ const AddFinance: React.FC = () => {
   const isEditMode = !!editLoanId;
 
   useEffect(() => {
-    dispatch(setPageTitle(isEditMode ? 'Edit Loan' : 'Give Loan'));
-  }, [dispatch, isEditMode]);
+    dispatch(setPageTitle(isEditMode ? t('finance_edit_loan_title') : t('finance_give_loan_title')));
+  }, [dispatch, isEditMode, t]);
 
   // Get shopId from URL (admin view), user object, or useShopId hook
   const userShopId = urlShopId || (user as any)?.shopId || userShopIdFromHook;
@@ -111,12 +110,12 @@ const AddFinance: React.FC = () => {
     try {
       const raw = localStorage.getItem(draftStorageKey);
       if (!raw) {
-        showError("No saved draft.");
+        showError(t('finance_no_saved_draft'));
         return;
       }
       const d = JSON.parse(raw) as { version?: number; selectedPosUserId?: string; posQuantities?: Record<string, number>; finaceRemarks?: string };
       if (d.version !== 1 || !d.selectedPosUserId) {
-        showError("No valid draft.");
+        showError(t('finance_no_valid_draft'));
         return;
       }
       setSelectedPosUserId(d.selectedPosUserId);
@@ -124,7 +123,7 @@ const AddFinance: React.FC = () => {
       if (d.finaceRemarks) setFormData((prev) => ({ ...prev, finaceRemarks: d.finaceRemarks || prev.finaceRemarks }));
       showSuccess(t("finance_pos_draft_restored"));
     } catch {
-      showError("Could not load draft.");
+      showError(t('finance_could_not_load_draft'));
     }
   }, [draftStorageKey, t]);
 
@@ -164,16 +163,16 @@ const AddFinance: React.FC = () => {
           setPosProductsError(null);
         } else {
           setPosProducts([]);
-          setPosProductsError(r.data?.message || "Products could not be loaded.");
+          setPosProductsError(r.data?.message || t('finance_no_products_in_shop'));
         }
         setPosQuantities({});
       })
       .catch((e) => {
         setPosProducts([]);
-        setPosProductsError(e.response?.data?.message || "Failed to load products.");
+        setPosProductsError(e.response?.data?.message || t('finance_no_products_in_shop'));
       })
       .finally(() => setLoadingPosProducts(false));
-  }, [token, selectedPosUserId]);
+  }, [token, selectedPosUserId, t]);
 
   useEffect(() => {
     if (!draftStorageKey || isEditMode || formData.finaceType !== "3" || !customer) return;
@@ -211,7 +210,7 @@ const AddFinance: React.FC = () => {
 
   // Fetch loan data for editing
   const fetchLoanData = async (loanId: string) => {
-    showLoading('Loading loan data...');
+    showLoading(t('finance_loading_loan_data'));
     try {
       const response = await axios.get(
         `${ServerSetting.serUrl}/api/viewfinace/${loanId}`,
@@ -280,17 +279,17 @@ const AddFinance: React.FC = () => {
           }
         }
 
-        showSuccess("Loan data loaded successfully!");
+        showSuccess(t('finance_loan_loaded_success'));
       } else {
-        showError("Loan not found. Please check the loan ID.", "Error");
+        showError(t('finance_loan_not_found'), t('finance_error_generic'));
         navigate(-1);
       }
     } catch (error: any) {
       console.error("Error fetching loan data:", error);
       closeAlert();
       showError(
-        error.response?.data?.message || "Failed to load loan data. Please try again.",
-        "Error"
+        error.response?.data?.message || t('finance_load_loan_failed'),
+        t('finance_error_generic')
       );
       navigate(-1);
     }
@@ -301,7 +300,7 @@ const AddFinance: React.FC = () => {
     if (!cnic || !cnic.trim()) return;
     
     if (!userShopId) {
-      showError('Shop ID is missing. Please ensure you have a shop assigned.');
+      showError(t('finance_shop_id_missing'));
       return;
     }
 
@@ -332,13 +331,13 @@ const AddFinance: React.FC = () => {
             setCustomerBalance(null);
             setFormData((prev) => ({ ...prev, finaceCusId: "" }));
             showError(
-              "This customer has been deleted. Please contact admin to restore.",
-              "Customer Not Available"
+              t('finance_customer_deleted'),
+              t('finance_customer_not_available')
             );
           } else {
             setCustomer(foundCustomer);
             setFormData((prev) => ({ ...prev, finaceCusId: foundCustomer._id }));
-            showSuccess("Customer found successfully!");
+            showSuccess(t('finance_customer_found'));
             
             // Fetch customer balance
             await fetchCustomerBalance(foundCustomer._id);
@@ -348,15 +347,15 @@ const AddFinance: React.FC = () => {
           setCustomerBalance(null);
           setFormData((prev) => ({ ...prev, finaceCusId: "" }));
           showError(
-            "Your shop has no customer registered with this CNIC number. Please register the customer first.",
-            "Customer Not Found"
+            t('finance_customer_cnic_not_found'),
+            t('finance_customer_not_found')
           );
         }
       } else {
         setCustomer(null);
         setCustomerBalance(null);
         setFormData((prev) => ({ ...prev, finaceCusId: "" }));
-        showError(shopCustomersResponse.data.message || "Error fetching shop customers.");
+        showError(shopCustomersResponse.data.message || t('finance_error_fetching_shop_customers'));
       }
     } catch (error: any) {
       console.error("Error checking customer:", error);
@@ -364,7 +363,7 @@ const AddFinance: React.FC = () => {
       setCustomerBalance(null);
       setFormData((prev) => ({ ...prev, finaceCusId: "" }));
       showError(
-        error.response?.data?.message || "Error checking customer. Please try again."
+        error.response?.data?.message || t('finance_error_checking_customer')
       );
     } finally {
       setCheckingCustomer(false);
@@ -425,14 +424,14 @@ const AddFinance: React.FC = () => {
   const validate = () => {
     const newErrors: Partial<Record<keyof FinanceForm, string>> = {};
     
-    if (!formData.finaceUserId) newErrors.finaceUserId = "User ID is required";
-    if (!formData.finaceShopId) newErrors.finaceShopId = "Shop ID is required";
-    if (!formData.finaceCusId) newErrors.finaceCusId = "Customer is required";
-    if (!formData.finaceCropId) newErrors.finaceCropId = "Crop ID is required";
-    if (!formData.finaceType) newErrors.finaceType = "Finance type is required";
-    if (!formData.finaceRemarks) newErrors.finaceRemarks = "Remarks is required";
+    if (!formData.finaceUserId) newErrors.finaceUserId = t('finance_validation_user_id');
+    if (!formData.finaceShopId) newErrors.finaceShopId = t('finance_validation_shop_id');
+    if (!formData.finaceCusId) newErrors.finaceCusId = t('finance_validation_customer');
+    if (!formData.finaceCropId) newErrors.finaceCropId = t('finance_validation_crop_id');
+    if (!formData.finaceType) newErrors.finaceType = t('finance_validation_type');
+    if (!formData.finaceRemarks) newErrors.finaceRemarks = t('finance_validation_remarks');
     // Loan amount required only when NOT Medicine (3). For Medicine, amount is set when POS user delivers (sum of product prices).
-    if (formData.finaceType !== "3" && !formData.loanAmount) newErrors.loanAmount = "Loan amount is required";
+    if (formData.finaceType !== "3" && !formData.loanAmount) newErrors.loanAmount = t('finance_validation_loan_amount');
     
     return newErrors;
   };
@@ -442,19 +441,19 @@ const AddFinance: React.FC = () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      showError("Please fill all required fields.");
+      showError(t('finance_fill_required_fields'));
       return;
     }
 
     // Show confirmation dialog
     const confirmed = isEditMode 
-      ? await confirmUpdate('this loan record')
-      : await confirmCreate('this loan record');
+      ? await confirmUpdate(t('finance_confirm_record_label'))
+      : await confirmCreate(t('finance_confirm_record_label'));
     if (!confirmed) return;
 
     setLoading(true);
     setErrors({});
-    showLoading(isEditMode ? 'Updating loan record...' : 'Creating loan record...');
+    showLoading(isEditMode ? t('finance_updating_loading') : t('finance_creating_loading'));
 
     try {
       const url = isEditMode 
@@ -498,22 +497,22 @@ const AddFinance: React.FC = () => {
               );
               if (posRes.data.status === 201) {
                 closeAlert();
-                showSuccess("Loan record created and POS user notified. Products are linked to this loan.");
+                showSuccess(t('finance_pos_created_notified'));
               } else {
                 closeAlert();
-                showSuccess("Loan record created. POS request could not be created — you can add products from the loan later.");
+                showSuccess(t('finance_pos_request_failed_later'));
               }
             } catch (e: any) {
               closeAlert();
-              showSuccess("Loan record created. POS request failed — you can add products from the loan later.");
+              showSuccess(t('finance_pos_request_error_later'));
             }
           } else {
             closeAlert();
-            showSuccess(response.data.message || "Loan record created successfully!");
+            showSuccess(response.data.message || t('finance_created_success'));
           }
         } else {
           closeAlert();
-          showSuccess(response.data.message || (isEditMode ? "Loan record updated successfully!" : "Loan record created successfully!"));
+          showSuccess(response.data.message || (isEditMode ? t('finance_updated_success') : t('finance_created_success')));
         }
         if (!isEditMode && draftStorageKey) {
           try {
@@ -531,13 +530,13 @@ const AddFinance: React.FC = () => {
         }, 1500);
       } else {
         closeAlert();
-        showError(response.data.message || (isEditMode ? "Failed to update loan record." : "Failed to create loan record."));
+        showError(response.data.message || (isEditMode ? t('finance_update_failed') : t('finance_create_failed')));
       }
     } catch (error: any) {
       console.error(`Error ${isEditMode ? 'updating' : 'creating'} loan:`, error);
       closeAlert();
       showError(
-        error.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} loan record. Please try again.`
+        error.response?.data?.message || (isEditMode ? t('finance_update_failed_retry') : t('finance_create_failed_retry'))
       );
     } finally {
       setLoading(false);
@@ -574,26 +573,27 @@ const AddFinance: React.FC = () => {
 
   return (
     <div>
-      {/* Header Section */}
-      <PageHeader
-        title={isEditMode ? 'Edit Loan' : 'Give Loan'}
-        description={isEditMode ? 'Update loan details for this customer' : 'Provide loan to customer for this crop'}
-        backTo={isEditMode ? `/loan/${userId}/${cropId}` : '/finance'}
-        backLabel={isEditMode ? 'Back to Loan List' : 'Back to Finance'}
-        icon="💰"
-      />
+      {/* Back button - top right, outside card */}
+      <div className="flex justify-end mb-4">
+        <Link
+          to={isEditMode ? `/loan/${userId}/${cropId}` : "/finance"}
+                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+        >
+          <span>←</span> {isEditMode ? t('finance_back_to_loan_list') : t('finance_back_to_finance')}
+        </Link>
+      </div>
 
       {/* Form Card */}
-      <div className="panel">
+      <div className="panel shadow-md dark:shadow-none">
         {/* CNIC Search Section */}
         {!isEditMode && (
           <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-blue-200 dark:border-gray-600">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
               <IconCreditCard className="w-5 h-5 mr-2 text-primary-600" />
-              Search Customer by CNIC
+              {t('finance_search_by_cnic_title')}
             </h3>
             <FormField
-              label="Customer CNIC"
+              label={t('finance_customer_cnic_label')}
               name="cnic"
               type="text"
               value={cnic}
@@ -606,15 +606,15 @@ const AddFinance: React.FC = () => {
                 }
               }}
               onBlur={handleCnicBlur}
-              placeholder="Enter 13-digit CNIC number"
+              placeholder={t('finance_cnic_placeholder')}
               icon={<IconCreditCard className="w-5 h-5" />}
-              helpText="Enter customer CNIC to search in your shop's customers"
+              helpText={t('finance_cnic_help_text')}
               disabled={checkingCustomer || loading}
             />
             {checkingCustomer && (
               <div className="mt-2 text-sm text-primary-600 flex items-center">
                 <span className="animate-spin border-2 border-primary-600 border-t-transparent rounded-full w-4 h-4 inline-block mr-2"></span>
-                Checking customer...
+                {t('finance_checking_customer')}
               </div>
             )}
           </div>
@@ -626,13 +626,13 @@ const AddFinance: React.FC = () => {
             <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-green-200 dark:border-gray-600 mb-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
                 <IconUser className="w-5 h-5 mr-2 text-green-600" />
-                Customer Information
+                {t('finance_customer_info_title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center">
                   <IconUser className="w-5 h-5 mr-2 text-gray-500" />
                   <div>
-                    <p className="text-xs text-gray-500">Name</p>
+                    <p className="text-xs text-gray-500">{t('finance_field_name')}</p>
                     <p className="font-semibold text-gray-800 dark:text-white">
                       {customer.cusNameF} {customer.cusNameL}
                     </p>
@@ -641,7 +641,7 @@ const AddFinance: React.FC = () => {
                 <div className="flex items-center">
                   <IconCreditCard className="w-5 h-5 mr-2 text-gray-500" />
                   <div>
-                    <p className="text-xs text-gray-500">CNIC</p>
+                    <p className="text-xs text-gray-500">{t('finance_field_cnic')}</p>
                     <p className="font-semibold text-gray-800 dark:text-white font-mono">
                       {customer.cusCNIC}
                     </p>
@@ -650,7 +650,7 @@ const AddFinance: React.FC = () => {
                 <div className="flex items-center">
                   <IconPhone className="w-5 h-5 mr-2 text-gray-500" />
                   <div>
-                    <p className="text-xs text-gray-500">Phone</p>
+                    <p className="text-xs text-gray-500">{t('finance_field_phone')}</p>
                     <p className="font-semibold text-gray-800 dark:text-white font-mono">
                       {customer.cusNumber}
                     </p>
@@ -659,7 +659,7 @@ const AddFinance: React.FC = () => {
                 <div className="flex items-center">
                   <IconMapPin className="w-5 h-5 mr-2 text-gray-500" />
                   <div>
-                    <p className="text-xs text-gray-500">Address</p>
+                    <p className="text-xs text-gray-500">{t('finance_field_address')}</p>
                     <p className="font-semibold text-gray-800 dark:text-white">
                       {customer.cusAddress}
                     </p>
@@ -673,43 +673,43 @@ const AddFinance: React.FC = () => {
               <div className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-yellow-200 dark:border-gray-600">
                 <div className="flex items-center justify-center">
                   <span className="animate-spin border-2 border-yellow-600 border-t-transparent rounded-full w-5 h-5 inline-block mr-2"></span>
-                  <span className="text-gray-600 dark:text-gray-300">Loading balance...</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('finance_loading_balance')}</span>
                 </div>
               </div>
             ) : customerBalance !== null && (
               <div className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-yellow-200 dark:border-gray-600">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
                   <IconCashBanknotes className="w-5 h-5 mr-2 text-yellow-600" />
-                  Customer Balance Information
+                  {t('finance_customer_balance_title')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Customer Owes to Shop */}
                   <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-red-200 dark:border-red-800">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Customer Owes to Shop</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('finance_customer_owes_shop')}</p>
                     <p className="text-2xl font-bold flex items-center text-red-600 dark:text-red-400">
                       <IconTrendingUp className="w-6 h-6 inline-block mr-1" />
                       Rs. {(customerBalance.cusBlane || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Amount customer needs to pay (cusBlane)
+                      {t('finance_customer_owes_note')}
                     </p>
                   </div>
                   
                   {/* Shop Owes to Customer */}
                   <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-green-200 dark:border-green-800">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Shop Owes to Customer</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('finance_shop_owes_customer')}</p>
                     <p className="text-2xl font-bold flex items-center text-green-600 dark:text-green-400">
                       <IconTrendingUp className="w-6 h-6 inline-block mr-1 rotate-180" />
                       Rs. {(customerBalance.blance || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Amount shop needs to pay (blance)
+                      {t('finance_shop_owes_note')}
                     </p>
                   </div>
                   
                   {/* Net Balance */}
                   <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-blue-200 dark:border-blue-800">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Net Balance</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('finance_net_balance')}</p>
                     {(() => {
                       const netBalance = (customerBalance.cusBlane || 0) - (customerBalance.blance || 0);
                       return (
@@ -728,7 +728,7 @@ const AddFinance: React.FC = () => {
                             )}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {netBalance >= 0 ? 'Customer owes to shop' : 'Shop owes to customer'}
+                            {netBalance >= 0 ? t('finance_net_customer_owes') : t('finance_net_shop_owes')}
                           </p>
                         </>
                       );
@@ -739,16 +739,16 @@ const AddFinance: React.FC = () => {
                 {/* After This Transaction Projection */}
                 {formData.loanAmount && formData.finaceType !== '' && (
                   <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-blue-200 dark:border-blue-800">
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">After This Transaction:</p>
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('finance_after_transaction')}</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">Transaction Amount:</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{t('finance_transaction_amount')}</p>
                         <p className="text-lg font-semibold text-gray-800 dark:text-white">
                           Rs. {parseFloat(formData.loanAmount as string || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">Projected Net Balance:</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{t('finance_projected_net_balance')}</p>
                         {(() => {
                           const projectedNet = calculateNewBalance();
                           return (
@@ -774,10 +774,10 @@ const AddFinance: React.FC = () => {
                 
                 <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <p className="text-sm text-gray-700 dark:text-gray-300">
-                    <strong>Note:</strong> 
-                    <br />• <strong>Customer Owes (cusBlane):</strong> Amount customer needs to pay to shop
-                    <br />• <strong>Shop Owes (blance):</strong> Amount shop needs to pay to customer
-                    <br />• <strong>Net Balance:</strong> Overall balance (Customer Owes - Shop Owes)
+                    <strong>{t('finance_note_label')}</strong> 
+                    <br />• <strong>{t('finance_note_cus_blane')}</strong>
+                    <br />• <strong>{t('finance_note_blance')}</strong>
+                    <br />• <strong>{t('finance_note_net')}</strong>
                   </p>
                 </div>
               </div>
@@ -789,37 +789,37 @@ const AddFinance: React.FC = () => {
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-6 flex items-center">
             <IconCashBanknotes className="w-5 h-5 mr-2 text-primary-600" />
-            Loan Details
+            {t('finance_loan_details_title')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
-              label="Loan Amount"
+              label={t('finance_loan_amount_label')}
               name="loanAmount"
               type="number"
               value={formData.loanAmount}
               onChange={handleChange}
               error={errors.loanAmount}
-              placeholder={formData.finaceType === "3" ? "Optional — set when POS delivers (sum of products)" : "Enter loan amount"}
+              placeholder={formData.finaceType === "3" ? t('finance_loan_amount_placeholder_pos') : t('finance_loan_amount_placeholder')}
               required={formData.finaceType !== "3"}
               icon={<IconCashBanknotes className="w-5 h-5" />}
               disabled={loading || !customer}
             />
 
             <FormField
-              label="Paid Amount"
+              label={t('finance_paid_amount_label')}
               name="loanPaidAmount"
               type="number"
               value={formData.loanPaidAmount}
               onChange={handleChange}
               error={errors.loanPaidAmount}
-              placeholder="Enter paid amount (if any)"
+              placeholder={t('finance_paid_amount_placeholder')}
               icon={<IconCashBanknotes className="w-5 h-5" />}
-              helpText="Leave 0 if no payment received yet"
+              helpText={t('finance_paid_amount_help')}
               disabled={loading || !customer}
             />
 
             <FormField
-              label="Finance Type"
+              label={t('finance_type_label')}
               name="finaceType"
               type="select"
               value={formData.finaceType}
@@ -835,36 +835,36 @@ const AddFinance: React.FC = () => {
               required
               disabled={loading || !customer}
               options={[
-                { value: "0", label: "Loan Given" },
-                { value: "1", label: "Loan Returned" },
-                { value: "2", label: "Payment" },
-                { value: "3", label: "Medicine (POS products)" },
+                { value: "0", label: t('finance_type_loan_given') },
+                { value: "1", label: t('finance_type_loan_returned') },
+                { value: "2", label: t('finance_type_payment') },
+                { value: "3", label: t('finance_type_medicine') },
               ]}
             />
 
             <FormField
-              label="Status"
+              label={t('finance_status_label')}
               name="paymentStatus"
               type="select"
               value={formData.paymentStatus !== undefined && formData.paymentStatus !== null ? String(formData.paymentStatus) : "0"}
               onChange={handleChange}
               disabled={loading || !customer}
               options={[
-                { value: "0", label: "Loan de diya" },
-                { value: "1", label: "Kuch return / Baki hai" },
-                { value: "2", label: "Full return" },
+                { value: "0", label: t('finance_status_given') },
+                { value: "1", label: t('finance_status_partial') },
+                { value: "2", label: t('finance_status_full') },
               ]}
             />
 
             <div className="md:col-span-2">
               <FormField
-                label="Remarks"
+                label={t('finance_remarks_label')}
                 name="finaceRemarks"
                 type="textarea"
                 value={formData.finaceRemarks}
                 onChange={handleChange}
                 error={errors.finaceRemarks}
-                placeholder="Enter any additional remarks or notes..."
+                placeholder={t('finance_remarks_placeholder')}
                 required
                 icon={<IconNotes className="w-5 h-5" />}
                 disabled={loading || !customer}
@@ -879,10 +879,10 @@ const AddFinance: React.FC = () => {
           <div className="mb-8 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-700 rounded-xl border-2 border-emerald-200 dark:border-emerald-800">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-1 flex items-center">
               <IconCashBanknotes className="w-5 h-5 mr-2 text-emerald-600" />
-              Medicine / POS Products
+              {t('finance_medicine_pos_title')}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
-              Select a POS user and add product quantities. When you click <strong>Create Loan Record</strong> below, the loan will be created and this product request will be linked to it; the POS user will be notified. Customer can collect from the POS shop with CNIC + shop name. Shop owner pays the POS user later (POS Payments).
+              {t('finance_medicine_pos_desc')}
             </p>
             {draftStorageKey && (
               <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -898,7 +898,7 @@ const AddFinance: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold mr-2">1</span>
-                  Select POS User & Shop
+                  {t('finance_select_pos_user_title')}
                 </label>
                 <select
                   value={typeof selectedPosUserId === 'string' ? selectedPosUserId : (selectedPosUserId as any)?._id ?? ''}
@@ -906,32 +906,32 @@ const AddFinance: React.FC = () => {
                   className="form-select w-full max-w-md rounded-lg border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500/20"
                   disabled={loadingPosUsers}
                 >
-                  <option value="">— Select connected POS user —</option>
+                  <option value="">{t('finance_select_pos_placeholder')}</option>
                   {connectedPosUsers.map((u) => {
                     const id = typeof u.posUserId === 'object' && u.posUserId !== null ? (u.posUserId as any)._id?.toString?.() ?? '' : String(u.posUserId ?? '');
                     return <option key={id || u.shopName} value={id}>{u.name} — {u.shopName}</option>;
                   })}
                 </select>
-                {loadingPosUsers && <p className="text-xs text-gray-500 mt-1">Loading POS users...</p>}
+                {loadingPosUsers && <p className="text-xs text-gray-500 mt-1">{t('finance_loading_products')}</p>}
                 {!loadingPosUsers && connectedPosUsers.length === 0 && (
-                  <p className="text-amber-600 dark:text-amber-400 text-sm mt-1">No connected POS users. Connect POS users from Connections first.</p>
+                  <p className="text-amber-600 dark:text-amber-400 text-sm mt-1">{t('finance_no_connected_pos_users')}</p>
                 )}
               </div>
               {selectedPosUserId && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold mr-2">2</span>
-                    Select products and quantities
+                    {t('finance_select_products_title')}
                   </label>
                   {loadingPosProducts ? (
                     <div className="flex items-center gap-2 text-gray-500 py-4">
                       <span className="animate-spin border-2 border-emerald-500 border-t-transparent rounded-full w-5 h-5 inline-block" />
-                      Loading products...
+                      {t('finance_loading_products')}
                     </div>
                   ) : posProductsError ? (
                     <div className="py-4 rounded-lg bg-danger/10 text-danger px-4 text-sm">{posProductsError}</div>
                   ) : posProducts.length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400 py-4 rounded-lg bg-white/50 dark:bg-black/20 px-4">No products in this POS shop.</p>
+                    <p className="text-gray-500 dark:text-gray-400 py-4 rounded-lg bg-white/50 dark:bg-black/20 px-4">{t('finance_no_products_in_shop')}</p>
                   ) : (
                     <div className="overflow-x-auto rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-gray-900/50">
                       <div className="p-3 border-b border-emerald-200 dark:border-emerald-800">
@@ -946,10 +946,10 @@ const AddFinance: React.FC = () => {
                       <table className="table-auto w-full text-sm">
                         <thead>
                           <tr className="bg-emerald-50 dark:bg-emerald-900/20 border-b border-emerald-200 dark:border-emerald-800">
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Product</th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Price (Rs)</th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 w-28">Qty</th>
-                            <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Line Total</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{t('finance_table_product')}</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{t('finance_table_price')}</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 w-28">{t('finance_table_qty')}</th>
+                            <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{t('finance_table_line_total')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -977,8 +977,8 @@ const AddFinance: React.FC = () => {
                         </tbody>
                       </table>
                       <div className="flex flex-wrap justify-between items-center gap-4 p-4 border-t border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/10">
-                        <span className="font-semibold text-gray-800 dark:text-gray-200">Total: Rs {posTotal.toLocaleString()}</span>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Use <strong>Create Loan Record</strong> below to save loan and link these products.</span>
+                        <span className="font-semibold text-gray-800 dark:text-gray-200">{t('finance_total_label')} {posTotal.toLocaleString()}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{t('finance_pos_footer_note')}</span>
                       </div>
                     </div>
                   )}
@@ -994,7 +994,7 @@ const AddFinance: React.FC = () => {
             to={isEditMode ? `/loan/${userId}/${cropId}` : "/finance"}
             className="btn btn-outline-primary"
           >
-            Cancel
+            {t('finance_cancel_btn')}
           </Link>
           <button
             type="button"
@@ -1005,12 +1005,12 @@ const AddFinance: React.FC = () => {
             {loading ? (
               <>
                 <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5 inline-block mr-2"></span>
-                {isEditMode ? 'Updating...' : 'Creating...'}
+                {isEditMode ? t('finance_updating_btn') : t('finance_creating_btn')}
               </>
             ) : (
               <>
                 <IconCashBanknotes className="w-5 h-5 mr-2" />
-                {isEditMode ? 'Update Loan Record' : 'Create Loan Record'}
+                {isEditMode ? t('finance_update_loan_btn') : t('finance_create_loan_btn')}
               </>
             )}
           </button>

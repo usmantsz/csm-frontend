@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import { useAuthToken } from '../../Hooks/useAuthToken';
 import { useShopId } from '../../Hooks/useShopId';
@@ -8,7 +9,6 @@ import { useShopIdFromUrl } from '../../Hooks/useShopIdFromUrl';
 import { ServerSetting } from '../../helperComponents/ServerSetting';
 import axios from 'axios';
 import IconArrowLeft from '../../components/Icon/IconArrowLeft';
-import PageHeader from '../../components/Agricultural/PageHeader';
 
 type PosRecord = {
     _id: string;
@@ -22,6 +22,7 @@ type PosRecord = {
 };
 
 const CropPosRecord = () => {
+    const { t } = useTranslation();
     const dispatch = useDispatch();
     const params = useParams<{ userId?: string; cropId?: string }>();
     const paramUserId = params?.userId ?? '';
@@ -46,8 +47,8 @@ const CropPosRecord = () => {
     }, [urlShopId, userShopId]);
 
     useEffect(() => {
-        dispatch(setPageTitle('POS User Record'));
-    }, [dispatch]);
+        dispatch(setPageTitle(t('posrecord_page_title')));
+    }, [dispatch, t]);
 
     // Resolve shopId from API when not provided by URL/context
     useEffect(() => {
@@ -96,10 +97,10 @@ const CropPosRecord = () => {
             })
             .catch((e) => {
                 setList([]);
-                setApiError(e.response?.data?.message || 'Failed to load records.');
+                setApiError(e.response?.data?.message || t('posrecord_load_failed'));
             })
             .finally(() => setLoading(false));
-    }, [cropId, shopId, token]);
+    }, [cropId, shopId, token, t]);
 
     const getRouteWithShopId = (path: string) => {
         const s = searchParams.get('shopId');
@@ -112,9 +113,18 @@ const CropPosRecord = () => {
     if (!paramUserId || !cropId) {
         return (
             <div>
-                <PageHeader title="POS User Record" description="View POS requests for this crop" onBack={() => window.history.back()} backLabel="Back" />
+                <div className="flex justify-end mb-4">
+                    <button
+                        type="button"
+                        onClick={() => window.history.back()}
+                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                    >
+                        <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                        {t('posrecord_back')}
+                    </button>
+                </div>
                 <div className="panel p-6 text-center text-gray-500 dark:text-gray-400">
-                    Missing crop or user in the URL. Please open this page from the Crop Menu.
+                    {t('posrecord_missing_crop_user')}
                 </div>
             </div>
         );
@@ -123,52 +133,58 @@ const CropPosRecord = () => {
     return (
         <div>
             <ul className="flex flex-wrap items-center gap-2 text-sm mb-6">
-                <li><Link to="/dashboard" className="text-primary hover:underline">Dashboard</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><Link to="/getassginshopcrops" className="text-primary hover:underline">My Crops</Link></li>
+                <li><Link to="/dashboard" className="text-primary hover:underline">{t('posrecord_breadcrumb_dashboard')}</Link></li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><Link to="/getassginshopcrops" className="text-primary hover:underline">{t('posrecord_breadcrumb_my_crops')}</Link></li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <Link to={cropMenuPath} className="text-primary hover:underline">Crop Menu</Link>
+                    <Link to={cropMenuPath} className="text-primary hover:underline">{t('posrecord_breadcrumb_crop_menu')}</Link>
                 </li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 text-gray-500 dark:text-gray-400">POS User Record</li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 text-gray-500 dark:text-gray-400">{t('posrecord_breadcrumb_pos_record')}</li>
             </ul>
-            <PageHeader
-                title={`POS User Record${cropName ? ` – ${cropName}` : ''}`}
-                description="Requests from POS users linked to this crop (medicine/products for customers)"
-                onBack={() => window.history.back()}
-                backLabel="Back to Crop Menu"
-                icon="📋"
-            />
+
+            {/* Back button - top right, outside card */}
+            <div className="flex justify-end mb-4">
+                <button
+                    type="button"
+                    onClick={() => window.history.back()}
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                >
+                    <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                    {t('posrecord_back_to_crop_menu')}
+                </button>
+            </div>
+
             <div className="panel bg-white dark:bg-[#0e1726] p-5 rounded-2xl border border-white-dark/10 shadow-sm">
                 {apiError && (
                     <div className="mb-4 p-3 rounded-lg bg-danger/10 text-danger text-sm">{apiError}</div>
                 )}
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">
-                        View and manage POS product requests for this crop. Record payments from the main POS Payments page.
-                    </p>
+                    <h5 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {t('posrecord_title')}{cropName ? ` – ${cropName}` : ''}
+                    </h5>
                     <Link
                         to="/pos-payments"
-                        className="btn bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-4 py-2"
+                        className="btn !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] shadow-none rounded-xl px-4 py-2"
                     >
-                        POS Payments (outstanding & history)
+                        {t('posrecord_pos_payments_btn')}
                     </Link>
                 </div>
                 {!cropId || !shopId ? (
-                    <div className="text-center py-8 text-gray-500">Crop or shop could not be resolved. Open from Crop Menu.</div>
+                    <div className="text-center py-8 text-gray-500">{t('posrecord_crop_shop_unresolved')}</div>
                 ) : loading ? (
                     <div className="flex justify-center py-8"><span className="animate-spin inline-block w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full" /></div>
                 ) : list.length === 0 ? (
-                    <p className="text-center text-gray-500 dark:text-gray-400 py-8">No POS user records for this crop yet.</p>
+                    <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('posrecord_no_records')}</p>
                 ) : (
                     <div className="overflow-x-auto rounded-xl border border-white-dark/10 dark:border-white/10">
                         <table className="table-auto w-full text-sm">
                             <thead>
                                 <tr className="bg-gray-50 dark:bg-white/5 border-b border-white-dark/10">
-                                    <th className="text-left py-3 px-4 font-semibold">Receipt</th>
-                                    <th className="text-left py-3 px-4 font-semibold">Customer</th>
-                                    <th className="text-left py-3 px-4 font-semibold">POS User</th>
-                                    <th className="text-right py-3 px-4 font-semibold">Amount</th>
-                                    <th className="text-left py-3 px-4 font-semibold">Status</th>
-                                    <th className="text-left py-3 px-4 font-semibold">Date</th>
+                                    <th className="text-left py-3 px-4 font-semibold">{t('posrecord_col_receipt')}</th>
+                                    <th className="text-left py-3 px-4 font-semibold">{t('posrecord_col_customer')}</th>
+                                    <th className="text-left py-3 px-4 font-semibold">{t('posrecord_col_pos_user')}</th>
+                                    <th className="text-right py-3 px-4 font-semibold">{t('posrecord_col_amount')}</th>
+                                    <th className="text-left py-3 px-4 font-semibold">{t('posrecord_col_status')}</th>
+                                    <th className="text-left py-3 px-4 font-semibold">{t('posrecord_col_date')}</th>
                                 </tr>
                             </thead>
                             <tbody>

@@ -7,7 +7,6 @@ import { ServerSetting } from '../../helperComponents/ServerSetting';
 import { Notification } from '../../helperComponents/Notification';
 import { useAuthToken } from '../../Hooks/useAuthToken';
 import { useShopIdFromUrl } from '../../Hooks/useShopIdFromUrl';
-import PageHeader from '../../components/Agricultural/PageHeader';
 import { useTranslation } from 'react-i18next';
 import TableCard from '../../components/Agricultural/TableCard';
 import { Modal } from '@mantine/core';
@@ -39,7 +38,7 @@ const BuyerList = () => {
     const PAGE_SIZES = [10, 20, 30, 50];
 
     useEffect(() => {
-        dispatch(setPageTitle('Buyer List'));
+        dispatch(setPageTitle(t('buyer_list')));
     }, [dispatch]);
 
     useEffect(() => {
@@ -119,9 +118,9 @@ const BuyerList = () => {
         const id = getOrderId(order);
         const total = getTotalPrice(order);
         const received = paymentTotals[id] || 0;
-        if (received >= total) return { text: 'Paid', color: 'success' };
-        if (received > 0) return { text: 'Partial', color: 'warning' };
-        return { text: 'Unpaid', color: 'danger' };
+        if (received >= total) return { text: t('paid'), color: 'success' };
+        if (received > 0) return { text: t('partial'), color: 'warning' };
+        return { text: t('unpaid'), color: 'danger' };
     };
 
     const handleOpenHistory = (order: any) => {
@@ -143,35 +142,35 @@ const BuyerList = () => {
         if (!paymentModal || !shopId || !cropId) return;
         const amt = Number(paymentAmount);
         if (!amt || amt <= 0) {
-            Notification({ text: 'Enter valid amount', color: 'warning' });
+            Notification({ text: t('enter_valid_amount'), color: 'warning' });
             return;
         }
         const order = paymentModal.order;
         const remainingDue = getRemainingDue(order);
         if (amt > remainingDue) {
             Swal.fire({
-                title: 'Amount exceeds due',
-                html: `Maximum allowed is <strong>Rs. ${remainingDue.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> (remaining due for this order).`,
+                title: t('amount_exceeds_due'),
+                html: `${t('maximum_allowed')} <strong>Rs. ${remainingDue.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> (${t('remaining_due_order')}).`,
                 icon: 'warning',
                 confirmButtonColor: '#3085d6',
             });
             return;
         }
         const confirmed = await Swal.fire({
-            title: 'Confirm Payment Received',
-            html: `Record payment of <strong>Rs. ${amt.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> from buyer?`,
+            title: t('confirm_payment_received'),
+            html: `${t('record_payment_from_buyer')} <strong>Rs. ${amt.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${t('from_buyer')}`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#10b981',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, record payment',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: t('yes_record_payment'),
+            cancelButtonText: t('cancel'),
         });
         if (!confirmed.isConfirmed) return;
 
         const cusId = isSabziMandi ? (order.vegetableOrderCusId?._id || order.vegetableOrderCusId) : (order.danaMandiOrderCusId?._id || order.danaMandiOrderCusId);
         if (!cusId) {
-            Notification({ text: 'Customer not found', color: 'danger' });
+            Notification({ text: t('customer_not_found'), color: 'danger' });
             return;
         }
         setSaving(true);
@@ -190,7 +189,7 @@ const BuyerList = () => {
         )
             .then((r) => {
                 if (r.data?.success) {
-                    Swal.fire({ title: 'Saved', text: 'Payment recorded successfully.', icon: 'success', timer: 2000, showConfirmButton: false });
+                    Swal.fire({ title: t('saved'), text: t('payment_recorded_successfully'), icon: 'success', timer: 2000, showConfirmButton: false });
                     setPaymentModal(null);
                     setPaymentAmount('');
                     setPaymentRemarks('');
@@ -198,7 +197,7 @@ const BuyerList = () => {
                         .then((tr) => setPaymentTotals(tr.data?.success ? tr.data.data || {} : {}));
                 }
             })
-            .catch((e) => Swal.fire({ title: 'Error', text: e.response?.data?.message || 'Failed to record payment.', icon: 'error' }))
+            .catch((e) => Swal.fire({ title: t('error'), text: e.response?.data?.message || t('failed_record_payment'), icon: 'error' }))
             .finally(() => setSaving(false));
     };
 
@@ -225,13 +224,13 @@ const BuyerList = () => {
 
     const columns = useMemo(
         () => [
-            { accessor: 'receiptId', title: 'Order ID', render: (order: any) => <span className="font-medium">{getReceiptId(order)}</span> },
-            { accessor: 'bapariName', title: 'Bapari Name', render: (order: any) => getBapariName(order) },
-            { accessor: 'price', title: 'Price', render: (order: any) => `Rs. ${getPrice(order).toLocaleString()}` },
-            { accessor: 'totalPrice', title: isSabziMandi ? 'Amount (from buyer)' : 'Amount', render: (order: any) => `Rs. ${getTotalPrice(order).toLocaleString()}` },
+            { accessor: 'receiptId', title: t('order_id'), render: (order: any) => <span className="font-medium">{getReceiptId(order)}</span> },
+            { accessor: 'bapariName', title: t('bapari_name'), render: (order: any) => getBapariName(order) },
+            { accessor: 'price', title: t('price'), render: (order: any) => `Rs. ${getPrice(order).toLocaleString()}` },
+            { accessor: 'totalPrice', title: isSabziMandi ? t('amount_from_buyer') : t('amount'), render: (order: any) => `Rs. ${getTotalPrice(order).toLocaleString()}` },
             {
                 accessor: 'status',
-                title: 'Status',
+                title: t('status'),
                 render: (order: any) => {
                     const s = getStatus(order);
                     return <span className={`badge bg-${s.color}`}>{s.text}</span>;
@@ -239,12 +238,12 @@ const BuyerList = () => {
             },
             {
                 accessor: 'actions',
-                title: 'Actions',
+                title: t('actions'),
                 render: (order: any) => (
                     <div className="flex flex-wrap gap-2">
-                        <button type="button" className="btn btn-primary btn-sm" onClick={() => { setPaymentModal({ order, orderType: isSabziMandi ? 'vegetable' : 'danaMandi' }); setPaymentAmount(''); setPaymentRemarks(''); }}>Payment Received</button>
-                        <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => handleOpenHistory(order)}>History</button>
-                        <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setDetailsModal(order)}>Order Details</button>
+                        <button type="button" className="btn btn-primary btn-sm" onClick={() => { setPaymentModal({ order, orderType: isSabziMandi ? 'vegetable' : 'danaMandi' }); setPaymentAmount(''); setPaymentRemarks(''); }}>{t('payment_received')}</button>
+                        <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => handleOpenHistory(order)}>{t('history')}</button>
+                        <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setDetailsModal(order)}>{t('order_details')}</button>
                     </div>
                 ),
             },
@@ -255,31 +254,32 @@ const BuyerList = () => {
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-6">
-                <li><Link to="/dashboard" className="text-primary hover:underline">Dashboard</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><Link to={getRoute('/getassginshopcrops')} className="text-primary hover:underline">My Crops</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><Link to={getRoute(`/cropmenu/${userId}/${cropId}`)} className="text-primary hover:underline">Crop Management</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><span>Buyer List</span></li>
+                <li><Link to="/dashboard" className="text-primary hover:underline">{t('dashboard')}</Link></li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><Link to={getRoute('/getassginshopcrops')} className="text-primary hover:underline">{t('my_crops')}</Link></li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><Link to={getRoute(`/cropmenu/${userId}/${cropId}`)} className="text-primary hover:underline">{t('crop_management')}</Link></li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><span>{t('buyer_list')}</span></li>
             </ul>
-            <PageHeader title={t('buyer_list')} description={t('buyer_list_desc')} onBack={() => window.history.back()} backLabel={t('back')} icon="👥" />
 
-            <TableCard
-                title="Orders"
-                description={`${filteredOrders.length} order(s)`}
-                data={paginatedOrders}
-                columns={columns}
-                loading={loading}
-                page={page}
-                pageSize={pageSize}
-                totalRecords={filteredOrders.length}
-                onPageChange={setPage}
-                onRecordsPerPageChange={(n) => { setPageSize(n); setPage(1); }}
-                recordsPerPageOptions={PAGE_SIZES}
-                searchValue={orderIdSearch}
-                onSearchChange={setOrderIdSearch}
-                searchPlaceholder="Search by Order ID..."
-                emptyMessage="No orders found."
-                idAccessor="_id"
-            />
+            <div className="shadow-sm dark:shadow-none rounded-lg">
+                <TableCard
+                    title={t('orders')}
+                    description={`${filteredOrders.length} ${t('orders').toLowerCase()}`}
+                    data={paginatedOrders}
+                    columns={columns}
+                    loading={loading}
+                    page={page}
+                    pageSize={pageSize}
+                    totalRecords={filteredOrders.length}
+                    onPageChange={setPage}
+                    onRecordsPerPageChange={(n) => { setPageSize(n); setPage(1); }}
+                    recordsPerPageOptions={PAGE_SIZES}
+                    searchValue={orderIdSearch}
+                    onSearchChange={setOrderIdSearch}
+                    searchPlaceholder={t('search_by_order_id')}
+                    emptyMessage={t('no_orders_found')}
+                    idAccessor="_id"
+                />
+            </div>
 
             <Modal opened={!!paymentModal} onClose={() => setPaymentModal(null)} title={t('payment_received')} size="sm">
                 {paymentModal && (() => {
@@ -289,11 +289,11 @@ const BuyerList = () => {
                     return (
                         <div className="space-y-4">
                             <div className="p-3 rounded-lg bg-gray-50 dark:bg-[#191e3a] border border-[#ebedf2] dark:border-[#191e3a]">
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Remaining due (max you can add)</p>
+                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t('remaining_due_max')}</p>
                                 <p className="text-lg font-semibold text-primary">Rs. {remainingDue.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount received (Rs.)</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('amount_received_rs')}</label>
                                 <input
                                     type="number"
                                     className={`form-input ${exceedsMax ? 'border-red-500' : ''}`}
@@ -317,13 +317,13 @@ const BuyerList = () => {
                                     }}
                                 />
                                 {exceedsMax && (
-                                    <p className="text-sm text-red-500 mt-1">Amount cannot exceed remaining due (Rs. {remainingDue.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
+                                    <p className="text-sm text-red-500 mt-1">{t('amount_cannot_exceed')} Rs. {remainingDue.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
                                 )}
                             </div>
-                            <textarea className="form-textarea w-full" placeholder="Remarks (optional)" value={paymentRemarks} onChange={(e) => setPaymentRemarks(e.target.value)} rows={2} />
+                            <textarea className="form-textarea w-full" placeholder={t('remarks_optional')} value={paymentRemarks} onChange={(e) => setPaymentRemarks(e.target.value)} rows={2} />
                             <div className="flex justify-end gap-2">
-                                <button type="button" className="btn btn-outline-secondary" onClick={() => setPaymentModal(null)}>Cancel</button>
-                                <button type="button" className="btn btn-primary" onClick={handleSavePayment} disabled={saving || exceedsMax}>{saving ? 'Saving...' : 'Save'}</button>
+                                <button type="button" className="btn btn-outline-secondary" onClick={() => setPaymentModal(null)}>{t('cancel')}</button>
+                                <button type="button" className="btn btn-primary" onClick={handleSavePayment} disabled={saving || exceedsMax}>{saving ? t('saving') : t('save')}</button>
                             </div>
                         </div>
                     );
@@ -340,31 +340,31 @@ const BuyerList = () => {
                             <div className="p-4 rounded-lg bg-gray-50 dark:bg-[#191e3a] border border-[#ebedf2] dark:border-[#191e3a]">
                                 <div className="flex flex-wrap items-center justify-between gap-3">
                                     <div>
-                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Status</p>
+                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t('status')}</p>
                                         <p className="mt-0.5"><span className={`badge bg-${status.color} text-sm`}>{status.text}</span></p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Received</p>
+                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t('total_received')}</p>
                                         <p className="mt-0.5 text-lg font-semibold text-primary">Rs. {totalReceived.toLocaleString()}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Order Amount</p>
+                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{t('order_amount')}</p>
                                         <p className="mt-0.5 text-gray-700 dark:text-gray-300">Rs. {orderTotal.toLocaleString()}</p>
                                     </div>
                                 </div>
-                                <p className="text-xs text-gray-500 mt-2">Received <strong>Rs. {totalReceived.toLocaleString()}</strong> out of <strong>Rs. {orderTotal.toLocaleString()}</strong></p>
+                                <p className="text-xs text-gray-500 mt-2">{t('received_out_of')} <strong>Rs. {totalReceived.toLocaleString()}</strong> {t('out_of')} <strong>Rs. {orderTotal.toLocaleString()}</strong></p>
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment entries</p>
-                                {historyList.length === 0 ? <p className="text-gray-500 py-2">No payments recorded yet.</p> : (
+                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('payment_entries')}</p>
+                                {historyList.length === 0 ? <p className="text-gray-500 py-2">{t('no_payments_recorded')}</p> : (
                                     <div className="border border-[#ebedf2] dark:border-[#191e3a] rounded-lg overflow-hidden">
                                         <div className="table-responsive max-h-80 overflow-y-auto">
                                             <table className="table-auto w-full text-left">
                                                 <thead className="bg-gray-100 dark:bg-[#0e1726] sticky top-0">
                                                     <tr>
-                                                        <th className="py-2.5 px-3 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Amount</th>
-                                                        <th className="py-2.5 px-3 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Date</th>
-                                                        <th className="py-2.5 px-3 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Remarks</th>
+                                                        <th className="py-2.5 px-3 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">{t('amount_column')}</th>
+                                                        <th className="py-2.5 px-3 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">{t('date_column')}</th>
+                                                        <th className="py-2.5 px-3 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">{t('remarks_column')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -399,10 +399,10 @@ const BuyerList = () => {
                     const receiptId = o.receiptId || o._id?.slice(-8) || o._id || '—';
                     const totalAmt = Number(o.totalPrice) || 0;
                     const rows: { label: string; value: string | number }[] = [
-                        { label: 'Order Type', value: isSabziMandi ? 'Vegetable (Sabzi Mandi)' : 'Dana Mandi' },
-                        { label: 'Bapari Name', value: bapari },
-                        { label: 'Price (per unit)', value: `Rs. ${(isSabziMandi ? Number(o.pricePisce) : Number(o.priceCrop) || 0).toLocaleString()}` },
-                        { label: 'Created At', value: o.createdAt ? new Date(o.createdAt).toLocaleString() : '—' },
+                        { label: t('order_type'), value: isSabziMandi ? t('vegetable_sabzi_mandi') : t('dana_mandi') },
+                        { label: t('bapari_name'), value: bapari },
+                        { label: t('price_per_unit'), value: `Rs. ${(isSabziMandi ? Number(o.pricePisce) : Number(o.priceCrop) || 0).toLocaleString()}` },
+                        { label: t('created_at'), value: o.createdAt ? new Date(o.createdAt).toLocaleString() : '—' },
                     ];
                     const extraKeys = Object.keys(o).filter((k) => !['_id', '__v', 'vegetableOrderCusId', 'danaMandiOrderCusId', 'receiptId', 'totalPrice', 'pricePisce', 'priceCrop', 'createdAt'].includes(k));
                     extraKeys.forEach((k) => {
@@ -414,11 +414,11 @@ const BuyerList = () => {
                         <div className="space-y-5">
                             <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border border-primary/20">
                                 <div>
-                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Receipt / Order ID</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{t('receipt_order_id')}</p>
                                     <p className="text-xl font-bold text-primary dark:text-primary">{receiptId}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Total Amount</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{t('total_amount')}</p>
                                     <p className="text-2xl font-bold text-gray-900 dark:text-white">Rs. {totalAmt.toLocaleString()}</p>
                                 </div>
                             </div>
@@ -433,7 +433,7 @@ const BuyerList = () => {
                             {cus && typeof cus === 'object' && (
                                 <div className="rounded-xl border border-[#ebedf2] dark:border-white/10 overflow-hidden">
                                     <div className="px-4 py-2.5 bg-gray-100 dark:bg-[#0e1726] border-b border-[#ebedf2] dark:border-white/5">
-                                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Customer details</p>
+                                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t('customer_details')}</p>
                                     </div>
                                     <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
                                         {Object.entries(cus)

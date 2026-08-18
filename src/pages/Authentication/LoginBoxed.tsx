@@ -156,7 +156,14 @@ const LoginBoxed = () => {
 
 
     return (
-        <div className="auth-page-root bg-gradient-to-br from-primary-50 via-white to-success-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative">
+        <div
+            className="auth-page-root bg-gradient-to-br from-primary-50 via-white to-success-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative"
+            style={{
+                alignItems: 'flex-start',
+                paddingTop: 'max(2.5rem, env(safe-area-inset-top, 0px))',
+                paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))',
+            }}
+        >
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-5">
                 <div className="absolute inset-0" style={{
@@ -173,22 +180,25 @@ const LoginBoxed = () => {
                 {/* Login Card */}
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
                     {/* Header Section */}
-                    <div className="auth-page-header bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900">
-                        <div className="flex justify-center mb-4">
-                            <div className="w-24 h-24 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden p-1.5">
+                    <div
+                        className="auth-page-header bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900"
+                        style={{ padding: '1.25rem 1.25rem 1.25rem' }}
+                    >
+                        <div className="flex justify-center mb-2">
+                            <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden p-1.5">
                                 <img src="/assets/images/commission-shop-logo.png" alt="Commission Shop" className="w-full h-full object-contain" />
                             </div>
                         </div>
-                        <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+                        <h1 className="text-2xl font-bold text-white mb-1">Welcome Back</h1>
                         <p className="text-primary-100 text-sm">Sign in to your Commission Shop account</p>
                     </div>
 
                     {/* Form Section */}
-                    <div className="auth-page-body">
-                        <form onSubmit={submitForm} className="space-y-6">
+                    <div className="auth-page-body" style={{ padding: '1.25rem 1.25rem 1.5rem' }}>
+                        <form onSubmit={submitForm} className="space-y-4">
                             {/* Email Field */}
                                 <div>
-                                <label htmlFor="Email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                <label htmlFor="Email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                     Email Address
                                 </label>
                                 <div className="relative">
@@ -222,7 +232,7 @@ const LoginBoxed = () => {
 
                             {/* Password Field */}
                                 <div>
-                                <label htmlFor="Password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                <label htmlFor="Password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                     Password
                                 </label>
                                 <div className="relative">
@@ -314,7 +324,7 @@ const LoginBoxed = () => {
                         </form>
 
                         {/* Footer */}
-                        <div className="mt-6 text-center">
+                        <div className="mt-4 text-center">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Don't have an account?{' '}
                                 <Link
@@ -329,7 +339,7 @@ const LoginBoxed = () => {
                 </div>
 
                 {/* Additional Info */}
-                <div className="mt-6 text-center">
+                <div className="mt-4 text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         Commission Shop Management System
                     </p>

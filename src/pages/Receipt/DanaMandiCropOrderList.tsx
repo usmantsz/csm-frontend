@@ -13,7 +13,6 @@ import IconPhone from "../../components/Icon/IconPhone";
 import IconMapPin from "../../components/Icon/IconMapPin";
 import IconNotes from "../../components/Icon/IconNotes";
 import IconFile from "../../components/Icon/IconFile";
-import PageHeader from "../../components/Agricultural/PageHeader";
 import { useTranslation } from "react-i18next";
 import { useShopId } from "./../../Hooks/useShopId";
 import { useShopIdFromUrl } from "./../../Hooks/useShopIdFromUrl";
@@ -21,6 +20,10 @@ import { useAuthToken } from "./../../Hooks/useAuthToken";
 import { Modal } from "@mantine/core";
 
 interface DanaMandiOrder {
+    piscesTypeId: boolean;
+    pricePisce: string;
+    retrunPayment(retrunPayment: any): unknown;
+    malaKhataPayment: any;
     _id: string;
     danaMandiOrderShopId: { _id: string; shopName: string; shopRegistrationNumber: string };
     danaMandiOrderCusId: { _id: string; cusNameF: string; cusNameL: string; cusNumber: string; cusCNIC: string };
@@ -48,21 +51,21 @@ const DanaMandiCropOrderList = () => {
     const [fetchingShopId, setFetchingShopId] = useState(false);
     const [cropDetails, setCropDetails] = useState<any>(null);
     const [isSabziMandi, setIsSabziMandi] = useState(false);
-    
+
     // If shopId is missing and we have userId, try to fetch shopId from userId (for admin direct access)
     useEffect(() => {
         const fetchShopIdFromUserId = async () => {
             // If we already have shopId, don't fetch
             if (shopId) return;
-            
+
             // Only fetch if we have userId and token, and either admin is viewing OR we don't have urlShopId
             if (!userId || !token) return;
-            
+
             // For admin: always try to fetch from userId if shopId is missing (even if urlShopId is null)
             // For shop owner: only fetch if urlShopId is also missing
             // Check isAdmin instead of isViewingAsAdmin because isViewingAsAdmin requires urlShopId to be true
             if (!isAdmin && urlShopId) return;
-            
+
             setFetchingShopId(true);
             try {
                 console.log('DanaMandiCropOrderList: Fetching shopId from userId:', userId, 'isAdmin:', isAdmin, 'isViewingAsAdmin:', isViewingAsAdmin);
@@ -93,10 +96,10 @@ const DanaMandiCropOrderList = () => {
                 setFetchingShopId(false);
             }
         };
-        
+
         fetchShopIdFromUserId();
     }, [userId, token, isAdmin, isViewingAsAdmin, shopId, urlShopId]);
-    
+
     // Update shopId when urlShopId changes
     useEffect(() => {
         if (urlShopId) {
@@ -144,7 +147,7 @@ const DanaMandiCropOrderList = () => {
     // Fetch crop details to determine crop type
     useEffect(() => {
         if (!cropId || !token) return;
-        
+
         axios
             .get(`${ServerSetting.serUrl}/api/viewcrop/${cropId}`, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -154,8 +157,8 @@ const DanaMandiCropOrderList = () => {
                     const crop = res.data.data;
                     setCropDetails(crop);
                     const cropType = String(crop.cropType || '').toLowerCase().trim();
-                    const isSabzi = cropType === 'sabzi mandi' || 
-                                   cropType === 'sabzimandi' || 
+                    const isSabzi = cropType === 'sabzi mandi' ||
+                                   cropType === 'sabzimandi' ||
                                    cropType === '1' ||
                                    cropType.includes('sabzi');
                     setIsSabziMandi(isSabzi);
@@ -171,39 +174,39 @@ const DanaMandiCropOrderList = () => {
     // Deps include fetchingShopId so we re-run when shopId fetch completes (even if shopId was set from urlShopId)
     useEffect(() => {
         if (!cropId) return;
-        
+
         // Show loading while waiting for dependencies
         if (cropDetails === null || fetchingShopId) {
             setIsLoading(true);
             return;
         }
-        
+
         if (!shopId) {
-            console.warn('DanaMandiCropOrderList: shopId is missing', { 
-                isViewingAsAdmin, 
+            console.warn('DanaMandiCropOrderList: shopId is missing', {
+                isViewingAsAdmin,
                 urlParams: window.location.search,
                 currentUrl: window.location.href,
                 userId,
                 urlShopId
             });
             if (isViewingAsAdmin) {
-                Notification({ 
-                    text: "Shop ID is missing. Please navigate from the shop view page by clicking on a crop.", 
-                    color: "warning" 
+                Notification({
+                    text: t('shop_id_missing_admin_hint'),
+                    color: "warning"
                 });
             } else {
-                Notification({ 
-                    text: "Shop ID is missing. Please ensure you have a shop assigned.", 
-                    color: "warning" 
+                Notification({
+                    text: t('shop_id_missing_user_hint'),
+                    color: "warning"
                 });
             }
             setIsLoading(false);
             return;
         }
-        
+
         console.log('DanaMandiCropOrderList: Fetching orders with shopId:', shopId, 'cropId:', cropId, 'isSabziMandi:', isSabziMandi);
         setIsLoading(true);
-        
+
         // Fetch orders based on crop type
         if (isSabziMandi) {
             // Fetch Vegetable Orders
@@ -219,16 +222,16 @@ const DanaMandiCropOrderList = () => {
                         const orders = res.data.data || [];
                         setInitialRecords(orders);
                         if (orders.length === 0) {
-                            Notification({ text: "No vegetable orders found for this crop.", color: "info" });
+                            Notification({ text: t('no_vegetable_orders_found'), color: "info" });
                         }
                     } else {
-                        Notification({ text: res.data.message || "Failed to fetch vegetable orders", color: "danger" });
+                        Notification({ text: res.data.message || t('failed_to_fetch_vegetable_orders'), color: "danger" });
                     }
                     setIsLoading(false);
                 })
                 .catch((err) => {
                     console.error("Error fetching vegetable orders:", err);
-                    Notification({ text: err.response?.data?.message || "Error fetching vegetable orders", color: "danger" });
+                    Notification({ text: err.response?.data?.message || t('error_fetching_vegetable_orders'), color: "danger" });
                     setIsLoading(false);
                 });
         } else {
@@ -244,16 +247,16 @@ const DanaMandiCropOrderList = () => {
                         setInitialRecords(orders);
                         console.log('DanaMandiCropOrderList: Dana Mandi orders loaded:', orders.length);
                         if (orders.length === 0) {
-                            Notification({ text: "No Dana Mandi orders found for this crop.", color: "info" });
+                            Notification({ text: t('no_dana_mandi_orders_found'), color: "info" });
                         }
                     } else {
-                        Notification({ text: res.data.message || "Failed to fetch orders", color: "danger" });
+                        Notification({ text: res.data.message || t('failed_to_fetch_orders'), color: "danger" });
                     }
                     setIsLoading(false);
                 })
                 .catch((err) => {
                     console.error("Error fetching dana mandi orders:", err);
-                    Notification({ text: err.response?.data?.message || "Error fetching dana mandi orders", color: "danger" });
+                    Notification({ text: err.response?.data?.message || t('error_fetching_dana_mandi_orders'), color: "danger" });
                     setIsLoading(false);
                 });
         }
@@ -268,8 +271,8 @@ const DanaMandiCropOrderList = () => {
             filtered = filtered.filter((item: any) => {
                 if (isSabziMandi) {
                     // Vegetable Orders
-                    const shopName = (typeof item.vegetableOrderShopId === 'object' && item.vegetableOrderShopId) 
-                        ? item.vegetableOrderShopId?.shopName?.toLowerCase() || "" 
+                    const shopName = (typeof item.vegetableOrderShopId === 'object' && item.vegetableOrderShopId)
+                        ? item.vegetableOrderShopId?.shopName?.toLowerCase() || ""
                         : "";
                     const cusName = (typeof item.vegetableOrderCusId === 'object' && item.vegetableOrderCusId)
                         ? `${item.vegetableOrderCusId?.cusNameF || ""} ${item.vegetableOrderCusId?.cusNameL || ""}`.toLowerCase()
@@ -335,13 +338,13 @@ const DanaMandiCropOrderList = () => {
             const printWindow = window.open("", "", "width=800,height=600");
             if (printWindow) {
                 const receiptId = selectedOrder?.receiptId || selectedOrder?._id.slice(-12).toUpperCase();
-                
+
                 printWindow.document.write(`
                     <!DOCTYPE html>
                     <html>
                     <head>
                         <meta charset="UTF-8">
-                        <title>Dana Mandi Receipt - ${receiptId}</title>
+                        <title>${t('dana_mandi_receipt')} - ${receiptId}</title>
                         <style>
                             * {
                                 margin: 0;
@@ -595,7 +598,7 @@ const DanaMandiCropOrderList = () => {
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Dana Mandi Receipt - ${receiptId}</title>
+                    <title>${t('dana_mandi_receipt')} - ${receiptId}</title>
                     <style>
                         * {
                             margin: 0;
@@ -836,8 +839,8 @@ const DanaMandiCropOrderList = () => {
                 <body>
                     ${printContent.innerHTML}
                     <div class="receipt-footer">
-                        <p><strong>This is an official receipt. Please save this file as PDF for your records.</strong></p>
-                        <p>Receipt ID: ${receiptId} | Date: ${formatDate(selectedOrder.createdAt)}</p>
+                        <p><strong>${t('official_receipt_note')}</strong></p>
+                        <p>${t('receipt_id')}: ${receiptId} | ${t('date')}: ${formatDate(selectedOrder.createdAt)}</p>
                     </div>
                 </body>
                 </html>
@@ -857,29 +860,31 @@ const DanaMandiCropOrderList = () => {
 
     return (
         <div>
-            <PageHeader
-                title={isSabziMandi ? t('sabzi_mandi_orders_list') : t('dana_mandi_orders_list')}
-                description={cropDetails?.cropName ? `${t('view_all_orders_crop')} ${cropDetails.cropName}` : t('view_all_orders_crop')}
-                backTo={userId && cropId ? `/cropmenu/${userId}/${cropId}` : '/getassginshopcrops'}
-                backLabel={t('back_to_crop_menu')}
-                icon="📄"
-            />
-            <div className="panel mt-6">
-                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
+            <div className="flex justify-end mb-4">
+                <button
+                    type="button"
+                    onClick={() => navigate(userId && cropId ? `/cropmenu/${userId}/${cropId}` : '/getassginshopcrops')}
+                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                >
+                    {t('back_to_crop_menu')}
+                </button>
+            </div>
+            <div className="panel shadow-md dark:shadow-none">
+                <div className="flex md:items-center md:justify-between flex-col md:flex-row mb-5 gap-4">
                     <h5 className="font-semibold text-lg dark:text-white-light">
                         {isSabziMandi ? t('sabzi_mandi_orders_list') : t('dana_mandi_orders_list')}
                     </h5>
-                    <div className="ltr:ml-auto rtl:mr-auto flex gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
                         <input
                             type="text"
-                            className="form-input w-auto"
-                            placeholder="Search by Receipt ID, CNIC, Phone, Shop, or Customer..."
+                            className="form-input w-full sm:w-auto"
+                            placeholder={t('search_orders_placeholder')}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
                         <input
                             type="date"
-                            className="form-input w-auto"
+                            className="form-input w-full sm:w-auto"
                             value={filterDate}
                             onChange={(e) => setFilterDate(e.target.value)}
                         />
@@ -900,19 +905,19 @@ const DanaMandiCropOrderList = () => {
                                 // Vegetable Orders Columns
                                 {
                                     accessor: "receiptId",
-                                    title: "Receipt ID",
+                                    title: t('receipt_id'),
                                     sortable: true,
                                     render: ({ receiptId, _id }: any) => (
                                         <span className="font-mono text-sm font-semibold text-primary-600 dark:text-primary-400">
-                                            {receiptId || _id?.slice(-8)?.toUpperCase() || 'N/A'}
+                                            {receiptId || _id?.slice(-8)?.toUpperCase() || t('na')}
                                         </span>
                                     ),
                                 },
                                 {
                                     accessor: "vegetableOrderCusId",
-                                    title: "Customer",
+                                    title: t('customer'),
                                     render: ({ vegetableOrderCusId }: any) => {
-                                        if (!vegetableOrderCusId) return 'N/A';
+                                        if (!vegetableOrderCusId) return t('na');
                                         // Handle both object and string ID
                                         if (typeof vegetableOrderCusId === 'object' && vegetableOrderCusId !== null) {
                                             const name = `${vegetableOrderCusId?.cusNameF || ''} ${vegetableOrderCusId?.cusNameL || ''}`.trim();
@@ -920,56 +925,56 @@ const DanaMandiCropOrderList = () => {
                                                 return name;
                                             }
                                         }
-                                        return 'N/A';
+                                        return t('na');
                                     },
                                 },
                                 {
                                     accessor: "vegetableOrderShopId",
-                                    title: "Shop",
+                                    title: t('shop'),
                                     render: ({ vegetableOrderShopId }: any) => {
-                                        if (!vegetableOrderShopId) return 'N/A';
+                                        if (!vegetableOrderShopId) return t('na');
                                         // Handle both object and string ID
                                         if (typeof vegetableOrderShopId === 'object') {
-                                            return vegetableOrderShopId?.shopName || 'N/A';
+                                            return vegetableOrderShopId?.shopName || t('na');
                                         }
-                                        return 'N/A';
+                                        return t('na');
                                     },
                                 },
-                                { 
-                                    accessor: "vegetableOrderCusId.cusCNIC", 
-                                    title: "CNIC", 
+                                {
+                                    accessor: "vegetableOrderCusId.cusCNIC",
+                                    title: t('cnic'),
                                     render: ({ vegetableOrderCusId }: any) => {
-                                        if (!vegetableOrderCusId) return 'N/A';
+                                        if (!vegetableOrderCusId) return t('na');
                                         if (typeof vegetableOrderCusId === 'object' && vegetableOrderCusId !== null) {
-                                            return vegetableOrderCusId?.cusCNIC || 'N/A';
+                                            return vegetableOrderCusId?.cusCNIC || t('na');
                                         }
-                                        return 'N/A';
+                                        return t('na');
                                     }
                                 },
-                                { 
-                                    accessor: "vegetableOrderCusId.cusNumber", 
-                                    title: "Phone", 
+                                {
+                                    accessor: "vegetableOrderCusId.cusNumber",
+                                    title: t('phone'),
                                     render: ({ vegetableOrderCusId }: any) => {
-                                        if (!vegetableOrderCusId) return 'N/A';
+                                        if (!vegetableOrderCusId) return t('na');
                                         if (typeof vegetableOrderCusId === 'object' && vegetableOrderCusId !== null) {
-                                            return vegetableOrderCusId?.cusNumber || 'N/A';
+                                            return vegetableOrderCusId?.cusNumber || t('na');
                                         }
-                                        return 'N/A';
+                                        return t('na');
                                     }
                                 },
-                                { 
-                                    accessor: "vegetableOrderBapariId", 
-                                    title: "Buyer Name",
-                                    render: ({ vegetableOrderBapariId }: any) => vegetableOrderBapariId || 'N/A'
+                                {
+                                    accessor: "vegetableOrderBapariId",
+                                    title: t('buyer_name'),
+                                    render: ({ vegetableOrderBapariId }: any) => vegetableOrderBapariId || t('na')
                                 },
-                                { 
-                                    accessor: "totalPisces", 
-                                    title: "Total Pieces",
+                                {
+                                    accessor: "totalPisces",
+                                    title: t('total_pieces'),
                                     render: ({ totalPisces }: any) => totalPisces || '0'
                                 },
-                                { 
+                                {
                                     accessor: "totalAmount",
-                                    title: "Total Amount",
+                                    title: t('total_amount'),
                                     render: ({ pricePisce, totalPisces }: any) => {
                                         const p = Number(pricePisce) || 0;
                                         const q = Number(totalPisces) || 0;
@@ -981,9 +986,9 @@ const DanaMandiCropOrderList = () => {
                                         );
                                     },
                                 },
-                                { 
-                                    accessor: "totalPrice", 
-                                    title: "Net Price",
+                                {
+                                    accessor: "totalPrice",
+                                    title: t('net_price'),
                                     render: ({ totalPrice }: any) => (
                                         <span className="font-semibold text-success-600 dark:text-success-400">
                                             Rs. {parseFloat(totalPrice || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -992,7 +997,7 @@ const DanaMandiCropOrderList = () => {
                                 },
                                 {
                                     accessor: "createdAt",
-                                    title: "Date",
+                                    title: t('date'),
                                     sortable: true,
                                     render: (row: any) =>
                                         new Date(row.createdAt).toLocaleDateString("en-GB", {
@@ -1003,7 +1008,7 @@ const DanaMandiCropOrderList = () => {
                                 },
                                 {
                                     accessor: "action",
-                                    title: "Action",
+                                    title: t('action'),
                                     render: (order: any) => (
                                         <button
                                             className="btn btn-sm btn-outline-primary flex items-center gap-2 hover:bg-primary hover:text-white transition-all duration-200"
@@ -1014,7 +1019,7 @@ const DanaMandiCropOrderList = () => {
                                             title={t('view_receipt')}
                                         >
                                             <FaEye className="w-4 h-4" />
-                                            <span className="hidden sm:inline">View</span>
+                                            <span className="hidden sm:inline">{t('view')}</span>
                                         </button>
                                     ),
                                 },
@@ -1022,40 +1027,40 @@ const DanaMandiCropOrderList = () => {
                                 // Dana Mandi Orders Columns
                                 {
                                     accessor: "receiptId",
-                                    title: "Receipt ID",
+                                    title: t('receipt_id'),
                                     sortable: true,
                                     render: ({ receiptId, _id }: any) => (
                                         <span className="font-mono text-sm font-semibold text-primary-600 dark:text-primary-400">
-                                            {receiptId || _id?.slice(-8)?.toUpperCase() || 'N/A'}
+                                            {receiptId || _id?.slice(-8)?.toUpperCase() || t('na')}
                                         </span>
                                     ),
                                 },
                                 {
                                     accessor: "danaMandiOrderCusId",
-                                    title: "Customer",
+                                    title: t('customer'),
                                     render: ({ danaMandiOrderCusId }: any) =>
-                                        danaMandiOrderCusId ? `${danaMandiOrderCusId?.cusNameF || ''} ${danaMandiOrderCusId?.cusNameL || ''}`.trim() : 'N/A',
+                                        danaMandiOrderCusId ? `${danaMandiOrderCusId?.cusNameF || ''} ${danaMandiOrderCusId?.cusNameL || ''}`.trim() : t('na'),
                                 },
                                 {
                                     accessor: "danaMandiOrderShopId",
-                                    title: "Shop",
-                                    render: ({ danaMandiOrderShopId }: any) => danaMandiOrderShopId?.shopName || 'N/A',
+                                    title: t('shop'),
+                                    render: ({ danaMandiOrderShopId }: any) => danaMandiOrderShopId?.shopName || t('na'),
                                 },
-                                { accessor: "danaMandiOrderCusId.cusCNIC", title: "CNIC", render: ({ danaMandiOrderCusId }: any) => danaMandiOrderCusId?.cusCNIC || 'N/A' },
-                                { accessor: "danaMandiOrderCusId.cusNumber", title: "Phone", render: ({ danaMandiOrderCusId }: any) => danaMandiOrderCusId?.cusNumber || 'N/A' },
-                                { accessor: "danaMandiOrderBapariId", title: "Bapari Name" },
-                                { 
+                                { accessor: "danaMandiOrderCusId.cusCNIC", title: t('cnic'), render: ({ danaMandiOrderCusId }: any) => danaMandiOrderCusId?.cusCNIC || t('na') },
+                                { accessor: "danaMandiOrderCusId.cusNumber", title: t('phone'), render: ({ danaMandiOrderCusId }: any) => danaMandiOrderCusId?.cusNumber || t('na') },
+                                { accessor: "danaMandiOrderBapariId", title: t('bapari_name') },
+                                {
                                     accessor: "totalPrice",
-                                    title: "Total Amount",
+                                    title: t('total_amount'),
                                     render: ({ totalPrice }: any) => (
                                         <span className="font-semibold text-gray-800 dark:text-gray-200">
                                             Rs. {Number(totalPrice || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </span>
                                     ),
                                 },
-                                { 
+                                {
                                     accessor: "netPrice",
-                                    title: "Net Price",
+                                    title: t('net_price'),
                                     render: (row: any) => {
                                         const total = Number(row.totalPrice) || 0;
                                         const commission = Number(row.commissioneTotal) || 0;
@@ -1071,7 +1076,7 @@ const DanaMandiCropOrderList = () => {
                                 },
                                 {
                                     accessor: "createdAt",
-                                    title: "Date",
+                                    title: t('date'),
                                     sortable: true,
                                     render: (row: any) =>
                                         new Date(row.createdAt).toLocaleDateString("en-GB", {
@@ -1082,7 +1087,7 @@ const DanaMandiCropOrderList = () => {
                                 },
                                 {
                                     accessor: "action",
-                                    title: "Action",
+                                    title: t('action'),
                                     render: (order: any) => (
                                         <button
                                             className="btn btn-sm btn-outline-primary flex items-center gap-2 hover:bg-primary hover:text-white transition-all duration-200"
@@ -1093,7 +1098,7 @@ const DanaMandiCropOrderList = () => {
                                             title={t('view_receipt')}
                                         >
                                             <FaEye className="w-4 h-4" />
-                                            <span className="hidden sm:inline">View</span>
+                                            <span className="hidden sm:inline">{t('view')}</span>
                                         </button>
                                     ),
                                 },
@@ -1107,23 +1112,23 @@ const DanaMandiCropOrderList = () => {
                             sortStatus={sortStatus}
                             onSortStatusChange={setSortStatus}
                             minHeight={200}
-                            paginationText={({ from, to, totalRecords }) => `Showing ${from} to ${to} of ${totalRecords} entries`}
+                            paginationText={({ from, to, totalRecords }) => t('pagination_showing', { from, to, totalRecords })}
                         />
                     </div>
                 )}
             </div>
 
             {/* Receipt Modal */}
-            <Modal 
-                opened={viewModal} 
-                onClose={() => setViewModal(false)} 
-                title="" 
+            <Modal
+                opened={viewModal}
+                onClose={() => setViewModal(false)}
+                title=""
                 size="xl"
                 centered
                 withCloseButton={false}
             >
                 {selectedOrder && (
-                    <div id="receipt-content" className="bg-white dark:bg-gray-800">
+                    <div id="receipt-content" className="bg-white dark:bg-gray-800 shadow-lg dark:shadow-none rounded-lg">
                         {/* Header Section with Gradient */}
                         <div className="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 rounded-t-lg p-6 mb-6">
                             <div className="flex items-center justify-between mb-4">
@@ -1133,9 +1138,9 @@ const DanaMandiCropOrderList = () => {
                                     </div>
                                     <div>
                                         <h2 className="text-2xl font-bold text-white">
-                                            {isSabziMandi ? 'Sabzi Mandi Receipt' : 'Dana Mandi Receipt'}
+                                            {isSabziMandi ? t('sabzi_mandi_receipt') : t('dana_mandi_receipt')}
                                         </h2>
-                                        <p className="text-primary-100 text-sm">Order Details & Payment Summary</p>
+                                        <p className="text-primary-100 text-sm">{t('order_details_payment_summary')}</p>
                                     </div>
                                 </div>
                                 <button
@@ -1148,13 +1153,13 @@ const DanaMandiCropOrderList = () => {
                                     </svg>
                                 </button>
                             </div>
-                            
+
                             {/* Receipt ID - Prominently Displayed */}
                             <div className="bg-white rounded-lg p-4 border border-green-200 shadow-sm">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <IconFile className="w-5 h-5 text-green-700" />
-                                        <span className="text-gray-800 text-sm font-medium">Receipt ID:</span>
+                                        <span className="text-gray-800 text-sm font-medium">{t('receipt_id')}:</span>
                                     </div>
                                     <span className="font-mono text-xl font-bold text-gray-900 bg-green-50 px-4 py-2 rounded-lg border border-green-300">
                                         {selectedOrder.receiptId || selectedOrder._id.slice(-12).toUpperCase()}
@@ -1164,7 +1169,7 @@ const DanaMandiCropOrderList = () => {
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span>Date: {formatDate(selectedOrder.createdAt)}</span>
+                                    <span>{t('date')}: {formatDate(selectedOrder.createdAt)}</span>
                                 </div>
                             </div>
                         </div>
@@ -1174,67 +1179,67 @@ const DanaMandiCropOrderList = () => {
                             {/* Shop & Customer Information */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 {/* Shop Information Card */}
-                                <div className="panel bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-2 border-blue-200 dark:border-blue-800">
+                                <div className="panel shadow-md dark:shadow-none bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-2 border-blue-200 dark:border-blue-800">
                                     <h3 className="text-lg font-bold text-blue-700 dark:text-blue-400 mb-4 flex items-center">
                                         <IconCashBanknotes className="w-5 h-5 mr-2" />
-                                        Shop Information
+                                        {t('shop_information')}
                                     </h3>
                                     <div className="space-y-2">
                                         <div>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Shop Name:</span>
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('shop_name')}:</span>
                                             <p className="font-semibold text-gray-800 dark:text-white">
-                                                {isSabziMandi 
-                                                    ? (typeof selectedOrder.vegetableOrderShopId === 'object' ? selectedOrder.vegetableOrderShopId?.shopName : 'N/A')
+                                                {isSabziMandi
+                                                    ? (typeof selectedOrder.vegetableOrderShopId === 'object' ? selectedOrder.vegetableOrderShopId?.shopName : t('na'))
                                                     : selectedOrder.danaMandiOrderShopId?.shopName}
                                             </p>
                                         </div>
                                         <div>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Buyer Name:</span>
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('buyer_name')}:</span>
                                             <p className="font-semibold text-gray-800 dark:text-white">
                                                 {isSabziMandi
-                                                    ? selectedOrder.vegetableOrderBapariId || 'N/A'
-                                                    : selectedOrder.danaMandiOrderBapariId || 'N/A'}
+                                                    ? selectedOrder.vegetableOrderBapariId || t('na')
+                                                    : selectedOrder.danaMandiOrderBapariId || t('na')}
                                             </p>
                                         </div>
                                         <div>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Crop:</span>
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('crop')}:</span>
                                             <p className="font-semibold text-gray-800 dark:text-white">
                                                 {isSabziMandi
                                                     ? (typeof selectedOrder.vegetableOrderCropId === 'object' && selectedOrder.vegetableOrderCropId !== null
-                                                        ? selectedOrder.vegetableOrderCropId?.cropName 
-                                                        : cropDetails?.cropName) || 'N/A'
-                                                    : selectedOrder.danaMandiOrderCropId?.cropName || cropDetails?.cropName || 'N/A'}
+                                                        ? selectedOrder.vegetableOrderCropId?.cropName
+                                                        : cropDetails?.cropName) || t('na')
+                                                    : selectedOrder.danaMandiOrderCropId?.cropName || cropDetails?.cropName || t('na')}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Customer Information Card */}
-                                <div className="panel bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-2 border-green-200 dark:border-green-800">
+                                <div className="panel shadow-md dark:shadow-none bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-2 border-green-200 dark:border-green-800">
                                     <h3 className="text-lg font-bold text-green-700 dark:text-green-400 mb-4 flex items-center">
                                         <IconUser className="w-5 h-5 mr-2" />
-                                        Customer Information
+                                        {t('customer_information')}
                                     </h3>
                                     <div className="space-y-2">
                                         <div>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Name:</span>
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('name')}:</span>
                                             <p className="font-semibold text-gray-800 dark:text-white">
                                                 {isSabziMandi
                                                     ? (typeof selectedOrder.vegetableOrderCusId === 'object' && selectedOrder.vegetableOrderCusId
                                                         ? `${selectedOrder.vegetableOrderCusId?.cusNameF || ''} ${selectedOrder.vegetableOrderCusId?.cusNameL || ''}`.trim()
-                                                        : 'N/A')
+                                                        : t('na'))
                                                     : `${selectedOrder.danaMandiOrderCusId?.cusNameF || ''} ${selectedOrder.danaMandiOrderCusId?.cusNameL || ''}`.trim()}
                                             </p>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <IconCreditCard className="w-4 h-4 text-gray-500" />
                                             <div>
-                                                <span className="text-sm text-gray-600 dark:text-gray-400">CNIC:</span>
+                                                <span className="text-sm text-gray-600 dark:text-gray-400">{t('cnic')}:</span>
                                                 <p className="font-semibold text-gray-800 dark:text-white font-mono">
                                                     {isSabziMandi
                                                         ? (typeof selectedOrder.vegetableOrderCusId === 'object' && selectedOrder.vegetableOrderCusId
                                                             ? selectedOrder.vegetableOrderCusId?.cusCNIC
-                                                            : 'N/A')
+                                                            : t('na'))
                                                         : selectedOrder.danaMandiOrderCusId?.cusCNIC}
                                                 </p>
                                             </div>
@@ -1242,12 +1247,12 @@ const DanaMandiCropOrderList = () => {
                                         <div className="flex items-center gap-2">
                                             <IconPhone className="w-4 h-4 text-gray-500" />
                                             <div>
-                                                <span className="text-sm text-gray-600 dark:text-gray-400">Phone:</span>
+                                                <span className="text-sm text-gray-600 dark:text-gray-400">{t('phone')}:</span>
                                                 <p className="font-semibold text-gray-800 dark:text-white font-mono">
                                                     {isSabziMandi
                                                         ? (typeof selectedOrder.vegetableOrderCusId === 'object' && selectedOrder.vegetableOrderCusId
                                                             ? selectedOrder.vegetableOrderCusId?.cusNumber
-                                                            : 'N/A')
+                                                            : t('na'))
                                                         : selectedOrder.danaMandiOrderCusId?.cusNumber}
                                                 </p>
                                             </div>
@@ -1257,42 +1262,42 @@ const DanaMandiCropOrderList = () => {
                             </div>
 
                             {/* Order Details Section */}
-                            <div className="panel mb-6">
+                            <div className="panel shadow-md dark:shadow-none mb-6">
                                 <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center">
                                     <IconCashBanknotes className="w-5 h-5 mr-2 text-primary-600" />
-                                    Order Details
+                                    {t('order_details')}
                                 </h3>
                                 {isSabziMandi ? (
                                     // Sabzi Mandi Order Details
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Price per Piece</span>
+                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm dark:shadow-none">
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('price_per_piece')}</span>
                                             <p className="text-lg font-bold text-gray-800 dark:text-white">
                                                 Rs. {parseFloat(selectedOrder.pricePisce || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </p>
                                         </div>
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Total Pieces</span>
+                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm dark:shadow-none">
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('total_pieces')}</span>
                                             <p className="text-lg font-bold text-gray-800 dark:text-white">
                                                 {selectedOrder.totalPisces || '0'}
                                             </p>
                                         </div>
-                                        <div className="p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border-2 border-primary-200 dark:border-primary-800">
-                                            <span className="text-sm text-primary-600 dark:text-primary-400">Net Total Price</span>
+                                        <div className="p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border-2 border-primary-200 dark:border-primary-800 shadow-sm dark:shadow-none">
+                                            <span className="text-sm text-primary-600 dark:text-primary-400">{t('net_total_price')}</span>
                                             <p className="text-xl font-bold text-primary-700 dark:text-primary-400">
                                                 Rs. {parseFloat(selectedOrder.totalPrice || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </p>
                                         </div>
                                         {(Number(selectedOrder.retrunPayment) || selectedOrder.returnPaymentAmount || 0) > 0 && (
                                             <>
-                                                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-                                                    <span className="text-sm text-amber-700 dark:text-amber-400">Return Payment</span>
+                                                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800 shadow-sm dark:shadow-none">
+                                                    <span className="text-sm text-amber-700 dark:text-amber-400">{t('return_payment')}</span>
                                                     <p className="text-lg font-bold text-amber-700 dark:text-amber-400">
                                                         Rs. {(Number(selectedOrder.retrunPayment) || selectedOrder.returnPaymentAmount || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </p>
                                                 </div>
-                                                <div className="p-4 bg-success-50 dark:bg-success-900/20 rounded-lg border-2 border-success-200 dark:border-success-800">
-                                                    <span className="text-sm text-success-600 dark:text-success-400">After Return Payment</span>
+                                                <div className="p-4 bg-success-50 dark:bg-success-900/20 rounded-lg border-2 border-success-200 dark:border-success-800 shadow-sm dark:shadow-none">
+                                                    <span className="text-sm text-success-600 dark:text-success-400">{t('after_return_payment')}</span>
                                                     <p className="text-xl font-bold text-success-700 dark:text-success-400">
                                                         Rs. {(Number(selectedOrder.afterRetrunPayemnt ?? selectedOrder.afterReturnAmount ?? selectedOrder.totalPrice ?? 0)).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </p>
@@ -1303,20 +1308,20 @@ const DanaMandiCropOrderList = () => {
                                 ) : (
                                     // Dana Mandi Order Details
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Price per Mann</span>
+                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm dark:shadow-none">
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('price_per_mann')}</span>
                                             <p className="text-lg font-bold text-gray-800 dark:text-white">
                                                 Rs. {selectedOrder.priceCrop?.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
                                             </p>
                                         </div>
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Weight</span>
+                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm dark:shadow-none">
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('weight')}</span>
                                             <p className="text-lg font-bold text-gray-800 dark:text-white">
-                                                {selectedOrder.weightMann} Mann {selectedOrder.weightKg ? `/ ${selectedOrder.weightKg} Kg` : ''}
+                                                {selectedOrder.weightMann} {t('mann')} {selectedOrder.weightKg ? `/ ${selectedOrder.weightKg} ${t('kg')}` : ''}
                                             </p>
                                         </div>
-                                        <div className="p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border-2 border-primary-200 dark:border-primary-800">
-                                            <span className="text-sm text-primary-600 dark:text-primary-400">Total Price</span>
+                                        <div className="p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border-2 border-primary-200 dark:border-primary-800 shadow-sm dark:shadow-none">
+                                            <span className="text-sm text-primary-600 dark:text-primary-400">{t('total_price')}</span>
                                             <p className="text-xl font-bold text-primary-700 dark:text-primary-400">
                                                 Rs. {selectedOrder.totalPrice?.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
                                             </p>
@@ -1327,26 +1332,26 @@ const DanaMandiCropOrderList = () => {
 
                             {/* Mala Khata Section - Only for Dana Mandi */}
                             {!isSabziMandi && selectedOrder.malaKhataName && (
-                                <div className="panel mb-6">
+                                <div className="panel shadow-md dark:shadow-none mb-6">
                                     <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center">
                                         <IconNotes className="w-5 h-5 mr-2 text-warning-600" />
-                                        Mala Khata Details
+                                        {t('mala_khata_details')}
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                         <div>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Name</span>
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('name')}</span>
                                             <p className="font-semibold text-gray-800 dark:text-white">{selectedOrder.malaKhataName || "-"}</p>
                                         </div>
                                         <div>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Mann</span>
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('mann')}</span>
                                             <p className="font-semibold text-gray-800 dark:text-white">{selectedOrder.malaKhataMan ?? "-"}</p>
                                         </div>
                                         <div>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Kg</span>
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('kg')}</span>
                                             <p className="font-semibold text-gray-800 dark:text-white">{selectedOrder.malaKhataKg ?? "-"}</p>
                                         </div>
                                         <div>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Payment</span>
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('payment')}</span>
                                             <p className="font-semibold text-gray-800 dark:text-white">
                                                 Rs. {selectedOrder.malaKhataPayment?.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
                                             </p>
@@ -1356,49 +1361,49 @@ const DanaMandiCropOrderList = () => {
                             )}
 
                             {/* Charges & Deductions Section */}
-                            <div className="panel mb-6">
+                            <div className="panel shadow-md dark:shadow-none mb-6">
                                 <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center">
                                     <IconCashBanknotes className="w-5 h-5 mr-2 text-danger-600" />
-                                    {isSabziMandi ? 'Charges & Deductions' : 'Charges & Deductions'}
+                                    {t('charges_deductions')}
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                                        <span className="text-sm text-gray-600 dark:text-gray-400">Rent & Delivery</span>
+                                    <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 shadow-sm dark:shadow-none">
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('rent_delivery')}</span>
                                         <p className="text-lg font-bold text-red-600 dark:text-red-400">
                                             Rs. {parseFloat(isSabziMandi ? (selectedOrder.RentDelivery || '0') : (selectedOrder.RentDelivery || '0')).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </p>
                                     </div>
                                     {!isSabziMandi && (
-                                        <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Mala Khata Payment</span>
+                                        <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 shadow-sm dark:shadow-none">
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('mala_khata_payment')}</span>
                                             <p className="text-lg font-bold text-red-600 dark:text-red-400">
                                                 Rs. {selectedOrder.malaKhataPayment?.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
                                             </p>
                                         </div>
                                     )}
-                                    <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                                        <span className="text-sm text-gray-600 dark:text-gray-400">Commission ({isSabziMandi ? (selectedOrder.commissioneRate || '0') : (selectedOrder.commissioneRate || '0')}%)</span>
+                                    <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 shadow-sm dark:shadow-none">
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('commission')} ({isSabziMandi ? (selectedOrder.commissioneRate || '0') : (selectedOrder.commissioneRate || '0')}%)</span>
                                         <p className="text-lg font-bold text-red-600 dark:text-red-400">
                                             Rs. {parseFloat(isSabziMandi ? (selectedOrder.commissioneTotal || '0') : (selectedOrder.commissioneTotal || '0')).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </p>
                                     </div>
-                                    <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                                        <span className="text-sm text-gray-600 dark:text-gray-400">Mazdoori ({isSabziMandi ? (selectedOrder.mazdoriRate || '0') : (selectedOrder.mazdoriRate || '0')}%)</span>
+                                    <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 shadow-sm dark:shadow-none">
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">{t('mazdoori')} ({isSabziMandi ? (selectedOrder.mazdoriRate || '0') : (selectedOrder.mazdoriRate || '0')}%)</span>
                                         <p className="text-lg font-bold text-red-600 dark:text-red-400">
                                             Rs. {parseFloat(isSabziMandi ? (selectedOrder.mazdoriTotal || '0') : (selectedOrder.mazdoriTotal || '0')).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </p>
                                     </div>
                                     {isSabziMandi && (
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Pieces Type</span>
+                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm dark:shadow-none">
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('pieces_type')}</span>
                                             <p className="text-lg font-bold text-gray-800 dark:text-white">
-                                                {selectedOrder.piscesType === 0 ? 'Standard' : selectedOrder.piscesType === 1 ? 'Special' : 'N/A'}
+                                                {selectedOrder.piscesTypeId === 0 ? t('standard') : selectedOrder.piscesType === 1 ? t('special') : t('na')}
                                             </p>
                                         </div>
                                     )}
                                     {!isSabziMandi && selectedOrder.piscesTypeId && (
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">Pisces Type</span>
+                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm dark:shadow-none">
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('pisces_type')}</span>
                                             <p className="text-lg font-bold text-gray-800 dark:text-white">{selectedOrder.piscesTypeId}</p>
                                         </div>
                                     )}
@@ -1406,19 +1411,19 @@ const DanaMandiCropOrderList = () => {
                             </div>
 
                             {/* Payment Breakdown Section */}
-                            <div className="panel bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 border-2 border-primary-200 dark:border-primary-800">
+                            <div className="panel shadow-md dark:shadow-none bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 border-2 border-primary-200 dark:border-primary-800">
                                 <h3 className="text-xl font-bold text-primary-700 dark:text-primary-400 mb-6 flex items-center">
                                     <IconCashBanknotes className="w-6 h-6 mr-2" />
-                                    Payment Breakdown & Final Amount
+                                    {t('payment_breakdown_final_amount')}
                                 </h3>
-                                
+
                                 {isSabziMandi ? (
                                     // Sabzi Mandi Payment Breakdown
                                     <>
                                         {/* Base Total */}
-                                        <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                                        <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm dark:shadow-none">
                                             <div className="flex justify-between items-center">
-                                                <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">Base Total (Price × Pieces)</p>
+                                                <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">{t('base_total_price_pieces')}</p>
                                                 <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                                                     Rs. {(parseFloat(selectedOrder.pricePisce || '0') * parseFloat(selectedOrder.totalPisces || '0')).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </p>
@@ -1427,35 +1432,35 @@ const DanaMandiCropOrderList = () => {
 
                                         {/* Deductions */}
                                         <div className="mb-4">
-                                            <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">Deductions:</h4>
+                                            <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">{t('deductions')}:</h4>
                                             <div className="space-y-2">
                                                 {parseFloat(selectedOrder.RentDelivery || '0') > 0 && (
-                                                    <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-                                                        <span className="text-gray-700 dark:text-gray-300">Rent & Delivery</span>
+                                                    <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-none">
+                                                        <span className="text-gray-700 dark:text-gray-300">{t('rent_delivery')}</span>
                                                         <span className="font-semibold text-red-600 dark:text-red-400">
                                                             - Rs. {parseFloat(selectedOrder.RentDelivery || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </span>
                                                     </div>
                                                 )}
                                                 {parseFloat(selectedOrder.commissioneTotal || '0') > 0 && (
-                                                    <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-                                                        <span className="text-gray-700 dark:text-gray-300">Commission Total ({selectedOrder.commissioneRate}%)</span>
+                                                    <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-none">
+                                                        <span className="text-gray-700 dark:text-gray-300">{t('commission_total')} ({selectedOrder.commissioneRate}%)</span>
                                                         <span className="font-semibold text-red-600 dark:text-red-400">
                                                             - Rs. {parseFloat(selectedOrder.commissioneTotal || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </span>
                                                     </div>
                                                 )}
                                                 {parseFloat(selectedOrder.mazdoriTotal || '0') > 0 && (
-                                                    <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-                                                        <span className="text-gray-700 dark:text-gray-300">Mazdoori Total ({selectedOrder.mazdoriRate}%)</span>
+                                                    <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-none">
+                                                        <span className="text-gray-700 dark:text-gray-300">{t('mazdoori_total')} ({selectedOrder.mazdoriRate}%)</span>
                                                         <span className="font-semibold text-red-600 dark:text-red-400">
                                                             - Rs. {parseFloat(selectedOrder.mazdoriTotal || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </span>
                                                     </div>
                                                 )}
                                                 {(Number(selectedOrder.retrunPayment) || selectedOrder.returnPaymentAmount || 0) > 0 && (
-                                                    <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-                                                        <span className="text-gray-700 dark:text-gray-300">Return Payment</span>
+                                                    <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-none">
+                                                        <span className="text-gray-700 dark:text-gray-300">{t('return_payment')}</span>
                                                         <span className="font-semibold text-red-600 dark:text-red-400">
                                                             - Rs. {(Number(selectedOrder.retrunPayment) || selectedOrder.returnPaymentAmount || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </span>
@@ -1465,9 +1470,9 @@ const DanaMandiCropOrderList = () => {
                                         </div>
 
                                         {/* Final Amount */}
-                                        <div className="p-6 bg-gradient-to-r from-success-500 to-success-600 dark:from-success-700 dark:to-success-800 rounded-lg">
+                                        <div className="p-6 bg-gradient-to-r from-success-500 to-success-600 dark:from-success-700 dark:to-success-800 rounded-lg shadow-md dark:shadow-none">
                                             <div className="flex justify-between items-center">
-                                                <p className="text-xl font-bold text-white">{(Number(selectedOrder.retrunPayment) || selectedOrder.returnPaymentAmount || 0) > 0 ? 'Final Amount (After Return Payment)' : 'Net Total Price'}</p>
+                                                <p className="text-xl font-bold text-white">{(Number(selectedOrder.retrunPayment) || selectedOrder.returnPaymentAmount || 0) > 0 ? t('final_amount_after_return') : t('net_total_price')}</p>
                                                 <p className="text-3xl font-bold text-white">
                                                     Rs. {(Number(selectedOrder.afterRetrunPayemnt ?? selectedOrder.afterReturnAmount ?? selectedOrder.totalPrice ?? 0)).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </p>
@@ -1478,9 +1483,9 @@ const DanaMandiCropOrderList = () => {
                                     // Dana Mandi Payment Breakdown
                                     <>
                                         {/* Total Price */}
-                                        <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                                        <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm dark:shadow-none">
                                             <div className="flex justify-between items-center">
-                                                <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Price (Before Deductions)</p>
+                                                <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">{t('total_price_before_deductions')}</p>
                                                 <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                                                     Rs. {selectedOrder.totalPrice?.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
                                                 </p>
@@ -1489,35 +1494,35 @@ const DanaMandiCropOrderList = () => {
 
                                         {/* Deductions */}
                                         <div className="mb-4">
-                                            <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">Deductions:</h4>
+                                            <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">{t('deductions')}:</h4>
                                             <div className="space-y-2">
-                                                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-                                                    <span className="text-gray-700 dark:text-gray-300">Rent Delivery</span>
+                                                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-none">
+                                                    <span className="text-gray-700 dark:text-gray-300">{t('rent_delivery')}</span>
                                                     <span className="font-semibold text-red-600 dark:text-red-400">
                                                         - Rs. {selectedOrder.RentDelivery?.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
                                                     </span>
                                                 </div>
-                                                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-                                                    <span className="text-gray-700 dark:text-gray-300">Mala Khata Payment</span>
+                                                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-none">
+                                                    <span className="text-gray-700 dark:text-gray-300">{t('mala_khata_payment')}</span>
                                                     <span className="font-semibold text-red-600 dark:text-red-400">
                                                         - Rs. {selectedOrder.malaKhataPayment?.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
                                                     </span>
                                                 </div>
-                                                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-                                                    <span className="text-gray-700 dark:text-gray-300">Commission Total</span>
+                                                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-none">
+                                                    <span className="text-gray-700 dark:text-gray-300">{t('commission_total')}</span>
                                                     <span className="font-semibold text-red-600 dark:text-red-400">
                                                         - Rs. {selectedOrder.commissioneTotal?.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
                                                     </span>
                                                 </div>
-                                                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-                                                    <span className="text-gray-700 dark:text-gray-300">Mazdoori Total</span>
+                                                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-none">
+                                                    <span className="text-gray-700 dark:text-gray-300">{t('mazdoori_total')}</span>
                                                     <span className="font-semibold text-red-600 dark:text-red-400">
                                                         - Rs. {selectedOrder.mazdoriTotal?.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
                                                     </span>
                                                 </div>
                                                 {selectedOrder.retrunPayment && parseFloat(selectedOrder.retrunPayment) > 0 && (
-                                                    <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
-                                                        <span className="text-gray-700 dark:text-gray-300">Return Payment</span>
+                                                    <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-none">
+                                                        <span className="text-gray-700 dark:text-gray-300">{t('return_payment')}</span>
                                                         <span className="font-semibold text-red-600 dark:text-red-400">
                                                             - Rs. {parseFloat(selectedOrder.retrunPayment).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </span>
@@ -1527,9 +1532,9 @@ const DanaMandiCropOrderList = () => {
                                         </div>
 
                                         {/* Final Amount */}
-                                        <div className="p-6 bg-gradient-to-r from-success-500 to-success-600 dark:from-success-700 dark:to-success-800 rounded-lg">
+                                        <div className="p-6 bg-gradient-to-r from-success-500 to-success-600 dark:from-success-700 dark:to-success-800 rounded-lg shadow-md dark:shadow-none">
                                             <div className="flex justify-between items-center">
-                                                <p className="text-xl font-bold text-white">Final Amount (After Return Payment)</p>
+                                                <p className="text-xl font-bold text-white">{t('final_amount_after_return')}</p>
                                                 <p className="text-3xl font-bold text-white">
                                                     Rs. {selectedOrder.afterRetrunPayemnt?.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
                                                 </p>
@@ -1541,25 +1546,25 @@ const DanaMandiCropOrderList = () => {
 
                             {/* Action Buttons */}
                             <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                                <button 
-                                    className="btn btn-outline-primary flex items-center gap-2" 
+                                <button
+                                    className="btn btn-outline-primary flex items-center gap-2"
                                     onClick={() => setViewModal(false)}
                                 >
-                                    Close
+                                    {t('close')}
                                 </button>
-                                <button 
-                                    className="btn btn-primary flex items-center gap-2" 
+                                <button
+                                    className="btn btn-primary flex items-center gap-2"
                                     onClick={handlePrint}
                                     title={t('print_receipt')}
                                 >
                                     <FaPrint className="w-4 h-4" /> {t('print_receipt')}
                                 </button>
-                                <button 
-                                    className="btn btn-danger flex items-center gap-2" 
+                                <button
+                                    className="btn btn-danger flex items-center gap-2"
                                     onClick={handleExportPDF}
                                     title={t('download_pdf')}
                                 >
-                                    <FaFilePdf className="w-4 h-4" /> Export PDF
+                                    <FaFilePdf className="w-4 h-4" /> {t('export_pdf')}
                                 </button>
                             </div>
                         </div>
