@@ -126,7 +126,10 @@ const ShopOwnerLogin = () => {
                 localStorage.setItem('token', userInfo.token);
                 localStorage.removeItem('loginSource');
 
-                // Remember me: store CNIC only (never store password)
+                // Remember me: store CNIC only (never store password).
+                // Actual username/password saving is handled by the
+                // browser's native password manager via autoComplete
+                // attributes + a real form submit event below.
                 if (rememberMe) {
                     localStorage.setItem('remember_shopowner', 'true');
                     localStorage.setItem('remember_shopowner_cnic', String(data.userEmail || '').replace(/\D/g, '').slice(0, 13));
@@ -183,7 +186,10 @@ const ShopOwnerLogin = () => {
                         <p className="relative text-sm text-amber-100 mt-1.5">Sign in with CNIC</p>
                     </div>
                     <div className="px-6 py-8">
-                        <form onSubmit={submitForm} className="space-y-6">
+                        {/* autoComplete="on" + name attributes on the real <form>/<input> elements
+                            let Chrome/Edge/Firefox detect this as a login form and offer to
+                            save the username + password in the browser's password manager. */}
+                        <form onSubmit={submitForm} className="space-y-6" autoComplete="on">
                             <div>
                                 <label htmlFor="loginId" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                     CNIC
@@ -194,9 +200,11 @@ const ShopOwnerLogin = () => {
                                     </div>
                                     <input
                                         id="loginId"
+                                        name="username"
                                         type="tel"
                                         inputMode="numeric"
                                         pattern="[0-9]*"
+                                        autoComplete="username"
                                         value={data.userEmail}
                                         onChange={(e) => handleInputChange('userEmail', e.target.value)}
                                         placeholder="3310112345678"
@@ -216,7 +224,9 @@ const ShopOwnerLogin = () => {
                                     </div>
                                     <input
                                         id="Password"
+                                        name="password"
                                         type={showPassword ? 'text' : 'password'}
+                                        autoComplete="current-password"
                                         value={data.userPassword}
                                         onChange={(e) => handleInputChange('userPassword', e.target.value)}
                                         placeholder="Enter your password"

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { setPageTitle } from '../../store/themeConfigSlice';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef, FC } from 'react';
 import axios from 'axios';
 import IconPencilPaper from '../../components/Icon/IconPencilPaper';
 import IconCoffee from '../../components/Icon/IconCoffee';
@@ -15,6 +15,7 @@ import IconClock from '../../components/Icon/IconClock';
 import { ServerSetting } from './../../helperComponents/ServerSetting';
 import { useAuthToken } from './../../Hooks/useAuthToken';
 import { ChangePasswordCard } from '../../components/Account/ChangePasswordCard';
+import { showSuccess, showError } from '../../utils/sweetAlert';
 
 function formatAddress(u: Record<string, unknown>, notSetLabel: string): string {
     const line = (u?.userAdress ?? u?.userAddress) as string | undefined;
@@ -56,9 +57,228 @@ function getDisplayName(u: Record<string, any> | null | undefined): string {
     return (single || '').trim();
 }
 
+/* =========================================================
+   Reusable Image Crop Modal (no external library required)
+   - Drag to reposition
+   - Slider to zoom IN and OUT (minimize)
+   - Outputs a square-cropped JPEG Blob
+   ========================================================= */
+
+const CROP_SIZE = 280;   // px, size of the crop viewport shown to the user
+const OUTPUT_SIZE = 500; // px, size of the final cropped image
+const MIN_ZOOM = 0.5;    // allows shrinking the image below "cover" fit
+const MAX_ZOOM = 3;
+
+interface ImageCropModalProps {
+    imageSrc: string;
+    round?: boolean;
+    title?: string;
+    onCancel: () => void;
+    onConfirm: (blob: Blob) => void;
+}
+
+const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, title, onCancel, onConfirm }) => {
+    const { t } = useTranslation();
+    const imgRef = useRef<HTMLImageElement>(null);
+    const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const dragRef = useRef({ startX: 0, startY: 0, startPosX: 0, startPosY: 0 });
+
+    // baseScale = the scale at which the image fully COVERS the crop viewport (zoom = 1 reference point)
+    const baseScale = useMemo(() => {
+        if (!naturalSize.width || !naturalSize.height) return 1;
+        return Math.max(CROP_SIZE / naturalSize.width, CROP_SIZE / naturalSize.height);
+    }, [naturalSize]);
+
+    const scale = baseScale * zoom;
+
+    // Clamps drag position. When the image is LARGER than the viewport it behaves as before
+    // (can't reveal empty edges). When the image is SMALLER than the viewport (minimized/zoomed out),
+    // it gets centered instead of being pinned to a corner.
+    const clampPosition = (pos: { x: number; y: number }, currentScale: number) => {
+        const displayedWidth = naturalSize.width * currentScale;
+        const displayedHeight = naturalSize.height * currentScale;
+
+        let x: number;
+        if (displayedWidth <= CROP_SIZE) {
+            x = (CROP_SIZE - displayedWidth) / 2;
+        } else {
+            const minX = CROP_SIZE - displayedWidth;
+            x = Math.min(0, Math.max(pos.x, minX));
+        }
+
+        let y: number;
+        if (displayedHeight <= CROP_SIZE) {
+            y = (CROP_SIZE - displayedHeight) / 2;
+        } else {
+            const minY = CROP_SIZE - displayedHeight;
+            y = Math.min(0, Math.max(pos.y, minY));
+        }
+
+        return { x, y };
+    };
+
+    const onImgLoad = () => {
+        if (!imgRef.current) return;
+        const { naturalWidth, naturalHeight } = imgRef.current;
+        setNaturalSize({ width: naturalWidth, height: naturalHeight });
+        const initialScale = Math.max(CROP_SIZE / naturalWidth, CROP_SIZE / naturalHeight);
+        const displayedWidth = naturalWidth * initialScale;
+        const displayedHeight = naturalHeight * initialScale;
+        setPosition({
+            x: (CROP_SIZE - displayedWidth) / 2,
+            y: (CROP_SIZE - displayedHeight) / 2,
+        });
+        setZoom(1);
+    };
+
+    const startDrag = (clientX: number, clientY: number) => {
+        setIsDragging(true);
+        dragRef.current = { startX: clientX, startY: clientY, startPosX: position.x, startPosY: position.y };
+    };
+
+    const moveDrag = (clientX: number, clientY: number) => {
+        if (!isDragging) return;
+        const dx = clientX - dragRef.current.startX;
+        const dy = clientY - dragRef.current.startY;
+        setPosition(clampPosition({ x: dragRef.current.startPosX + dx, y: dragRef.current.startPosY + dy }, scale));
+    };
+
+    const endDrag = () => setIsDragging(false);
+
+    const handleZoomChange = (newZoom: number) => {
+        setZoom(newZoom);
+        setPosition((prev) => clampPosition(prev, baseScale * newZoom));
+    };
+
+    const handleConfirm = () => {
+        if (!naturalSize.width || !naturalSize.height || !imgRef.current) return;
+
+        // Source rectangle (in ORIGINAL image pixel coordinates) that corresponds to the crop viewport
+        const cropX = -position.x / scale;
+        const cropY = -position.y / scale;
+        const cropSizeOnImage = CROP_SIZE / scale;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = OUTPUT_SIZE;
+        canvas.height = OUTPUT_SIZE;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Fill background first (matters when image is minimized and doesn't cover the whole crop area)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+        // Clip the source rect against the actual image bounds so we never pass
+        // negative/oversized values into drawImage (which breaks on some browsers).
+        const sxClipped = Math.max(cropX, 0);
+        const syClipped = Math.max(cropY, 0);
+        const sxEnd = Math.min(cropX + cropSizeOnImage, naturalSize.width);
+        const syEnd = Math.min(cropY + cropSizeOnImage, naturalSize.height);
+        const swClipped = sxEnd - sxClipped;
+        const shClipped = syEnd - syClipped;
+
+        if (swClipped > 0 && shClipped > 0) {
+            const outScale = OUTPUT_SIZE / cropSizeOnImage;
+            const dx = (sxClipped - cropX) * outScale;
+            const dy = (syClipped - cropY) * outScale;
+            const dw = swClipped * outScale;
+            const dh = shClipped * outScale;
+
+            ctx.drawImage(
+                imgRef.current,
+                sxClipped, syClipped, swClipped, shClipped,
+                dx, dy, dw, dh
+            );
+        }
+
+        canvas.toBlob((blob) => {
+            if (blob) onConfirm(blob);
+        }, 'image/jpeg', 0.92);
+    };
+
+    return (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4">
+            <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-[#ebedf2] dark:border-[#191e3a] shadow-xl p-5 sm:p-6">
+                <h5 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">
+                    {title || t('crop_image')}
+                </h5>
+
+                <div
+                    className="relative mx-auto overflow-hidden bg-gray-100 dark:bg-white/5 select-none touch-none"
+                    style={{
+                        width: CROP_SIZE,
+                        height: CROP_SIZE,
+                        borderRadius: round ? '50%' : '12px',
+                        cursor: isDragging ? 'grabbing' : 'grab',
+                    }}
+                    onMouseDown={(e) => { e.preventDefault(); startDrag(e.clientX, e.clientY); }}
+                    onMouseMove={(e) => moveDrag(e.clientX, e.clientY)}
+                    onMouseUp={endDrag}
+                    onMouseLeave={endDrag}
+                    onTouchStart={(e) => { const t0 = e.touches[0]; startDrag(t0.clientX, t0.clientY); }}
+                    onTouchMove={(e) => { const t0 = e.touches[0]; moveDrag(t0.clientX, t0.clientY); }}
+                    onTouchEnd={endDrag}
+                >
+                    <img
+                        ref={imgRef}
+                        src={imageSrc}
+                        onLoad={onImgLoad}
+                        alt={t('crop_preview_alt')}
+                        draggable={false}
+                        style={{
+                            position: 'absolute',
+                            left: position.x,
+                            top: position.y,
+                            width: naturalSize.width * scale,
+                            height: naturalSize.height * scale,
+                            maxWidth: 'none',
+                        }}
+                    />
+                    {!round && <div className="pointer-events-none absolute inset-0 border-2 border-white/70 rounded-xl" />}
+                </div>
+
+                <div className="flex items-center gap-3 mt-4">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">−</span>
+                    <input
+                        type="range"
+                        min={MIN_ZOOM}
+                        max={MAX_ZOOM}
+                        step={0.01}
+                        value={zoom}
+                        onChange={(e) => handleZoomChange(parseFloat(e.target.value))}
+                        className="w-full accent-green-600"
+                    />
+                    <span className="text-xs text-gray-500 dark:text-gray-400">+</span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
+                    {t('drag_to_reposition_zoom_to_resize')}
+                </p>
+
+                <div className="flex gap-2 mt-6 justify-end">
+                    <button type="button" onClick={onCancel} className="btn btn-outline-secondary rounded-xl flex-1 sm:flex-none">
+                        {t('cancel')}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleConfirm}
+                        className="btn shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] rounded-xl flex-1 sm:flex-none"
+                    >
+                        {t('save_crop')}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+/* ========================================================= */
+
 const Profile = () => {
     const dispatch = useDispatch();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { token, user } = useAuthToken();
     const [dataUserLogin, setDataUserLogin] = useState<Record<string, unknown>>({});
     const [activeSubscription, setActiveSubscription] = useState<any>(null);
@@ -66,14 +286,21 @@ const Profile = () => {
     const [loadingSub, setLoadingSub] = useState(false);
     const isShopOwner = user?.userRole === 1 || user?.userRole === '1';
 
+    // ---- Avatar crop state ----
+    const [cropState, setCropState] = useState<{ open: boolean; imageSrc: string } | null>(null);
+    const [avatarPreviewOverride, setAvatarPreviewOverride] = useState<string>('');
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
     const displayName = useMemo(() => {
         const combined = getDisplayName(dataUserLogin);
         return combined || t('my_profile');
     }, [dataUserLogin, t]);
 
-    const avatarSrc = dataUserLogin?.userProfileImage
-        ? `${ServerSetting.serUrl}/profile/${dataUserLogin.userProfileImage}`
-        : '/assets/images/profile-34.jpeg';
+    const avatarSrc =
+        avatarPreviewOverride ||
+        (dataUserLogin?.userProfileImage
+            ? `${ServerSetting.serUrl}/profile/${dataUserLogin.userProfileImage}`
+            : '/assets/images/profile-34.jpeg');
 
     useEffect(() => {
         const userInfo = localStorage.getItem('userInformation');
@@ -85,7 +312,7 @@ const Profile = () => {
                 setDataUserLogin({});
             }
         }
-        dispatch(setPageTitle('Profile'));
+        dispatch(setPageTitle(t('page_title_profile')));
     }, [dispatch]);
 
     useEffect(() => {
@@ -108,6 +335,75 @@ const Profile = () => {
                 .finally(() => setLoadingSub(false));
         }
     }, [isShopOwner, user?._id, token]);
+
+    // ---- Avatar edit handlers ----
+    const handleAvatarFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            setCropState({ open: true, imageSrc: reader.result as string });
+        };
+        reader.readAsDataURL(file);
+        e.target.value = ''; // reset so re-selecting the same file re-triggers onChange
+    };
+
+    const handleCropCancel = () => setCropState(null);
+
+    const handleCropConfirm = async (blob: Blob) => {
+        setCropState(null);
+
+        const previewUrl = URL.createObjectURL(blob);
+        setAvatarPreviewOverride(previewUrl); // instant visual feedback
+
+        const userId = (dataUserLogin as any)?._id || user?._id;
+        if (!userId || !token) {
+            showError(t('user_id_missing'));
+            return;
+        }
+
+        setUploadingAvatar(true);
+        try {
+            const croppedFile = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
+            const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('userProfileImage', croppedFile);
+
+            // NOTE: adjust this endpoint to your actual self-profile-update API route
+            // if it differs from the admin one used elsewhere in the app.
+            const res = await axios.patch(`${ServerSetting.serUrl}/api/updateUserAdmin`, formData, {
+                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
+            });
+
+            if (res.data.status === 200) {
+                showSuccess(t('profile_photo_updated_success'));
+                const returnedFileName = res.data?.data?.userProfileImage;
+                setDataUserLogin((prev) => ({
+                    ...prev,
+                    userProfileImage: returnedFileName || (prev as any)?.userProfileImage,
+                }));
+                // keep localStorage in sync so a page refresh still shows the new photo
+                const userInfo = localStorage.getItem('userInformation');
+                if (userInfo) {
+                    try {
+                        const parsed = JSON.parse(userInfo);
+                        const base = parsed?.data ? parsed.data : parsed;
+                        const updated = { ...base, userProfileImage: returnedFileName || base.userProfileImage };
+                        const toStore = parsed?.data ? { ...parsed, data: updated } : updated;
+                        localStorage.setItem('userInformation', JSON.stringify(toStore));
+                    } catch {
+                        // ignore malformed localStorage content
+                    }
+                }
+            } else {
+                showError(res.data.message || t('profile_photo_update_failed'));
+            }
+        } catch (err: any) {
+            showError(err.response?.data?.message || t('profile_photo_update_error'));
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
 
     return (
         <div>
@@ -140,15 +436,29 @@ const Profile = () => {
                                             <img
                                                 src={avatarSrc}
                                                 alt=""
-                                                className="h-28 w-28 rounded-2xl border-4 border-white object-cover shadow-xl dark:border-[#0e1726] sm:h-32 sm:w-32"
+                                                className={`h-28 w-28 rounded-2xl border-4 border-white object-cover shadow-xl dark:border-[#0e1726] sm:h-32 sm:w-32 ${
+                                                    uploadingAvatar ? 'opacity-60' : ''
+                                                }`}
                                             />
-                                            <Link
-                                                to="/users/user-account-settings"
-                                                className="absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-md transition hover:opacity-95"
+                                            {uploadingAvatar && (
+                                                <span className="absolute inset-0 flex items-center justify-center">
+                                                    <span className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                                                </span>
+                                            )}
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleAvatarFileSelect}
+                                                className="hidden"
+                                                id="profileAvatarInput"
+                                            />
+                                            <label
+                                                htmlFor="profileAvatarInput"
+                                                className="absolute -bottom-1 -right-1 flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-primary text-white shadow-md transition hover:opacity-95"
                                                 title={t('edit_profile')}
                                             >
                                                 <IconPencilPaper className="h-5 w-5" />
-                                            </Link>
+                                            </label>
                                         </div>
                                         <div className="mt-4 text-center sm:mt-0 sm:pb-1 sm:text-left">
                                             <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">{displayName}</h1>
@@ -228,7 +538,10 @@ const Profile = () => {
                                         <IconMenuInvoice className="h-5 w-5 text-primary" />
                                         {t('current_plan')}
                                     </h5>
-                                    <Link to="/users/user-account-settings?tab=subscription" className="btn btn-primary btn-sm rounded-xl">
+                                    <Link
+                                        to="/users/user-account-settings?tab=subscription"
+                                        className="btn btn-sm rounded-xl shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]"
+                                    >
                                         {t('manage')}
                                     </Link>
                                 </div>
@@ -244,17 +557,20 @@ const Profile = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">{t('price')}</p>
-                                            <p className="font-semibold">Rs. {activeSubscription.subId?.subPrice ?? activeSubscription.subPriceHistory ?? '—'}</p>
+                                            <p className="font-semibold">{t('currency_rs')} {activeSubscription.subId?.subPrice ?? activeSubscription.subPriceHistory ?? '—'}</p>
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">{t('table_expires')}</p>
                                             <p className="font-semibold">
                                                 {activeSubscription.expireDate
-                                                    ? new Date(activeSubscription.expireDate).toLocaleDateString(t('date_locale') || 'en-PK', {
-                                                          year: 'numeric',
-                                                          month: 'long',
-                                                          day: 'numeric',
-                                                      })
+                                                    ? new Date(activeSubscription.expireDate).toLocaleDateString(
+                                                          i18n.language === 'ur' ? 'ur-PK' : 'en-PK',
+                                                          {
+                                                              year: 'numeric',
+                                                              month: 'long',
+                                                              day: 'numeric',
+                                                          }
+                                                      )
                                                     : '—'}
                                             </p>
                                         </div>
@@ -276,14 +592,20 @@ const Profile = () => {
                                                 {activeSubscription.status === 'active' && !activeSubscription.isExpired ? t('active') : t('expired')}
                                             </span>
                                         </div>
-                                        <Link to="/SubcriptionHistory" className="btn btn-outline-primary btn-sm mt-2 w-full rounded-xl">
+                                        <Link
+                                            to="/SubcriptionHistory"
+                                            className="btn btn-sm mt-2 w-full rounded-xl shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]"
+                                        >
                                             {t('view_full_history')}
                                         </Link>
                                     </div>
                                 ) : (
                                     <div className="py-6 text-center text-gray-500 dark:text-gray-400">
                                         <p className="mb-3">{t('no_active_subscription')}</p>
-                                        <Link to="/addsubcription" className="btn btn-primary btn-sm rounded-xl">
+                                        <Link
+                                            to="/addsubcription"
+                                            className="btn btn-sm rounded-xl shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]"
+                                        >
                                             {t('subscribe_now')}
                                         </Link>
                                     </div>
@@ -313,7 +635,7 @@ const Profile = () => {
                                                     <div>
                                                         <p className="font-medium">{h.subNameHistory || h.subIdHistory?.subName || '—'}</p>
                                                         <p className="text-xs text-gray-500">
-                                                            Rs. {h.subPriceHistory || h.subIdHistory?.subPrice || '—'} •{' '}
+                                                            {t('currency_rs')} {h.subPriceHistory || h.subIdHistory?.subPrice || '—'} •{' '}
                                                             {h.expireDateHistory ? new Date(h.expireDateHistory).toLocaleDateString() : '—'}
                                                         </p>
                                                     </div>
@@ -330,6 +652,17 @@ const Profile = () => {
                     )}
                 </div>
             </div>
+
+            {/* Avatar crop modal */}
+            {cropState?.open && (
+                <ImageCropModal
+                    imageSrc={cropState.imageSrc}
+                    round={true}
+                    title={t('crop_profile_image')}
+                    onCancel={handleCropCancel}
+                    onConfirm={handleCropConfirm}
+                />
+            )}
         </div>
     );
 };

@@ -10,6 +10,7 @@ import IconCheck from '../../components/Icon/IconCircleCheck';
 import { Notification } from './../../helperComponents/Notification';
 import { ServerSetting } from './../../helperComponents/ServerSetting';
 import axios from 'axios';
+import IconArrowRight from '../../components/Icon/IconArrowRight';
 
 const ForgotPassword = () => {
     const dispatch = useDispatch();
@@ -580,7 +581,7 @@ const ForgotPassword = () => {
                                 to="/login"
                                 className="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 flex items-center justify-center"
                             >
-                                <IconArrowLeft className="w-4 h-4 mr-1" />
+                                <IconArrowRight  className="w-4 h-4 mr-1"/>
                                 Back to Login
                             </Link>
                         </div>

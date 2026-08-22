@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { setPageTitle } from '../../store/themeConfigSlice';
@@ -16,10 +16,18 @@ const CustomerLogin = () => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({ cusCNIC: '', cusPassword: '' });
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(() => localStorage.getItem('remember_customer') === 'true');
 
     useEffect(() => {
         dispatch(setPageTitle('Sign In'));
     }, [dispatch]);
+
+    useEffect(() => {
+        const saved = localStorage.getItem('remember_customer_cnic');
+        if (saved) {
+            setData((prev) => ({ ...prev, cusCNIC: saved }));
+        }
+    }, []);
 
     const validateForm = () => {
         const newErrors = { cusCNIC: '', cusPassword: '' };
@@ -64,6 +72,19 @@ const CustomerLogin = () => {
                 localStorage.setItem('userInformation', JSON.stringify(userInfo));
                 localStorage.setItem('userRole', 'customer');
                 localStorage.setItem('token', userInfo.token);
+
+                // Remember me: store CNIC only (never store password).
+                // Actual username/password saving is handled by the
+                // browser's native password manager via autoComplete
+                // attributes + a real form submit event below.
+                if (rememberMe) {
+                    localStorage.setItem('remember_customer', 'true');
+                    localStorage.setItem('remember_customer_cnic', data.cusCNIC.trim());
+                } else {
+                    localStorage.removeItem('remember_customer');
+                    localStorage.removeItem('remember_customer_cnic');
+                }
+
                 Notification({ text: 'Login successful', color: 'success' });
                 navigate('/dashboard');
             } else {
@@ -103,7 +124,10 @@ const CustomerLogin = () => {
                     </div>
                     {/* Body — height increased (more vertical padding, more spacing between fields) */}
                     <div className="auth-login-card-body !py-10">
-                        <form onSubmit={submitForm} className="space-y-7">
+                        {/* autoComplete="on" + name attributes on the real <form>/<input> elements
+                            let Chrome/Edge/Firefox detect this as a login form and offer to
+                            save the username + password in the browser's password manager. */}
+                        <form onSubmit={submitForm} className="space-y-7" autoComplete="on">
                             <div>
                                 <label htmlFor="CNIC" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                     CNIC
@@ -114,9 +138,11 @@ const CustomerLogin = () => {
                                     </div>
                                     <input
                                         id="CNIC"
+                                        name="username"
                                         type="text"
                                         inputMode="numeric"
                                         maxLength={15}
+                                        autoComplete="username"
                                         value={data.cusCNIC}
                                         onChange={(e) => { setData((p) => ({ ...p, cusCNIC: e.target.value })); if (errors.cusCNIC) setErrors((p) => ({ ...p, cusCNIC: '' })); }}
                                         placeholder="Enter CNIC (e.g. 3310112345678)"
@@ -136,7 +162,9 @@ const CustomerLogin = () => {
                                     </div>
                                     <input
                                         id="Password"
+                                        name="password"
                                         type={showPassword ? 'text' : 'password'}
+                                        autoComplete="current-password"
                                         value={data.cusPassword}
                                         onChange={(e) => { setData((p) => ({ ...p, cusPassword: e.target.value })); if (errors.cusPassword) setErrors((p) => ({ ...p, cusPassword: '' })); }}
                                         placeholder="Password"
@@ -152,6 +180,24 @@ const CustomerLogin = () => {
                                     </button>
                                 </div>
                                 {errors.cusPassword && <p className="mt-1 text-sm text-danger">{errors.cusPassword}</p>}
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <input
+                                        id="remember-me"
+                                        name="remember-me"
+                                        type="checkbox"
+                                        checked={rememberMe}
+                                        onChange={(e) => setRememberMe(e.target.checked)}
+                                        className="h-4 w-4 text-green-700 focus:ring-green-600 border-gray-300 rounded"
+                                    />
+                                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                        Remember me
+                                    </label>
+                                </div>
+                                <Link to="/forgotpassword" className="text-sm font-medium text-green-700 dark:text-green-400 hover:underline">
+                                    Forgot password?
+                                </Link>
                             </div>
                             <button
                                 type="submit"

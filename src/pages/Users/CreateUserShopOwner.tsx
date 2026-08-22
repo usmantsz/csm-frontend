@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef, FC } from 'react';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 import IconHome from '../../components/Icon/IconHome';
@@ -18,6 +18,226 @@ import { useTranslation } from 'react-i18next';
 import IconSearch from '../../components/Icon/IconSearch';
 import IconEye from '../../components/Icon/IconEye';
 import { CROP_TYPE_OPTIONS, normalizeCropType } from '../../constants/cropTypes';
+
+/* =========================================================
+   Reusable Image Crop Modal (no external library required)
+   - Drag to reposition
+   - Slider to zoom IN and OUT (minimize)
+   - Outputs a square-cropped JPEG Blob
+   (Same component/behavior as used on the Profile page.)
+   ========================================================= */
+
+const CROP_SIZE = 280;   // px, size of the crop viewport shown to the user
+const OUTPUT_SIZE = 500; // px, size of the final cropped image
+const MIN_ZOOM = 0.5;    // allows shrinking the image below "cover" fit
+const MAX_ZOOM = 3;
+
+interface ImageCropModalProps {
+    imageSrc: string;
+    round?: boolean;
+    title?: string;
+    onCancel: () => void;
+    onConfirm: (blob: Blob) => void;
+}
+
+const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, title, onCancel, onConfirm }) => {
+    const { t } = useTranslation();
+    const imgRef = useRef<HTMLImageElement>(null);
+    const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const dragRef = useRef({ startX: 0, startY: 0, startPosX: 0, startPosY: 0 });
+
+    // baseScale = the scale at which the image fully COVERS the crop viewport (zoom = 1 reference point)
+    const baseScale = useMemo(() => {
+        if (!naturalSize.width || !naturalSize.height) return 1;
+        return Math.max(CROP_SIZE / naturalSize.width, CROP_SIZE / naturalSize.height);
+    }, [naturalSize]);
+
+    const scale = baseScale * zoom;
+
+    // Clamps drag position. When the image is LARGER than the viewport it behaves as before
+    // (can't reveal empty edges). When the image is SMALLER than the viewport (minimized/zoomed out),
+    // it gets centered instead of being pinned to a corner.
+    const clampPosition = (pos: { x: number; y: number }, currentScale: number) => {
+        const displayedWidth = naturalSize.width * currentScale;
+        const displayedHeight = naturalSize.height * currentScale;
+
+        let x: number;
+        if (displayedWidth <= CROP_SIZE) {
+            x = (CROP_SIZE - displayedWidth) / 2;
+        } else {
+            const minX = CROP_SIZE - displayedWidth;
+            x = Math.min(0, Math.max(pos.x, minX));
+        }
+
+        let y: number;
+        if (displayedHeight <= CROP_SIZE) {
+            y = (CROP_SIZE - displayedHeight) / 2;
+        } else {
+            const minY = CROP_SIZE - displayedHeight;
+            y = Math.min(0, Math.max(pos.y, minY));
+        }
+
+        return { x, y };
+    };
+
+    const onImgLoad = () => {
+        if (!imgRef.current) return;
+        const { naturalWidth, naturalHeight } = imgRef.current;
+        setNaturalSize({ width: naturalWidth, height: naturalHeight });
+        const initialScale = Math.max(CROP_SIZE / naturalWidth, CROP_SIZE / naturalHeight);
+        const displayedWidth = naturalWidth * initialScale;
+        const displayedHeight = naturalHeight * initialScale;
+        setPosition({
+            x: (CROP_SIZE - displayedWidth) / 2,
+            y: (CROP_SIZE - displayedHeight) / 2,
+        });
+        setZoom(1);
+    };
+
+    const startDrag = (clientX: number, clientY: number) => {
+        setIsDragging(true);
+        dragRef.current = { startX: clientX, startY: clientY, startPosX: position.x, startPosY: position.y };
+    };
+
+    const moveDrag = (clientX: number, clientY: number) => {
+        if (!isDragging) return;
+        const dx = clientX - dragRef.current.startX;
+        const dy = clientY - dragRef.current.startY;
+        setPosition(clampPosition({ x: dragRef.current.startPosX + dx, y: dragRef.current.startPosY + dy }, scale));
+    };
+
+    const endDrag = () => setIsDragging(false);
+
+    const handleZoomChange = (newZoom: number) => {
+        setZoom(newZoom);
+        setPosition((prev) => clampPosition(prev, baseScale * newZoom));
+    };
+
+    const handleConfirm = () => {
+        if (!naturalSize.width || !naturalSize.height || !imgRef.current) return;
+
+        // Source rectangle (in ORIGINAL image pixel coordinates) that corresponds to the crop viewport
+        const cropX = -position.x / scale;
+        const cropY = -position.y / scale;
+        const cropSizeOnImage = CROP_SIZE / scale;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = OUTPUT_SIZE;
+        canvas.height = OUTPUT_SIZE;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Fill background first (matters when image is minimized and doesn't cover the whole crop area)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+        // Clip the source rect against the actual image bounds so we never pass
+        // negative/oversized values into drawImage (which breaks on some browsers).
+        const sxClipped = Math.max(cropX, 0);
+        const syClipped = Math.max(cropY, 0);
+        const sxEnd = Math.min(cropX + cropSizeOnImage, naturalSize.width);
+        const syEnd = Math.min(cropY + cropSizeOnImage, naturalSize.height);
+        const swClipped = sxEnd - sxClipped;
+        const shClipped = syEnd - syClipped;
+
+        if (swClipped > 0 && shClipped > 0) {
+            const outScale = OUTPUT_SIZE / cropSizeOnImage;
+            const dx = (sxClipped - cropX) * outScale;
+            const dy = (syClipped - cropY) * outScale;
+            const dw = swClipped * outScale;
+            const dh = shClipped * outScale;
+
+            ctx.drawImage(
+                imgRef.current,
+                sxClipped, syClipped, swClipped, shClipped,
+                dx, dy, dw, dh
+            );
+        }
+
+        canvas.toBlob((blob) => {
+            if (blob) onConfirm(blob);
+        }, 'image/jpeg', 0.92);
+    };
+
+    return (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4">
+            <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-[#ebedf2] dark:border-[#191e3a] shadow-xl p-5 sm:p-6">
+                <h5 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">
+                    {title || t('crop_image')}
+                </h5>
+
+                <div
+                    className="relative mx-auto overflow-hidden bg-gray-100 dark:bg-white/5 select-none touch-none"
+                    style={{
+                        width: CROP_SIZE,
+                        height: CROP_SIZE,
+                        borderRadius: round ? '50%' : '12px',
+                        cursor: isDragging ? 'grabbing' : 'grab',
+                    }}
+                    onMouseDown={(e) => { e.preventDefault(); startDrag(e.clientX, e.clientY); }}
+                    onMouseMove={(e) => moveDrag(e.clientX, e.clientY)}
+                    onMouseUp={endDrag}
+                    onMouseLeave={endDrag}
+                    onTouchStart={(e) => { const t0 = e.touches[0]; startDrag(t0.clientX, t0.clientY); }}
+                    onTouchMove={(e) => { const t0 = e.touches[0]; moveDrag(t0.clientX, t0.clientY); }}
+                    onTouchEnd={endDrag}
+                >
+                    <img
+                        ref={imgRef}
+                        src={imageSrc}
+                        onLoad={onImgLoad}
+                        alt="Crop preview"
+                        draggable={false}
+                        style={{
+                            position: 'absolute',
+                            left: position.x,
+                            top: position.y,
+                            width: naturalSize.width * scale,
+                            height: naturalSize.height * scale,
+                            maxWidth: 'none',
+                        }}
+                    />
+                    {!round && <div className="pointer-events-none absolute inset-0 border-2 border-white/70 rounded-xl" />}
+                </div>
+
+                <div className="flex items-center gap-3 mt-4">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">−</span>
+                    <input
+                        type="range"
+                        min={MIN_ZOOM}
+                        max={MAX_ZOOM}
+                        step={0.01}
+                        value={zoom}
+                        onChange={(e) => handleZoomChange(parseFloat(e.target.value))}
+                        className="w-full accent-green-600"
+                    />
+                    <span className="text-xs text-gray-500 dark:text-gray-400">+</span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
+                    {t('drag_to_reposition_zoom_to_resize')}
+                </p>
+
+                <div className="flex gap-2 mt-6 justify-end">
+                    <button type="button" onClick={onCancel} className="btn btn-outline-secondary rounded-xl flex-1 sm:flex-none">
+                        {t('cancel')}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleConfirm}
+                        className="btn shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] rounded-xl flex-1 sm:flex-none"
+                    >
+                        {t('save_crop')}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+/* ========================================================= */
 
 const CreateUserShopOwner = () => {
     const { t } = useTranslation();
@@ -92,6 +312,10 @@ const CreateUserShopOwner = () => {
     const [perImageShop, setPerImageShop] = useState('')
     // const [formData, setFormData] = useState(initialData);
     // const [errors, setErrors] = useState(initail);
+
+    // ---- Image crop state (profile image + shop bill image) ----
+    const [cropState, setCropState] = useState<{ open: boolean; imageSrc: string; target: 'profile' | 'shop' } | null>(null);
+
     function uploadFile() {
         setIsLoading(true)
 
@@ -117,6 +341,8 @@ const CreateUserShopOwner = () => {
             });
     }, []);
     const MAX_PROFILE_IMAGE_MB = 5;
+
+    // Opens the crop modal instead of directly using the picked file.
     const handelImage = (e: any) => {
         const file = e.target.files[0];
         if (file) {
@@ -125,23 +351,52 @@ const CreateUserShopOwner = () => {
                 e.target.value = '';
                 return;
             }
-            setFormData((prev) => ({
-                ...prev,
-                userProfileImage: file,
-            }));
-            setPerImage(URL.createObjectURL(file))
-            setErrors((prev: any) => ({ ...prev, userProfileImage: false }));
+            const reader = new FileReader();
+            reader.onload = () => {
+                setCropState({ open: true, imageSrc: reader.result as string, target: 'profile' });
+            };
+            reader.readAsDataURL(file);
         }
+        e.target.value = ''; // reset so re-selecting the same file re-triggers onChange
     };
 
+    // Opens the crop modal instead of directly using the picked file.
     const handelImageShop = (e: any) => {
         const file = e.target.files[0];
         if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                setCropState({ open: true, imageSrc: reader.result as string, target: 'shop' });
+            };
+            reader.readAsDataURL(file);
+        }
+        e.target.value = '';
+    };
+
+    const handleCropCancel = () => setCropState(null);
+
+    // Runs after the user confirms the crop — routes the cropped blob to
+    // whichever field (profile image or shop bill image) triggered the modal.
+    const handleCropConfirm = (blob: Blob) => {
+        if (!cropState) return;
+        const { target } = cropState;
+        setCropState(null);
+
+        if (target === 'profile') {
+            const croppedFile = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
+            setFormData((prev) => ({
+                ...prev,
+                userProfileImage: croppedFile as unknown as string,
+            }));
+            setPerImage(URL.createObjectURL(blob));
+            setErrors((prev: any) => ({ ...prev, userProfileImage: false }));
+        } else {
+            const croppedFile = new File([blob], 'shop.jpg', { type: 'image/jpeg' });
             setFormDataShop((prev) => ({
                 ...prev,
-                shopBillImageTop: file,
+                shopBillImageTop: croppedFile as unknown as string,
             }));
-            setPerImageShop(URL.createObjectURL(file))
+            setPerImageShop(URL.createObjectURL(blob));
             setErrorsShop((prev: any) => ({ ...prev, shopBillImageTop: false }));
         }
     };
@@ -374,7 +629,7 @@ const CreateUserShopOwner = () => {
         setImages2(imageList as never[]);
     };
 
-    const [cropData, setCropData] = useState<any[]>([]); // State to store crop data
+    const [cropData, setCropData] = useState<any[]>([]); // State to store crop (agriculture) data
     const [selectedCards, setSelectedCards] = useState<string[]>([]); // State to track selected cards
     const [cropSearchQuery, setCropSearchQuery] = useState('');
     const [cropTypeFilter, setCropTypeFilter] = useState('');
@@ -1048,6 +1303,17 @@ const CreateUserShopOwner = () => {
                 ) : (
                     ''
                 )}
+
+            {/* Image crop modal — shared by profile image and shop bill image uploads */}
+            {cropState?.open && (
+                <ImageCropModal
+                    imageSrc={cropState.imageSrc}
+                    round={cropState.target === 'profile'}
+                    title={cropState.target === 'profile' ? t('crop_profile_image') : t('crop_image')}
+                    onCancel={handleCropCancel}
+                    onConfirm={handleCropConfirm}
+                />
+            )}
         </div>
     );
 };
