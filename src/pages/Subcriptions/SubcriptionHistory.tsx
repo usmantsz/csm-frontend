@@ -16,6 +16,7 @@ import { ServerSetting } from './../../helperComponents/ServerSetting';
 import { showSuccess, showError } from '../../utils/sweetAlert';
 import { downloadExcel } from 'react-export-table-to-excel';
 import TableCard from './../../components/Agricultural/TableCard';
+import IconArrowRight from '../../components/Icon/IconArrowRight';
 
 const col = ['id', 'status', 'subNameHistory', 'subPriceHistory', 'userNameF', 'userNameL', 'userCNIC', 'subName', 'subPrice', 'startDateHistory', 'expireDateHistory', 'paymentMethod', 'remarks', 'transactionId'];
 
@@ -386,7 +387,7 @@ const SubscriptionHistory = () => {
         onClick={() => navigate('/dashboard')}
         className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
         >
-            <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            <IconArrowRight className="w-4 h-4 rtl:rotate-180"/>
             {t('back_to_dashboard')}
         </button>
             </div>

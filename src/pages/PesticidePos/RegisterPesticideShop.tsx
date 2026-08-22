@@ -272,9 +272,9 @@ const RegisterPesticideShop = () => {
                 </div>
 
                 <div className={`${card} flex flex-wrap items-center gap-3`}>
-                    <button type="submit" className="btn btn-primary rounded-2xl px-5 py-2.5" disabled={loading}>
-                        {loading ? t('form_registering') : t('btn_register_pesticide_shop')}
-                    </button>
+                    <button type="submit" className="btn btn-primary rounded-2xl px-5 py-2.5 !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]" disabled={loading}>
+    {loading ? t('form_registering') : t('btn_register_pesticide_shop')}
+</button>
                     <Link to="/pesticide-pos/shops" className="btn btn-outline-secondary rounded-2xl px-5 py-2.5">
                         {t('cancel')}
                     </Link>

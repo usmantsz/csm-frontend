@@ -441,6 +441,58 @@
   "payment_recorded": "Payment recorded",
   "failed": "Failed",
 
+  "crop_image": "Crop Image",
+
+  "dashboard": "Dashboard",
+  "profile": "Profile",
+  "my_profile": "My Profile",
+  "page_title_profile": "Profile",
+
+  "role_administrator": "Administrator",
+  "role_shop_owner": "Shop Owner",
+  "role_sub_administrator": "Sub Administrator",
+  "team_member_role": "Team Member",
+  "role_customer": "Customer",
+  "role_user": "User",
+
+  "crop_image": "Crop Image",
+  "crop_profile_image": "Crop Profile Image",
+  "crop_preview_alt": "Crop preview",
+  "drag_to_reposition_zoom_to_resize": "Drag to reposition, use the slider to zoom",
+  "cancel": "Cancel",
+  "save_crop": "Save",
+
+  "edit_profile": "Edit Profile",
+  "account_settings": "Account Settings",
+  "address": "Address",
+  "not_set": "Not set",
+  "email": "Email",
+  "cnic_label": "CNIC",
+  "phone": "Phone",
+
+  "current_plan": "Current Plan",
+  "manage": "Manage",
+  "table_plan_name": "Plan Name",
+  "price": "Price (Rs.)",
+  "currency_rs": "Rs.",
+  "table_expires": "Expires",
+  "days_left": "{{count}} day left",
+  "days_left_plural": "{{count}} days left",
+  "expires_today": "Expires today",
+  "expired": "Expired",
+  "active": "Active",
+  "view_full_history": "View Full History",
+  "no_active_subscription": "No active subscription",
+  "subscribe_now": "Subscribe Now",
+
+  "subscription_history_title": "Subscription History",
+  "view_all": "View All",
+  "no_subscription_history": "No subscription history found",
+
+  "user_id_missing": "User ID is missing",
+  "profile_photo_updated_success": "Profile photo updated successfully",
+  "profile_photo_update_failed": "Failed to update profile photo",
+  "profile_photo_update_error": "An error occurred while updating profile photo",
 
    "admin_view": "Admin View",
   "viewing_customers_as_admin": "Viewing customers as administrator",
@@ -452,7 +504,13 @@
   "failed_to_fetch_customers": "Failed to fetch customers",
   "error_fetching_customers": "Error fetching customers",
 
+  "crop_profile_image": "Crop Profile Image",
+"save_crop": "Save Crop",
+"drag_to_reposition_zoom_to_resize": "Drag to reposition, use slider to zoom in or out",
 
+  "crop_preview_alt": "Crop preview",
+  "currency_rs": "Rs.",
+  "page_title_profile": "Profile",
 
   "crophistory_page_title": "Crop History - Year & Customer",
   "crophistory_breadcrumb_dashboard": "Dashboard",

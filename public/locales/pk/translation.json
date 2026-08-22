@@ -670,6 +670,61 @@
   "failed_to_fetch_customers": "گاہکوں کو حاصل کرنے میں ناکامی",
   "error_fetching_customers": "گاہکوں کو حاصل کرنے میں خرابی",
 
+  "crop_profile_image": "پروفائل تصویر کو کراپ کریں",
+  "save_crop": "کراپ محفوظ کریں",
+
+  "dashboard": "ڈیش بورڈ",
+  "profile": "پروفائل",
+  "my_profile": "میری پروفائل",
+  "page_title_profile": "پروفائل",
+
+  "role_administrator": "ایڈمنسٹریٹر",
+  "role_shop_owner": "دکان کا مالک",
+  "role_sub_administrator": "سب ایڈمنسٹریٹر",
+  "team_member_role": "ٹیم ممبر",
+  "role_customer": "کسٹمر",
+  "role_user": "صارف",
+
+  "crop_image": "تصویر کراپ کریں",
+  "crop_profile_image": "پروفائل تصویر کراپ کریں",
+  "crop_preview_alt": "کراپ پیش نظارہ",
+  "drag_to_reposition_zoom_to_resize": "پوزیشن بدلنے کے لیے گھسیٹیں، سائز بدلنے کے لیے سلائیڈر استعمال کریں",
+  "cancel": "منسوخ کریں",
+  "save_crop": "محفوظ کریں",
+
+  "edit_profile": "پروفائل میں ترمیم کریں",
+  "account_settings": "اکاؤنٹ کی ترتیبات",
+  "address": "پتہ",
+  "not_set": "مقرر نہیں",
+  "email": "ای میل",
+  "cnic_label": "شناختی کارڈ",
+  "phone": "فون نمبر",
+
+  "current_plan": "موجودہ پلان",
+  "manage": "منظم کریں",
+  "table_plan_name": "پلان کا نام",
+  "price": "قیمت (روپے)",
+  "currency_rs": "روپے",
+  "table_expires": "میعاد ختم",
+  "days_left": "{{count}} دن باقی",
+  "days_left_plural": "{{count}} دن باقی",
+  "expires_today": "آج میعاد ختم ہو رہی ہے",
+  "expired": "میعاد ختم",
+  "active": "فعال",
+  "view_full_history": "مکمل تاریخ دیکھیں",
+  "no_active_subscription": "کوئی فعال سبسکرپشن موجود نہیں",
+  "subscribe_now": "ابھی سبسکرائب کریں",
+
+  "subscription_history_title": "سبسکرپشن کی تاریخ",
+  "view_all": "سب دیکھیں",
+  "no_subscription_history": "کوئی سبسکرپشن تاریخ نہیں ملی",
+
+  "user_id_missing": "صارف کی شناخت موجود نہیں",
+  "profile_photo_updated_success": "پروفائل تصویر کامیابی سے اپ ڈیٹ ہو گئی",
+  "profile_photo_update_failed": "پروفائل تصویر اپ ڈیٹ کرنے میں ناکامی",
+  "profile_photo_update_error": "پروفائل تصویر اپ ڈیٹ کرتے وقت خرابی پیش آگئی",
+
+"drag_to_reposition_zoom_to_resize": "پوزیشن بدلنے کے لیے گھسیٹیں، زوم ان یا آؤٹ کے لیے سلائیڈر استعمال کریں",
 
   "crophistory_page_title": "فصل کی تاریخ - سال اور کسٹمر",
   "crophistory_breadcrumb_dashboard": "ڈیش بورڈ",
@@ -822,6 +877,12 @@
   "loanlist_notif_status_updated": "حیثیت اپڈیٹ ہو گئی",
   "loanlist_notif_update_failed": "اپڈیٹ ناکام",
   "loanlist_notif_error_updating_status": "حیثیت اپڈیٹ کرنے میں خرابی",
+
+  "crop_image": "تصویر کراپ کریں",
+
+  "crop_preview_alt": "کراپ پیش نظارہ",
+  "currency_rs": "روپے",
+  "page_title_profile": "پروفائل",
 
 
   "finance_give_loan_title": "قرض دیں",

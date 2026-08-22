@@ -168,7 +168,7 @@ const PesticidePosSubscriptions = () => {
                                         <td className="py-3 px-4">
                                             <Link
                                                 to={`/pesticide-pos/subscriptions/edit/${s._id}`}
-                                                className="btn btn-outline-primary btn-sm rounded-xl"
+                                                className="btn btn-outline-primary btn-sm rounded-xl hover:!bg-[#16a34a] hover:!text-white hover:!border-[#16a34a]"
                                             >
                                                 {t('edit')}
                                             </Link>

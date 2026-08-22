@@ -14,6 +14,7 @@ import IconFile from '../../components/Icon/IconFile';
 import IconPhone from '../../components/Icon/IconPhone';
 import IconMapPin from '../../components/Icon/IconMapPin';
 import { useTranslation } from 'react-i18next';
+import IconArrowRight from '../../components/Icon/IconArrowRight';
 
 interface Shop {
     _id: string;
@@ -178,7 +179,8 @@ const ShopView = () => {
                     onClick={() => navigate('/shop')}
                     className="flex items-center gap-2 rounded-2xl bg-green-100 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-200 dark:bg-green-900/30 dark:text-green-200 dark:hover:bg-green-900/50 shrink-0"
                 >
-                    <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                    <IconArrowRight className="w-4 h-4 rtl:rotate-180"/>
+                   
                     {t('back_to_all_shops')}
                 </button>
             </div>

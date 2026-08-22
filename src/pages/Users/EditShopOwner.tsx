@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef, FC } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +17,7 @@ import { showSuccess, showError } from '../../utils/sweetAlert';
 import DOMPurify from 'dompurify';
 import IconSearch from '../../components/Icon/IconSearch';
 import { CROP_TYPE_OPTIONS, normalizeCropType } from '../../constants/cropTypes';
+import IconArrowRight from '../../components/Icon/IconArrowRight';
 
 interface UserForm {
     userNameF: string;
@@ -51,6 +52,225 @@ const initialShopErrors = {
     shopName: '', shopNumber: '', shopAddress: '', shopProvince: '', shopCity: '', shopRegistrationNumber: '',
 };
 
+/* =========================================================
+   Reusable Image Crop Modal (no external library required)
+   - Drag to reposition
+   - Slider to zoom IN and OUT (minimize)
+   - Outputs a square-cropped JPEG Blob
+   ========================================================= */
+
+const CROP_SIZE = 280;   // px, size of the crop viewport shown to the user
+const OUTPUT_SIZE = 500; // px, size of the final cropped image
+const MIN_ZOOM = 0.5;    // allows shrinking the image below "cover" fit
+const MAX_ZOOM = 3;
+
+interface ImageCropModalProps {
+    imageSrc: string;
+    round?: boolean;
+    title?: string;
+    onCancel: () => void;
+    onConfirm: (blob: Blob) => void;
+}
+
+const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, title, onCancel, onConfirm }) => {
+    const { t } = useTranslation();
+    const imgRef = useRef<HTMLImageElement>(null);
+    const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const dragRef = useRef({ startX: 0, startY: 0, startPosX: 0, startPosY: 0 });
+
+    // baseScale = the scale at which the image fully COVERS the crop viewport (zoom = 1 reference point)
+    const baseScale = useMemo(() => {
+        if (!naturalSize.width || !naturalSize.height) return 1;
+        return Math.max(CROP_SIZE / naturalSize.width, CROP_SIZE / naturalSize.height);
+    }, [naturalSize]);
+
+    const scale = baseScale * zoom;
+
+    // Clamps drag position. When the image is LARGER than the viewport it behaves as before
+    // (can't reveal empty edges). When the image is SMALLER than the viewport (minimized/zoomed out),
+    // it gets centered instead of being pinned to a corner.
+    const clampPosition = (pos: { x: number; y: number }, currentScale: number) => {
+        const displayedWidth = naturalSize.width * currentScale;
+        const displayedHeight = naturalSize.height * currentScale;
+
+        let x: number;
+        if (displayedWidth <= CROP_SIZE) {
+            x = (CROP_SIZE - displayedWidth) / 2;
+        } else {
+            const minX = CROP_SIZE - displayedWidth;
+            x = Math.min(0, Math.max(pos.x, minX));
+        }
+
+        let y: number;
+        if (displayedHeight <= CROP_SIZE) {
+            y = (CROP_SIZE - displayedHeight) / 2;
+        } else {
+            const minY = CROP_SIZE - displayedHeight;
+            y = Math.min(0, Math.max(pos.y, minY));
+        }
+
+        return { x, y };
+    };
+
+    const onImgLoad = () => {
+        if (!imgRef.current) return;
+        const { naturalWidth, naturalHeight } = imgRef.current;
+        setNaturalSize({ width: naturalWidth, height: naturalHeight });
+        const initialScale = Math.max(CROP_SIZE / naturalWidth, CROP_SIZE / naturalHeight);
+        const displayedWidth = naturalWidth * initialScale;
+        const displayedHeight = naturalHeight * initialScale;
+        setPosition({
+            x: (CROP_SIZE - displayedWidth) / 2,
+            y: (CROP_SIZE - displayedHeight) / 2,
+        });
+        setZoom(1);
+    };
+
+    const startDrag = (clientX: number, clientY: number) => {
+        setIsDragging(true);
+        dragRef.current = { startX: clientX, startY: clientY, startPosX: position.x, startPosY: position.y };
+    };
+
+    const moveDrag = (clientX: number, clientY: number) => {
+        if (!isDragging) return;
+        const dx = clientX - dragRef.current.startX;
+        const dy = clientY - dragRef.current.startY;
+        setPosition(clampPosition({ x: dragRef.current.startPosX + dx, y: dragRef.current.startPosY + dy }, scale));
+    };
+
+    const endDrag = () => setIsDragging(false);
+
+    const handleZoomChange = (newZoom: number) => {
+        setZoom(newZoom);
+        setPosition((prev) => clampPosition(prev, baseScale * newZoom));
+    };
+
+    const handleConfirm = () => {
+        if (!naturalSize.width || !naturalSize.height || !imgRef.current) return;
+
+        // Source rectangle (in ORIGINAL image pixel coordinates) that corresponds to the crop viewport
+        const cropX = -position.x / scale;
+        const cropY = -position.y / scale;
+        const cropSizeOnImage = CROP_SIZE / scale;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = OUTPUT_SIZE;
+        canvas.height = OUTPUT_SIZE;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Fill background first (matters when image is minimized and doesn't cover the whole crop area)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+        // Clip the source rect against the actual image bounds so we never pass
+        // negative/oversized values into drawImage (which breaks on some browsers).
+        const sxClipped = Math.max(cropX, 0);
+        const syClipped = Math.max(cropY, 0);
+        const sxEnd = Math.min(cropX + cropSizeOnImage, naturalSize.width);
+        const syEnd = Math.min(cropY + cropSizeOnImage, naturalSize.height);
+        const swClipped = sxEnd - sxClipped;
+        const shClipped = syEnd - syClipped;
+
+        if (swClipped > 0 && shClipped > 0) {
+            const outScale = OUTPUT_SIZE / cropSizeOnImage;
+            const dx = (sxClipped - cropX) * outScale;
+            const dy = (syClipped - cropY) * outScale;
+            const dw = swClipped * outScale;
+            const dh = shClipped * outScale;
+
+            ctx.drawImage(
+                imgRef.current,
+                sxClipped, syClipped, swClipped, shClipped,
+                dx, dy, dw, dh
+            );
+        }
+
+        canvas.toBlob((blob) => {
+            if (blob) onConfirm(blob);
+        }, 'image/jpeg', 0.92);
+    };
+
+    return (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4">
+            <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-[#ebedf2] dark:border-[#191e3a] shadow-xl p-5 sm:p-6">
+                <h5 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">
+                    {title || t('crop_image')}
+                </h5>
+
+                <div
+                    className="relative mx-auto overflow-hidden bg-gray-100 dark:bg-white/5 select-none touch-none"
+                    style={{
+                        width: CROP_SIZE,
+                        height: CROP_SIZE,
+                        borderRadius: round ? '50%' : '12px',
+                        cursor: isDragging ? 'grabbing' : 'grab',
+                    }}
+                    onMouseDown={(e) => { e.preventDefault(); startDrag(e.clientX, e.clientY); }}
+                    onMouseMove={(e) => moveDrag(e.clientX, e.clientY)}
+                    onMouseUp={endDrag}
+                    onMouseLeave={endDrag}
+                    onTouchStart={(e) => { const t0 = e.touches[0]; startDrag(t0.clientX, t0.clientY); }}
+                    onTouchMove={(e) => { const t0 = e.touches[0]; moveDrag(t0.clientX, t0.clientY); }}
+                    onTouchEnd={endDrag}
+                >
+                    <img
+                        ref={imgRef}
+                        src={imageSrc}
+                        onLoad={onImgLoad}
+                        alt="Crop preview"
+                        draggable={false}
+                        style={{
+                            position: 'absolute',
+                            left: position.x,
+                            top: position.y,
+                            width: naturalSize.width * scale,
+                            height: naturalSize.height * scale,
+                            maxWidth: 'none',
+                        }}
+                    />
+                    {!round && <div className="pointer-events-none absolute inset-0 border-2 border-white/70 rounded-xl" />}
+                </div>
+
+                <div className="flex items-center gap-3 mt-4">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">−</span>
+                    <input
+                        type="range"
+                        min={MIN_ZOOM}
+                        max={MAX_ZOOM}
+                        step={0.01}
+                        value={zoom}
+                        onChange={(e) => handleZoomChange(parseFloat(e.target.value))}
+                        className="w-full accent-green-600"
+                    />
+                    <span className="text-xs text-gray-500 dark:text-gray-400">+</span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
+                    {t('drag_to_reposition_zoom_to_resize')}
+                </p>
+
+                <div className="flex gap-2 mt-6 justify-end">
+                    <button type="button" onClick={onCancel} className="btn btn-outline-secondary rounded-xl flex-1 sm:flex-none">
+                        {t('cancel')}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleConfirm}
+                        className="btn shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] rounded-xl flex-1 sm:flex-none"
+                    >
+                        {t('save_crop')}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+/* ========================================================= */
+
 const EditShopOwner = () => {
     const { t } = useTranslation();
     const { userId } = useParams<{ userId: string }>();
@@ -59,7 +279,6 @@ const EditShopOwner = () => {
     const { token } = useAuthToken();
     const { userRole } = useUserPermissions();
 
-    // Only Admin (0) and Sub Admin (2) can change user status (Block/Delete)
     const canChangeStatus = canPerformRestrictedActions(userRole);
 
     const [loading, setLoading] = useState(true);
@@ -67,7 +286,6 @@ const EditShopOwner = () => {
     const [savingShop, setSavingShop] = useState(false);
     const [activeTab, setActiveTab] = useState<'user' | 'shop' | 'subscription' | 'crops'>('user');
 
-    // Subscription state
     const [activeSubscription, setActiveSubscription] = useState<any>(null);
     const [subscriptions, setSubscriptions] = useState<any[]>([]);
     const [loadingSubscription, setLoadingSubscription] = useState(false);
@@ -76,7 +294,6 @@ const EditShopOwner = () => {
     const [paymentForm, setPaymentForm] = useState({ paymentMethod: 'bank', remarks: '', transactionId: '' });
     const [pendingSubscribe, setPendingSubscribe] = useState<{ subId: string; months: number } | null>(null);
 
-    // Crops state
     const [allCrops, setAllCrops] = useState<any[]>([]);
     const [assignedCrops, setAssignedCrops] = useState<any[]>([]);
     const [selectedCropsToAdd, setSelectedCropsToAdd] = useState<string[]>([]);
@@ -99,6 +316,15 @@ const EditShopOwner = () => {
     const [userProfilePreview, setUserProfilePreview] = useState<string>('');
     const [shopImagePreview, setShopImagePreview] = useState<string>('');
     const [hasShop, setHasShop] = useState(false);
+
+    // ---- Crop modal state (shared by both profile image & shop logo) ----
+    const [cropState, setCropState] = useState<{
+        open: boolean;
+        imageSrc: string;
+        target: 'user' | 'shop';
+        fileName: string;
+        fileType: string;
+    } | null>(null);
 
     useEffect(() => {
         dispatch(setPageTitle(t('edit_shop_owner')));
@@ -130,11 +356,9 @@ const EditShopOwner = () => {
 
     useEffect(() => {
         if (activeTab === 'crops' && userId && token) {
-            // Fetch crops when crops tab is opened, even if no subscription yet
             if (activeSubscription) {
                 fetchAssignedCrops();
             } else {
-                // Try to fetch crops anyway (API can work without subId)
                 fetchAssignedCrops();
             }
         }
@@ -217,30 +441,69 @@ const EditShopOwner = () => {
         }
     };
 
+    // Text/select fields only now — file selection is routed through the crop modal handlers below
     const handleUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        if (name === 'userProfileImage' && e.target instanceof HTMLInputElement && e.target.files?.[0]) {
-            const file = e.target.files[0];
-            setUserForm((prev) => ({ ...prev, userProfileImage: file }));
-            setUserProfilePreview(URL.createObjectURL(file));
-            setUserErrors((prev) => ({ ...prev, userProfileImage: '' }));
-        } else {
-            setUserForm((prev) => ({ ...prev, [name]: value }));
-            setUserErrors((prev) => ({ ...prev, [name]: value.trim() ? '' : t('field_required') }));
-        }
+        setUserForm((prev) => ({ ...prev, [name]: value }));
+        setUserErrors((prev) => ({ ...prev, [name]: value.trim() ? '' : t('field_required') }));
     };
 
     const handleShopChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, files } = e.target;
-        if (type === 'file' && files?.[0]) {
-            const file = files[0];
-            setShopForm((prev) => ({ ...prev, [name]: file }));
-            setShopImagePreview(URL.createObjectURL(file));
-            setShopErrors((prev) => ({ ...prev, [name]: '' }));
+        const { name, value } = e.target;
+        setShopForm((prev) => ({ ...prev, [name]: value }));
+        setShopErrors((prev) => ({ ...prev, [name]: value.trim() ? '' : t('field_required') }));
+    };
+
+    // ---- New: file select handlers open the crop modal instead of setting the file directly ----
+    const handleUserFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            setCropState({
+                open: true,
+                imageSrc: reader.result as string,
+                target: 'user',
+                fileName: file.name.replace(/\.[^.]+$/, '') + '.jpg',
+                fileType: 'image/jpeg',
+            });
+        };
+        reader.readAsDataURL(file);
+        e.target.value = ''; // reset so re-selecting the same file re-triggers onChange
+    };
+
+    const handleShopFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            setCropState({
+                open: true,
+                imageSrc: reader.result as string,
+                target: 'shop',
+                fileName: file.name.replace(/\.[^.]+$/, '') + '.jpg',
+                fileType: 'image/jpeg',
+            });
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+    };
+
+    const handleCropCancel = () => setCropState(null);
+
+    const handleCropConfirm = (blob: Blob) => {
+        if (!cropState) return;
+        const croppedFile = new File([blob], cropState.fileName, { type: cropState.fileType });
+        const previewUrl = URL.createObjectURL(blob);
+
+        if (cropState.target === 'user') {
+            setUserForm((prev) => ({ ...prev, userProfileImage: croppedFile }));
+            setUserProfilePreview(previewUrl);
         } else {
-            setShopForm((prev) => ({ ...prev, [name]: value }));
-            setShopErrors((prev) => ({ ...prev, [name]: value.trim() ? '' : t('field_required') }));
+            setShopForm((prev) => ({ ...prev, shopBillImageTop: croppedFile }));
+            setShopImagePreview(previewUrl);
         }
+        setCropState(null);
     };
 
     const validateUser = () => {
@@ -349,41 +612,19 @@ const EditShopOwner = () => {
     };
 
     const fetchActiveSubscription = async () => {
-        if (!userId || !token) {
-            console.log('[EditShopOwner] Missing userId or token:', { userId: !!userId, token: !!token });
-            return;
-        }
+        if (!userId || !token) return;
         setLoadingSubscription(true);
         try {
-            console.log('[EditShopOwner] Fetching active subscription for userId:', userId, 'Type:', typeof userId);
             const res = await axios.post(`${ServerSetting.serUrl}/api/getActiveSubscription`, { userId }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('[EditShopOwner] Subscription response status:', res.data.status);
-            console.log('[EditShopOwner] Subscription response data:', res.data.data);
-            console.log('[EditShopOwner] Full response:', res.data);
-
             if (res.data.status === 200 && res.data.data) {
-                const subData = res.data.data;
-                console.log('[EditShopOwner] Setting subscription data:', {
-                    hasSubId: !!subData.subId,
-                    subIdType: typeof subData.subId,
-                    subIdValue: subData.subId?._id || subData.subId,
-                    status: subData.status,
-                    isExpired: subData.isExpired
-                });
-                setActiveSubscription(subData);
-            } else if (res.data.status === 404) {
-                console.log('[EditShopOwner] No subscription found (404)');
-                setActiveSubscription(null);
+                setActiveSubscription(res.data.data);
             } else {
-                console.log('[EditShopOwner] Unexpected response:', res.data);
                 setActiveSubscription(null);
             }
         } catch (err: any) {
             console.error('[EditShopOwner] Error fetching active subscription:', err);
-            console.error('[EditShopOwner] Error response:', err.response?.data);
-            console.error('[EditShopOwner] Error status:', err.response?.status);
             if (err.response?.status === 404) {
                 setActiveSubscription(null);
             }
@@ -410,26 +651,19 @@ const EditShopOwner = () => {
         setLoadingCrops(true);
         try {
             const subId = activeSubscription?.subId?._id || activeSubscription?.subId || null;
-            console.log('[EditShopOwner] Fetching assigned crops for userId:', userId, 'subId:', subId);
-
             const res = await axios.post(`${ServerSetting.serUrl}/api/getAssignedCrops`, {
                 userId,
                 ...(subId && { subId }),
             }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('[EditShopOwner] Assigned crops response:', res.data);
             if (res.data.status === 200 && res.data.data) {
-                const crops = res.data.data.cropIds || [];
-                console.log('[EditShopOwner] Found', crops.length, 'assigned crops');
-                setAssignedCrops(crops);
+                setAssignedCrops(res.data.data.cropIds || []);
             } else {
-                console.log('[EditShopOwner] No crops found');
                 setAssignedCrops([]);
             }
         } catch (err: any) {
             console.error('[EditShopOwner] Error fetching assigned crops:', err);
-            console.error('[EditShopOwner] Error response:', err.response?.data);
             setAssignedCrops([]);
         } finally {
             setLoadingCrops(false);
@@ -530,7 +764,6 @@ const EditShopOwner = () => {
                 setLoadingCrops(false);
                 return;
             }
-            console.log('[EditShopOwner] Removing crops:', { userId, subId, cropIdsToRemove });
             const res = await axios.post(`${ServerSetting.serUrl}/api/removeCrops`, {
                 userId,
                 subId,
@@ -538,7 +771,6 @@ const EditShopOwner = () => {
             }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('[EditShopOwner] Remove crops response:', res.data);
             if (res.data.status === 200) {
                 showSuccess(t('crops_removed_success'));
                 await fetchAssignedCrops();
@@ -565,7 +797,6 @@ const EditShopOwner = () => {
         }
         setLoadingCrops(true);
         try {
-            console.log('[EditShopOwner] Adding crops:', { userId, subId, cropIds: selectedCropsToAdd });
             const res = await axios.post(`${ServerSetting.serUrl}/api/assigncrop`, {
                 userId,
                 subId,
@@ -573,7 +804,6 @@ const EditShopOwner = () => {
             }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('[EditShopOwner] Add crops response:', res.data);
             if (res.data.status === 200) {
                 showSuccess(t('crops_added_success'));
                 setSelectedCropsToAdd([]);
@@ -611,9 +841,8 @@ const EditShopOwner = () => {
         });
     }, [availableCrops, cropSearchQuery, cropTypeFilter]);
 
-    // ---- Shared style tokens (normal, matches other admin pages) ----
     const btnPrimary = 'btn btn-primary rounded-xl';
-    const cardWrapClass = 'border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-5 sm:p-6 bg-white dark:bg-black';
+    const cardWrapClass = 'border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-5 sm:p-6 bg-white dark:bg-black shadow-md';
     const btnOutlinePrimary = 'btn btn-outline-primary rounded-xl';
     const btnOutlineSecondary = 'btn btn-outline-secondary rounded-xl';
     const btnSaveGreen = 'btn shadow-none flex items-center gap-2 !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] rounded-xl';
@@ -632,7 +861,8 @@ const EditShopOwner = () => {
 
             <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
                 <h5 className="font-bold text-2xl text-gray-900 dark:text-white truncate">{t('edit_shop_owner')}</h5>
-                <Link to="/shopowner" className={`${btnOutlineSecondary} btn-sm shrink-0`}>
+                <Link to="/shopowner" className={`${btnOutlineSecondary} btn-sm flex gap-1 shrink-0`}>
+                    <IconArrowRight/>
                     {t('back_to_list')}
                 </Link>
             </div>
@@ -703,7 +933,7 @@ const EditShopOwner = () => {
                             <input
                                 type="file"
                                 accept="image/*"
-                                onChange={handleUserChange}
+                                onChange={handleUserFileSelect}
                                 name="userProfileImage"
                                 className="hidden"
                                 id="userProfileInput"
@@ -854,7 +1084,7 @@ const EditShopOwner = () => {
                                     <input
                                         type="file"
                                         accept="image/*"
-                                        onChange={handleShopChange}
+                                        onChange={handleShopFileSelect}
                                         name="shopBillImageTop"
                                         className="hidden"
                                         id="shopImageInput"
@@ -960,7 +1190,7 @@ const EditShopOwner = () => {
                             <span className="animate-[spin_2s_linear_infinite] border-4 border-[#f1f2f3] border-l-primary dark:border-l-primary-light rounded-full w-8 h-8 inline-block" />
                         </div>
                     ) : activeSubscription ? (
-                        <div className="mb-6 p-4 border border-[#ebedf2] dark:border-[#191e3a] bg-gray-50 dark:bg-white/[0.03] rounded-2xl">
+                        <div className="mb-6 p-4 border border-[#ebedf2] dark:border-[#191e3a] bg-gray-50 dark:bg-white/[0.03] rounded-2xl shadow-sm">
                             <div className="flex flex-wrap justify-between items-start gap-3 mb-3">
                                 <h4 className="font-semibold text-gray-900 dark:text-white">{t('current_subscription')}</h4>
                                 {(activeSubscription.status === 'expired' || activeSubscription.isExpired) && (
@@ -1002,7 +1232,7 @@ const EditShopOwner = () => {
                         <h4 className="font-semibold mb-4 text-gray-900 dark:text-white">{t('change_subscription')}</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {subscriptions.map((sub: any) => (
-                                <div key={sub._id} className="flex flex-col min-w-0 border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-4 bg-white dark:bg-black transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                                <div key={sub._id} className="flex flex-col min-w-0 border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-4 bg-white dark:bg-black shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
                                     <div className="flex items-start justify-between gap-2 mb-3">
                                         <h5 className="font-semibold text-gray-900 dark:text-white truncate" title={sub.subName}>{sub.subName}</h5>
                                         <span className="shrink-0 whitespace-nowrap inline-flex items-center rounded-lg bg-primary-light dark:bg-primary/20 px-2.5 py-1 text-sm font-bold text-primary dark:text-primary-light">
@@ -1055,7 +1285,7 @@ const EditShopOwner = () => {
                                 ) : assignedCrops.length > 0 ? (
                                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                         {assignedCrops.map((crop: any) => (
-                                            <div key={crop._id} className="min-w-0 border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-3 text-center relative bg-white dark:bg-black">
+                                            <div key={crop._id} className="min-w-0 border border-[#ebedf2] dark:border-[#191e3a] rounded-2xl p-3 text-center relative bg-white dark:bg-black shadow-sm">
                                                 <img
                                                     src={`${ServerSetting.serUrl}/crop/${crop.cropImage}`}
                                                     alt={crop.cropName}
@@ -1111,7 +1341,7 @@ const EditShopOwner = () => {
                                                 className={`min-w-0 border rounded-2xl p-3 text-center cursor-pointer transition-all duration-200 bg-white dark:bg-black ${
                                                     selectedCropsToAdd.includes(crop._id)
                                                         ? 'border-primary dark:border-primary-light shadow-lg scale-105'
-                                                        : 'border-[#ebedf2] dark:border-[#191e3a]'
+                                                        : 'border-[#ebedf2] dark:border-[#191e3a] shadow-sm'
                                                 }`}
                                             >
                                                 <img
@@ -1198,6 +1428,17 @@ const EditShopOwner = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Image crop modal — opens for both profile image and shop logo uploads */}
+            {cropState?.open && (
+                <ImageCropModal
+                    imageSrc={cropState.imageSrc}
+                    round={cropState.target === 'user'}
+                    title={cropState.target === 'user' ? t('crop_profile_image') : t('crop_shop_logo')}
+                    onCancel={handleCropCancel}
+                    onConfirm={handleCropConfirm}
+                />
             )}
         </div>
     );

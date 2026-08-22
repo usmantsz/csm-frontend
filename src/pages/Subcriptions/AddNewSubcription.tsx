@@ -10,6 +10,7 @@ import { ServerSetting } from './../../helperComponents/ServerSetting';
 import { useAuthToken } from './../../Hooks/useAuthToken';
 import { useNavigate } from "react-router-dom";
 import IconArrowLeft from '../../components/Icon/IconArrowLeft';
+import IconArrowRight from "../../components/Icon/IconArrowRight";
 
 interface SubscriptionForm {
     subName: string;
@@ -133,7 +134,7 @@ const AddNewSubscription = () => {
         onClick={() => navigate('/dashboard')}
         className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
         >
-            <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            <IconArrowRight className="w-4 h-4 rtl:rotate-180"/>
             {t('back_to_dashboard')}
         </button>
             </div>
@@ -166,12 +167,12 @@ const AddNewSubscription = () => {
             </div>
             <div className="mt-5 flex justify-end">
                 <button
-                    type="button"
-                    className="btn btn-primary rounded-xl transition-transform duration-200 hover:-translate-y-0.5"
-                    onClick={handleSubmit}
-                >
-                    {t('btn_add_subscription')}
-                </button>
+    type="button"
+    className="btn btn-primary rounded-xl transition-transform duration-200 hover:-translate-y-0.5 !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]"
+    onClick={handleSubmit}
+>
+    {t('btn_add_subscription')}
+</button>
             </div>
             </div>
         </div>
