@@ -493,6 +493,22 @@
   "profile_photo_updated_success": "Profile photo updated successfully",
   "profile_photo_update_failed": "Failed to update profile photo",
   "profile_photo_update_error": "An error occurred while updating profile photo",
+  "btn_save_shop_details_and_next": "Save Shop Details & Next",
+
+  "shop_information": "Shop Information",
+  "choose_subscription_plan": "Choose a Subscription Plan",
+  "assign_crops_to_shop_owner": "Assign Crops to Shop Owner",
+
+  "btn_save_shop_details_and_next": "Save Shop Details & Next",
+  "select_plan": "Select Plan",
+  "btn_save_and_finish": "Save & Finish",
+  "btn_save_and_next": "Save & Next",
+  "currency_pkr": "PKR",
+  "crops_allowed": "Crops allowed",
+  "form_placeholder_shop_name": "Enter shop name",
+"form_placeholder_shop_address": "Enter shop address",
+"assign_crops_desc": "Click on crops to select. Selected crops will be assigned to this shop owner.",
+"choose_subscription_plan_desc": "Select a plan for this shop owner. Price, crop limit, and duration are shown below.",
 
    "admin_view": "Admin View",
   "viewing_customers_as_admin": "Viewing customers as administrator",

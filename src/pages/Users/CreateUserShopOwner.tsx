@@ -189,7 +189,7 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
                         ref={imgRef}
                         src={imageSrc}
                         onLoad={onImgLoad}
-                        alt="Crop preview"
+                        alt={t('crop_preview_alt')}
                         draggable={false}
                         style={{
                             position: 'absolute',
@@ -298,7 +298,7 @@ const CreateUserShopOwner = () => {
     const [errorsShop, setErrorsShop] = useState(initailShopDataError);
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Create New Shop Owner'));
+        dispatch(setPageTitle(t('page_title_create_shop_owner')));
     }, [dispatch]);
     const [tabs, setTabs] = useState<string>('home');
     const toggleTabs = (name: string) => {
@@ -347,7 +347,7 @@ const CreateUserShopOwner = () => {
         const file = e.target.files[0];
         if (file) {
             if (file.size > MAX_PROFILE_IMAGE_MB * 1024 * 1024) {
-                Notification({ text: `Profile image must be under ${MAX_PROFILE_IMAGE_MB}MB.`, color: 'danger' });
+                Notification({ text: t('profile_image_max_size', { size: MAX_PROFILE_IMAGE_MB }), color: 'danger' });
                 e.target.value = '';
                 return;
             }
@@ -411,7 +411,7 @@ const CreateUserShopOwner = () => {
         // Clear the error for the specific field if it has a valid value
         setErrors((prevErrors) => ({
             ...prevErrors,
-            [name]: value.trim() ? "" : "This field is required",
+            [name]: value.trim() ? "" : t('field_required'),
         }));
     };
 
@@ -429,7 +429,7 @@ const CreateUserShopOwner = () => {
             // Clear the error for the specific field if it has a valid value
             setErrorsShop((prevErrors) => ({
                 ...prevErrors,
-                [name]: value.trim() ? "" : "This field is required",
+                [name]: value.trim() ? "" : t('field_required'),
             }));
         }
     };
@@ -441,22 +441,22 @@ const CreateUserShopOwner = () => {
 
         // Manually check each field
         if (!formDataShop.shopName.trim()) {
-            newErrors.shopName = "This field is required";
+            newErrors.shopName = t('field_required');
         }
         if (!formDataShop.shopNumber.trim()) {
-            newErrors.shopNumber = "This field is required";
+            newErrors.shopNumber = t('field_required');
         }
         if (!formDataShop.shopProvince.trim()) {
-            newErrors.shopProvince = "This field is required";
+            newErrors.shopProvince = t('field_required');
         }
         if (!formDataShop.shopCity.trim()) {
-            newErrors.shopCity = "This field is required";
+            newErrors.shopCity = t('field_required');
         }
         if (!formDataShop.shopRegistrationNumber.trim()) {
-            newErrors.shopRegistrationNumber = "This field is required";
+            newErrors.shopRegistrationNumber = t('field_required');
         }
         if (!formDataShop.shopAddress.trim()) {
-            newErrors.shopAddress = "This field is required";
+            newErrors.shopAddress = t('field_required');
         }
 
         // Update the errors state
@@ -491,7 +491,7 @@ const CreateUserShopOwner = () => {
                 });
                 if (response && response.data) {
                     Notification({
-                        text: response.data.message || "Shop added successfully!",
+                        text: response.data.message || t('shop_added_success'),
                         color: 'success',
                     });
                     console.log("Form submitted successfully:", response.data);
@@ -501,7 +501,7 @@ const CreateUserShopOwner = () => {
                 }
             } catch (error: any) {
                 Notification({
-                    text: error.response.data.message || "Error",
+                    text: error.response.data.message || t('error_generic'),
                     color: 'danger',
                 });
                 // console.error("Error submitting form:", error.message);
@@ -520,45 +520,45 @@ const CreateUserShopOwner = () => {
 
         // Manually check each field
         if (!formData.userNameF.trim()) {
-            newErrors.userNameF = "This field is required";
+            newErrors.userNameF = t('field_required');
         }
 
         if (!formData.userNameL.trim()) {
-            newErrors.userNameL = "This field is required";
+            newErrors.userNameL = t('field_required');
         }
 
         if (!formData.userPhone.trim()) {
-            newErrors.userPhone = "This field is required";
+            newErrors.userPhone = t('field_required');
         }
 
         if (!formData.userEmail.trim()) {
-            newErrors.userEmail = "This field is required";
+            newErrors.userEmail = t('field_required');
         }
 
         if (!formData.userCNIC.trim()) {
-            newErrors.userCNIC = "This field is required";
+            newErrors.userCNIC = t('field_required');
         }
 
         if (!formData.userProvince.trim()) {
-            newErrors.userProvince = "This field is required";
+            newErrors.userProvince = t('field_required');
         }
 
         if (!formData.userCity.trim()) {
-            newErrors.userCity = "This field is required";
+            newErrors.userCity = t('field_required');
         }
 
         if (!formData.userAdress.trim()) {
-            newErrors.userAdress = "This field is required";
+            newErrors.userAdress = t('field_required');
         }
 
         // Password: min 6 chars, at least one uppercase, one lowercase, one number (matches backend)
         const pwd = (formData.userPassword || '').trim();
         if (!pwd) {
-            newErrors.userPassword = "Password is required";
+            newErrors.userPassword = t('password_required');
         } else if (pwd.length < 6) {
-            newErrors.userPassword = "Password must be at least 6 characters";
+            newErrors.userPassword = t('password_min_length');
         } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(pwd)) {
-            newErrors.userPassword = "Password must contain at least one uppercase letter, one lowercase letter, and one number";
+            newErrors.userPassword = t('password_complexity');
         }
 
         setErrors(newErrors);
@@ -590,14 +590,14 @@ const CreateUserShopOwner = () => {
                 const ok = response.status === 200 || response.status === 201;
                 const userId = response.data?.data?.userId ?? response.data?.userId;
                 if (ok && userId) {
-                    Notification({ text: response.data?.message || 'User registered successfully.', color: 'success' });
+                    Notification({ text: response.data?.message || t('user_registered_success'), color: 'success' });
                     docUpload(userId);
                     setFormDataShop({ ...formDataShop, 'shopUserId': userId });
                     setSubscriptionSubcribe({ ...subcriptionSubcribe, 'userId': userId });
                 } else if (!ok && response.data?.message) {
                     Notification({ text: response.data.message, color: 'danger' });
                 } else if (!userId) {
-                    Notification({ text: response.data?.message || 'Registration failed. No user ID returned.', color: 'danger' });
+                    Notification({ text: response.data?.message || t('registration_failed_no_id'), color: 'danger' });
                 }
             } catch (error: any) {
                 console.error("Error submitting form:", error);
@@ -715,7 +715,7 @@ const CreateUserShopOwner = () => {
             // console.log("Form submitted successfully:", response.data);
         } catch (err: unknown) {
             console.error("Error submitting form:", err);
-            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Something went wrong.";
+            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || t('something_went_wrong');
             Notification({ text: message, color: 'danger' });
         }
 
@@ -734,7 +734,7 @@ const CreateUserShopOwner = () => {
             navigate('/shopowner');
         } catch (err: unknown) {
             console.error("Error submitting form:", err);
-            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Something went wrong.";
+            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || t('something_went_wrong');
             Notification({ text: message, color: 'danger' });
         }
     }
@@ -817,7 +817,7 @@ const CreateUserShopOwner = () => {
                                             {perImage ? (
                                                 <img
                                                     src={perImage}
-                                                    alt="Profile"
+                                                    alt={t('profile_alt')}
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
@@ -991,7 +991,7 @@ const CreateUserShopOwner = () => {
                                                             </button>
                                                             {imageList.map((image, index) => (
                                                                 <div key={index} className="mt-2 rounded-lg overflow-hidden border border-white-light dark:border-white/10">
-                                                                    <img src={image.dataURL} alt="Front CNIC" className="w-full h-auto max-h-32 object-contain" />
+                                                                    <img src={image.dataURL} alt={t('front_cnic_alt')} className="w-full h-auto max-h-32 object-contain" />
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -1008,7 +1008,7 @@ const CreateUserShopOwner = () => {
                                                             </button>
                                                             {imageList.map((image, index) => (
                                                                 <div key={index} className="mt-2 rounded-lg overflow-hidden border border-white-light dark:border-white/10">
-                                                                    <img src={image.dataURL} alt="Back CNIC" className="w-full h-auto max-h-32 object-contain" />
+                                                                    <img src={image.dataURL} alt={t('back_cnic_alt')} className="w-full h-auto max-h-32 object-contain" />
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -1023,7 +1023,7 @@ const CreateUserShopOwner = () => {
                                             className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 !bg-[#16a34a] hover:!bg-[#15803d]"
                                             onClick={handleSubmit}
                                         >
-                                            Save &amp; Next →
+                                            {t('btn_save_and_next')} →
                                         </button>
                                     </div>
 
@@ -1037,7 +1037,7 @@ const CreateUserShopOwner = () => {
                     <div className="rounded-2xl border border-white-light bg-white dark:bg-[#0b1526]/60 dark:border-white/10 p-6 shadow-sm">
                             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
                                 <IconMenuShop className="w-5 h-5 text-primary shrink-0" />
-                                Shop Information
+                                {t('shop_information')}
                             </h2>
                             <div className="flex flex-col lg:flex-row gap-8">
                                 <div className="shrink-0 flex flex-col items-center mx-auto lg:mx-0">
@@ -1052,21 +1052,21 @@ const CreateUserShopOwner = () => {
                                         <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-primary-200 dark:border-primary-700 bg-gray-100 dark:bg-white/5 flex items-center justify-center hover:border-primary transition-colors duration-200">
                                             <img
                                                 src={perImageShop || "https://cdn.iconscout.com/icon/free/png-256/free-logo-icon-download-in-svg-png-gif-file-formats--emblem-label-round-arrows-elements-pack-sign-symbols-icons-2882300.png"}
-                                                alt="Shop"
+                                                alt={t('shop_alt')}
                                                 className="w-full h-full object-cover"
                                             />
                                         </div>
-                                        <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">Shop logo / bill image</p>
+                                        <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">{t('shop_logo_bill_image')}</p>
                                     </label>
                                 </div>
                                 <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div className="min-w-0">
-                                        <label htmlFor="shopName" className="form-label">Shop Name <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopName" className="form-label">{t('shop_name')} <span className="text-danger">*</span></label>
                                         <input
                                             id="shopName"
                                             name="shopName"
                                             type="text"
-                                            placeholder="Jimmy Turner"
+                                            placeholder={t('form_placeholder_shop_name')}
                                             className={`form-input w-full ${errorsShop.shopName ? "border-red-500" : ""}`}
                                             value={formDataShop.shopName}
                                             onChange={handleChangeShop}
@@ -1076,7 +1076,7 @@ const CreateUserShopOwner = () => {
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <label htmlFor="shopRegistrationNumber" className="form-label">License / Registration <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopRegistrationNumber" className="form-label">{t('license_registration')} <span className="text-danger">*</span></label>
                                         <input
                                             id="shopRegistrationNumber"
                                             name="shopRegistrationNumber"
@@ -1091,7 +1091,7 @@ const CreateUserShopOwner = () => {
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <label htmlFor="shopNumber" className="form-label">Phone <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopNumber" className="form-label">{t('phone')} <span className="text-danger">*</span></label>
                                         <input
                                             id="shopNumber"
                                             name="shopNumber"
@@ -1106,12 +1106,12 @@ const CreateUserShopOwner = () => {
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <label htmlFor="shopProvince" className="form-label">Province <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopProvince" className="form-label">{t('province')} <span className="text-danger">*</span></label>
                                         <input
                                             id="shopProvince"
                                             name="shopProvince"
                                             type="text"
-                                            placeholder="Province"
+                                            placeholder={t('form_placeholder_province')}
                                             className={`form-input w-full ${errorsShop.shopProvince ? "border-red-500" : ""}`}
                                             value={formDataShop.shopProvince}
                                             onChange={handleChangeShop}
@@ -1121,12 +1121,12 @@ const CreateUserShopOwner = () => {
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <label htmlFor="shopCity" className="form-label">City <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopCity" className="form-label">{t('city')} <span className="text-danger">*</span></label>
                                         <input
                                             id="shopCity"
                                             name="shopCity"
                                             type="text"
-                                            placeholder="City"
+                                            placeholder={t('form_placeholder_city')}
                                             className={`form-input w-full ${errorsShop.shopCity ? "border-red-500" : ""}`}
                                             value={formDataShop.shopCity}
                                             onChange={handleChangeShop}
@@ -1136,12 +1136,12 @@ const CreateUserShopOwner = () => {
                                         )}
                                     </div>
                                     <div className="sm:col-span-2 min-w-0">
-                                        <label htmlFor="shopAddress" className="form-label">Address <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopAddress" className="form-label">{t('shop_address')} <span className="text-danger">*</span></label>
                                         <input
                                             id="shopAddress"
                                             name="shopAddress"
                                             type="text"
-                                            placeholder="New York"
+                                            placeholder={t('form_placeholder_shop_address')}
                                             className={`form-input w-full ${errorsShop.shopAddress ? "border-red-500" : ""}`}
                                             value={formDataShop.shopAddress}
                                             onChange={handleChangeShop}
@@ -1159,7 +1159,7 @@ const CreateUserShopOwner = () => {
                                             className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 !bg-[#16a34a] hover:!bg-[#15803d]"
                                             onClick={handleSubmitShop}
                                         >
-                                            Save Shop Details &amp; Next →
+                                            {t('btn_save_shop_details_and_next')} →
                                         </button>
                                     </div>
 
@@ -1173,9 +1173,9 @@ const CreateUserShopOwner = () => {
                     <div className="rounded-2xl border border-white-light bg-white dark:bg-[#0b1526]/60 dark:border-white/10 p-6 shadow-sm">
                             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
                                 <IconUser className="w-5 h-5 text-primary shrink-0" />
-                                Choose a Subscription Plan
+                                {t('choose_subscription_plan')}
                             </h2>
-                            <p className="text-gray-600 dark:text-gray-400 mb-6">Select a plan for this shop owner. Price, crop limit, and duration are shown below.</p>
+                            <p className="text-gray-600 dark:text-gray-400 mb-6">{t('choose_subscription_plan_desc')}</p>
                             {subscriptions.length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     {subscriptions.map((sub: any) => (
@@ -1185,17 +1185,17 @@ const CreateUserShopOwner = () => {
                                         >
                                             <div className="p-5 flex-1">
                                                 <div className="flex items-start justify-between gap-3 mb-3">
-                                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate" title={sub.subName}>{sub.subName}</h3>
+                                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate" dir="ltr" title={sub.subName}>{sub.subName}</h3>
                                                     <span className="shrink-0 whitespace-nowrap inline-flex items-center rounded-xl bg-primary/10 dark:bg-primary/20 px-3 py-1.5 text-sm font-bold text-primary">
-                                                        {sub.subPrice} PKR
+                                                        {sub.subPrice} {t('currency_pkr')}
                                                     </span>
                                                 </div>
                                                 <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(sub.subDescription || '') }} />
                                             </div>
                                             <div className="px-5 py-3 border-t border-white-light dark:border-white/10">
                                                 <ul className="space-y-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                    <li>Crops allowed: {sub.subCrop}</li>
-                                                    {sub.timeDuration && <li>Duration: {sub.timeDuration} months</li>}
+                                                    <li>{t('crops_allowed')}: {sub.subCrop}</li>
+                                                    {sub.timeDuration && <li>{t('duration')}: {sub.timeDuration} {t('months')}</li>}
                                                 </ul>
                                             </div>
                                             <div className="p-5 pt-3">
@@ -1204,7 +1204,7 @@ const CreateUserShopOwner = () => {
                                                     className="flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition-colors !bg-[#16a34a] hover:!bg-[#15803d]"
                                                     onClick={() => selectSubcription(sub._id, sub.timeDuration)}
                                                 >
-                                                    Select Plan
+                                                    {t('select_plan')}
                                                 </button>
                                             </div>
                                         </div>
@@ -1212,7 +1212,7 @@ const CreateUserShopOwner = () => {
                                 </div>
                             ) : (
                                 <div className="text-center py-12 rounded-xl bg-gray-50 dark:bg-white/5">
-                                    <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">No subscription plans found.</p>
+                                    <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">{t('no_subscription_plans_found')}</p>
                                     <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">{t('add_plans_from_subscriptions')}</p>
                                 </div>
                             )}
@@ -1224,9 +1224,9 @@ const CreateUserShopOwner = () => {
                     <div className="rounded-2xl border border-white-light bg-white dark:bg-[#0b1526]/60 dark:border-white/10 p-6 shadow-sm">
                             <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
                                 <IconPhone className="w-5 h-5 text-primary shrink-0" />
-                                Assign Crops to Shop Owner
+                                {t('assign_crops_to_shop_owner')}
                             </h2>
-                            <p className="text-gray-600 dark:text-gray-400 mb-6">Click on crops to select. Selected crops will be assigned to this shop owner.</p>
+                            <p className="text-gray-600 dark:text-gray-400 mb-6">{t('assign_crops_desc')}</p>
                             {cropData.length > 0 ? (
                                 <>
                                     <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -1234,7 +1234,7 @@ const CreateUserShopOwner = () => {
                                             <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
                                             <input
                                                 type="text"
-                                                placeholder="Search crops by name..."
+                                                placeholder={t('search_crops_placeholder')}
                                                 value={cropSearchQuery}
                                                 onChange={(e) => setCropSearchQuery(e.target.value)}
                                                 className="form-input pl-10 w-full"
@@ -1251,7 +1251,9 @@ const CreateUserShopOwner = () => {
                                                 ))}
                                             </select>
                                         </div>
-                                        <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{filteredCrops.length} of {cropData.length} crop{cropData.length !== 1 ? 's' : ''}</span>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                                            {filteredCrops.length} {t('of')} {cropData.length} {cropData.length !== 1 ? t('crops') : t('crop')}
+                                        </span>
                                     </div>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                                         {filteredCrops.map((crop: any) => {
@@ -1275,27 +1277,27 @@ const CreateUserShopOwner = () => {
                                                         )}
                                                     </div>
                                                     <span className="font-semibold text-gray-800 dark:text-white text-sm line-clamp-2">{crop.cropName}</span>
-                                                    {isSelected && <span className="inline-flex items-center rounded-lg bg-primary px-2 py-0.5 text-xs font-semibold text-white">Selected</span>}
+                                                    {isSelected && <span className="inline-flex items-center rounded-lg bg-primary px-2 py-0.5 text-xs font-semibold text-white">{t('selected')}</span>}
                                                 </button>
                                             );
                                         })}
                                     </div>
                                     <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            {selectedCards.length} crop(s) selected
+                                            {selectedCards.length} {t('crops_selected')}
                                         </p>
                                         <button
                                             type="button"
                                             className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 !bg-[#16a34a] hover:!bg-[#15803d]"
                                             onClick={handleSubmitCrop}
                                         >
-                                            Save &amp; Finish →
+                                            {t('btn_save_and_finish')} →
                                         </button>
                                     </div>
                                 </>
                             ) : (
                                 <div className="text-center py-12 rounded-xl bg-gray-50 dark:bg-white/5">
-                                    <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">No crops found.</p>
+                                    <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">{t('no_crops_found')}</p>
                                     <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">{t('add_crops_from_crops')}</p>
                                 </div>
                             )}

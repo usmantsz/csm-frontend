@@ -723,6 +723,22 @@
   "profile_photo_updated_success": "پروفائل تصویر کامیابی سے اپ ڈیٹ ہو گئی",
   "profile_photo_update_failed": "پروفائل تصویر اپ ڈیٹ کرنے میں ناکامی",
   "profile_photo_update_error": "پروفائل تصویر اپ ڈیٹ کرتے وقت خرابی پیش آگئی",
+  "btn_save_shop_details_and_next": "دکان کی تفصیلات محفوظ کریں اور اگلا",
+
+  "shop_information": "دکان کی معلومات",
+  "choose_subscription_plan": "سبسکرپشن پلان منتخب کریں",
+  "assign_crops_to_shop_owner": "دکان کے مالک کو فصلیں تفویض کریں",
+
+  "btn_save_shop_details_and_next": "دکان کی تفصیلات محفوظ کریں اور اگلا",
+  "select_plan": "پلان منتخب کریں",
+  "btn_save_and_finish": "محفوظ کریں اور مکمل کریں",
+  "btn_save_and_next": "محفوظ کریں اور اگلا",
+  "currency_pkr": "روپے",
+  "crops_allowed": "اجازت شدہ فصلیں",
+  "form_placeholder_shop_name": "دکان کا نام درج کریں",
+"form_placeholder_shop_address": "دکان کا پتہ درج کریں",
+"assign_crops_desc": "فصلیں منتخب کرنے کے لیے ان پر کلک کریں۔ منتخب فصلیں اس دکان کے مالک کو تفویض ہوں گی۔",
+"choose_subscription_plan_desc": "اس دکان کے مالک کے لیے پلان منتخب کریں۔ قیمت، فصلوں کی حد اور مدت نیچے دکھائی گئی ہے۔",
 
 "drag_to_reposition_zoom_to_resize": "پوزیشن بدلنے کے لیے گھسیٹیں، زوم ان یا آؤٹ کے لیے سلائیڈر استعمال کریں",
 

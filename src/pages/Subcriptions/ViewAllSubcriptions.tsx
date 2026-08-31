@@ -74,11 +74,11 @@ const ViewAllSubscriptions = () => {
                     >
                         <div className="p-5 flex-1">
                             <div className="flex items-start justify-between gap-3 mb-3">
-                                <h3 className="text-lg font-bold text-stone-900 dark:text-white truncate" title={sub.subName}>
+                                <h3 className="text-lg font-bold text-stone-900 dark:text-white truncate" dir="ltr" title={sub.subName}>
                                     {sub.subName}
                                 </h3>
                                 <span className="shrink-0 whitespace-nowrap inline-flex items-center rounded-xl border-2 border-success bg-white dark:bg-black px-3 py-1.5 text-sm font-bold text-[#3b3f5c] dark:text-white-light">
-                                    {sub.subPrice} PKR
+                                    {sub.subPrice} {t('currency_pkr')}
                                 </span>
                             </div>
                             <div

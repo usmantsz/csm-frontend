@@ -35,7 +35,10 @@ const QuickActionButton = ({
             to={to}
             className={`${cardClasses} group rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 active:translate-y-0 active:shadow-md`}
         >
-            <div className="flex items-center space-x-3">
+            {/* space-x-3 ki jagah gap-3: space-x margin-left based hota hai jo RTL
+                (Urdu) mein flip nahi hota, gap-3 direction-agnostic hai isliye
+                LTR aur RTL dono mein icon aur text ke darmiyan sahi space deta hai */}
+            <div className="flex items-center gap-3">
                 <span
                     className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-2xl transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 ${iconBg} ${iconText}`}
                 >
