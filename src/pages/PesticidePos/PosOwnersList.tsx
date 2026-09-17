@@ -16,8 +16,15 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import { useAuthToken } from '../../Hooks/useAuthToken';
 import { useTranslation } from 'react-i18next';
 
+// Design tokens taken from the Stitch dark navy + emerald "brand" theme.
+// Same structure/features/handlers as before — only the visual styling
+// (card, header, search input, table theme vars, badges, modals) changed.
 const card =
-    'rounded-[2rem] border border-green-200 bg-white/95 p-6 shadow-sm transition-shadow hover:shadow-md dark:border-green-800 dark:bg-[#0b1526]/85';
+    'rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md ' +
+    'dark:border-emerald-500/25 dark:bg-[#0b1a26]/90 dark:shadow-2xl dark:backdrop-blur-sm';
+const searchInputBase =
+    'form-input w-full pl-10 rounded-xl dark:bg-[#0b1a26] dark:border-slate-800 dark:text-slate-200 dark:placeholder-slate-500 ' +
+    'dark:focus:border-emerald-500 dark:focus:ring-emerald-500';
 
 type PosShopRecord = {
     _id: string;
@@ -164,23 +171,42 @@ const PosOwnersList = () => {
     return (
         <div className="space-y-6">
             <ul className="flex space-x-2 rtl:space-x-reverse">
-                <li><Link to="/dashboard" className="text-primary hover:underline">Dashboard</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><Link to="/pesticide-pos/shops" className="text-primary hover:underline">Pesticide POS</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 text-gray-500 dark:text-gray-400">POS Owners</li>
+                <li>
+                    <Link to="/dashboard" className="text-emerald-600 hover:underline dark:text-emerald-400">
+                        Dashboard
+                    </Link>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <Link to="/pesticide-pos/shops" className="text-emerald-600 hover:underline dark:text-emerald-400">
+                        Pesticide POS
+                    </Link>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 text-gray-500 dark:text-slate-500">POS Owners</li>
             </ul>
-            
 
             <div className={card}>
                 <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="min-w-0">
-                        <h1 className="text-xl font-bold text-success sm:text-2xl">{t('pos_owners_title')}</h1>
-                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t('pos_owners_desc')}</p>
+                    <div className="min-w-0 flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 shadow-sm dark:bg-[#0b1a26] dark:border-emerald-500/30 dark:text-emerald-400">
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-2xl">{t('pos_owners_title')}</h1>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{t('pos_owners_desc')}</p>
+                        </div>
                     </div>
                     <div className="relative w-full shrink-0 lg:w-auto lg:min-w-[260px]">
-                        <IconSearch className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                        <IconSearch className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
                         <input
                             type="text"
-                            className="form-input w-full pl-10"
+                            className={searchInputBase}
                             placeholder={t('search_placeholder')}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -188,10 +214,10 @@ const PosOwnersList = () => {
                     </div>
                 </div>
 
-                <div className="pos-owners-table dark:[--mantine-color-body:theme(colors.gray.900)] dark:[--mantine-color-text:theme(colors.blue.300)] [&_.mantine-datatable-empty-state]:text-blue-600 dark:[&_.mantine-datatable-empty-state]:!text-blue-300">
+                <div className="pos-owners-table dark:[--mantine-color-body:#0b1a26] dark:[--mantine-color-text:theme(colors.slate.300)] [&_.mantine-datatable-empty-state]:text-emerald-600 dark:[&_.mantine-datatable-empty-state]:!text-emerald-400 dark:[&_thead]:!bg-[#071521] dark:[&_thead]:!border-slate-800 dark:[&_th]:!text-slate-400 dark:[&_tbody_tr]:!border-slate-800/50 dark:[&_tbody_tr:hover]:!bg-slate-800/30">
                     {isLoading ? (
                         <div className="flex justify-center items-center h-20">
-                            <span className="animate-[spin_2s_linear_infinite] border-8 border-[#f1f2f3] border-l-success border-r-success rounded-full w-14 h-14 inline-block align-middle m-auto" />
+                            <span className="animate-[spin_2s_linear_infinite] border-8 border-[#f1f2f3] border-l-emerald-500 border-r-emerald-500 dark:border-[#0b1a26] dark:border-l-emerald-500 dark:border-r-emerald-500 rounded-full w-14 h-14 inline-block align-middle m-auto" />
                         </div>
                     ) : (
                         <DataTable
@@ -209,7 +235,7 @@ const PosOwnersList = () => {
                                         const img = o?.userProfileImage ? `${ServerSetting.serUrl}/profile/${o.userProfileImage}` : '/assets/images/profile-34.jpeg';
                                         return (
                                             <div className="flex items-center w-max">
-                                                <img className="w-9 h-9 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={img} alt="" />
+                                                <img className="w-9 h-9 rounded-full ltr:mr-2 rtl:ml-2 object-cover ring-2 ring-transparent dark:ring-emerald-500/20" src={img} alt="" />
                                                 <div>{name}</div>
                                             </div>
                                         );
@@ -263,9 +289,13 @@ const PosOwnersList = () => {
                                     render: (row: PosShopRecord) => (
                                         <span>
                                             {row.status === 1 ? (
-                                                <span className="badge badge-outline-danger">{t('blocked')}</span>
+                                                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-red-50 text-rose-700 border border-red-200 dark:bg-red-950/80 dark:text-rose-300 dark:border-red-500/40">
+                                                    {t('blocked')}
+                                                </span>
                                             ) : (
-                                                <span className="badge badge-outline-success">{t('active')}</span>
+                                                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-500/40">
+                                                    {t('active')}
+                                                </span>
                                             )}
                                         </span>
                                     ),
@@ -277,7 +307,7 @@ const PosOwnersList = () => {
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <button
                                                 type="button"
-                                                className="text-blue-500 hover:text-blue-700 p-1"
+                                                className="text-blue-500 hover:text-blue-700 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10"
                                                 onClick={() => viewTask(row)}
                                                 title={t('view')}
                                             >
@@ -285,7 +315,7 @@ const PosOwnersList = () => {
                                             </button>
                                             <button
                                                 type="button"
-                                                className="text-primary hover:text-primary/80 p-1"
+                                                className="text-emerald-600 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10"
                                                 onClick={() => openSubHistory(row)}
                                                 title={t('subscription_history_title')}
                                             >
@@ -293,7 +323,11 @@ const PosOwnersList = () => {
                                             </button>
                                             <button
                                                 type="button"
-                                                className={row.status === 1 ? 'text-green-500 hover:text-green-700 p-1' : 'text-red-500 hover:text-red-700 p-1'}
+                                                className={
+                                                    row.status === 1
+                                                        ? 'text-green-500 hover:text-green-700 p-1.5 rounded-lg hover:bg-green-50 dark:hover:bg-green-500/10'
+                                                        : 'text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10'
+                                                }
                                                 onClick={() => handleBlock(row)}
                                                 title={row.status === 1 ? 'Unblock' : 'Block'}
                                             >
@@ -301,7 +335,7 @@ const PosOwnersList = () => {
                                             </button>
                                             <Link
                                                 to={`/pesticide-pos/shops/edit/${row._id}`}
-                                                className="text-yellow-500 hover:text-yellow-700 inline-flex p-1"
+                                                className="text-yellow-500 hover:text-yellow-700 inline-flex p-1.5 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-500/10"
                                                 title={t('edit')}
                                             >
                                                 <FaEdit />
@@ -335,38 +369,76 @@ const PosOwnersList = () => {
                     <div className="fixed inset-0 overflow-y-auto">
                         <div className="flex min-h-full items-center justify-center px-4 py-8">
                             <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
-                                <Dialog.Panel className="relative panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                                    <button type="button" onClick={() => setViewModal(false)} className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none">
+                                <Dialog.Panel className="relative panel border-0 p-0 rounded-2xl overflow-hidden w-full max-w-lg text-black dark:text-white-dark dark:bg-[#0b1a26] dark:border dark:border-emerald-500/20">
+                                    <button
+                                        type="button"
+                                        onClick={() => setViewModal(false)}
+                                        className="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-slate-200 outline-none"
+                                    >
                                         <IconX />
                                     </button>
                                     <div className="p-5">
-                                        <h5 className="text-lg font-semibold mb-4">{t('pos_owners_title')} – {t('view')}</h5>
+                                        <h5 className="text-lg font-semibold mb-4 dark:text-white">
+                                            {t('pos_owners_title')} – {t('view')}
+                                        </h5>
                                         {selectedRow && (
                                             <div className="space-y-4">
                                                 <div className="flex items-center gap-4">
                                                     <img
-                                                        src={selectedRow.shopOwnerId?.userProfileImage ? `${ServerSetting.serUrl}/profile/${selectedRow.shopOwnerId.userProfileImage}` : '/assets/images/profile-34.jpeg'}
+                                                        src={
+                                                            selectedRow.shopOwnerId?.userProfileImage
+                                                                ? `${ServerSetting.serUrl}/profile/${selectedRow.shopOwnerId.userProfileImage}`
+                                                                : '/assets/images/profile-34.jpeg'
+                                                        }
                                                         alt=""
-                                                        className="w-20 h-20 rounded-full object-cover"
+                                                        className="w-20 h-20 rounded-full object-cover ring-2 ring-transparent dark:ring-emerald-500/30"
                                                     />
                                                     <div>
-                                                        <p className="font-semibold">{getOwnerName(selectedRow)}</p>
-                                                        <p className="text-sm text-gray-500">{selectedRow.shopName}</p>
-                                                        <span className={`badge mt-1 ${selectedRow.status === 1 ? 'badge-outline-danger' : 'badge-outline-success'}`}>
+                                                        <p className="font-semibold dark:text-white">{getOwnerName(selectedRow)}</p>
+                                                        <p className="text-sm text-gray-500 dark:text-slate-400">{selectedRow.shopName}</p>
+                                                        <span
+                                                            className={`mt-1 inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium border ${
+                                                                selectedRow.status === 1
+                                                                    ? 'bg-red-50 text-rose-700 border-red-200 dark:bg-red-950/80 dark:text-rose-300 dark:border-red-500/40'
+                                                                    : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-500/40'
+                                                            }`}
+                                                        >
                                                             {selectedRow.status === 1 ? 'Blocked' : 'Active'}
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="border-t border-white-light dark:border-[#1b2e4b] pt-4 grid grid-cols-1 gap-2 text-sm">
-                                                    <p><strong>Phone:</strong> {selectedRow.shopOwnerId?.userPhone ?? selectedRow.shopPhone ?? '—'}</p>
-                                                    <p><strong>Email:</strong> {selectedRow.shopOwnerId?.userEmail ?? '—'}</p>
-                                                    <p><strong>CNIC:</strong> {selectedRow.shopOwnerId?.userCNIC != null ? String(selectedRow.shopOwnerId.userCNIC) : '—'}</p>
-                                                    <p><strong>Address:</strong> {[selectedRow.shopOwnerId?.userProvince, selectedRow.shopOwnerId?.userCity, selectedRow.shopOwnerId?.userAdress].filter(Boolean).join(', ') || '—'}</p>
-                                                    <p><strong>Shop Reg.#:</strong> {selectedRow.shopRegistrationNumber ?? '—'}</p>
-                                                    <p><strong>Shop Address:</strong> {selectedRow.shopAddress ?? '—'}</p>
+                                                <div className="border-t border-white-light dark:border-slate-800 pt-4 grid grid-cols-1 gap-2 text-sm dark:text-slate-300">
+                                                    <p>
+                                                        <strong className="dark:text-white">Phone:</strong> {selectedRow.shopOwnerId?.userPhone ?? selectedRow.shopPhone ?? '—'}
+                                                    </p>
+                                                    <p>
+                                                        <strong className="dark:text-white">Email:</strong> {selectedRow.shopOwnerId?.userEmail ?? '—'}
+                                                    </p>
+                                                    <p>
+                                                        <strong className="dark:text-white">CNIC:</strong>{' '}
+                                                        {selectedRow.shopOwnerId?.userCNIC != null ? String(selectedRow.shopOwnerId.userCNIC) : '—'}
+                                                    </p>
+                                                    <p>
+                                                        <strong className="dark:text-white">Address:</strong>{' '}
+                                                        {[selectedRow.shopOwnerId?.userProvince, selectedRow.shopOwnerId?.userCity, selectedRow.shopOwnerId?.userAdress]
+                                                            .filter(Boolean)
+                                                            .join(', ') || '—'}
+                                                    </p>
+                                                    <p>
+                                                        <strong className="dark:text-white">Shop Reg.#:</strong> {selectedRow.shopRegistrationNumber ?? '—'}
+                                                    </p>
+                                                    <p>
+                                                        <strong className="dark:text-white">Shop Address:</strong> {selectedRow.shopAddress ?? '—'}
+                                                    </p>
                                                 </div>
                                                 <div className="flex justify-end pt-4">
-                                                    <button type="button" className="btn btn-outline-secondary" onClick={() => setViewModal(false)}>{t('close')}</button>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-outline-secondary rounded-xl dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                                                        onClick={() => setViewModal(false)}
+                                                    >
+                                                        {t('close')}
+                                                    </button>
                                                 </div>
                                             </div>
                                         )}
@@ -387,31 +459,63 @@ const PosOwnersList = () => {
                     <div className="fixed inset-0 overflow-y-auto">
                         <div className="flex min-h-full items-center justify-center px-4 py-8">
                             <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
-                                <Dialog.Panel className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                                    <div className="flex items-center justify-between p-5 border-b border-white-light dark:border-[#1b2e4b]">
-                                        <h5 className="text-lg font-semibold">POS Subscription – {subHistoryRow ? getOwnerName(subHistoryRow) + ' / ' + subHistoryRow.shopName : ''}</h5>
-                                        <button type="button" onClick={() => setSubHistoryModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <Dialog.Panel className="panel border-0 p-0 rounded-2xl overflow-hidden w-full max-w-lg text-black dark:text-white-dark dark:bg-[#0b1a26] dark:border dark:border-emerald-500/20">
+                                    <div className="flex items-center justify-between p-5 border-b border-white-light dark:border-slate-800">
+                                        <h5 className="text-lg font-semibold dark:text-white">
+                                            POS Subscription – {subHistoryRow ? getOwnerName(subHistoryRow) + ' / ' + subHistoryRow.shopName : ''}
+                                        </h5>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSubHistoryModal(false)}
+                                            className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-200"
+                                        >
                                             <IconX />
                                         </button>
                                     </div>
                                     <div className="p-5">
                                         {subHistoryRow && (
-                                            <div className="border border-white-light dark:border-[#1b2e4b] rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
-                                                <div className="grid grid-cols-2 gap-2 text-sm">
-                                                    <p><strong>Plan:</strong> {subHistoryRow.posSubscriptionId?.name || '—'}</p>
-                                                    <p><strong>Price:</strong> {subHistoryRow.posSubscriptionId?.price != null ? subHistoryRow.posSubscriptionId.price + ' PKR' : '—'}</p>
-                                                    <p><strong>Start:</strong> {formatDate(subHistoryRow.subscriptionStartDate)}</p>
-                                                    <p><strong>Expire:</strong> {formatDate(subHistoryRow.subscriptionExpireDate)}</p>
-                                                    <p><strong>Status:</strong>
-                                                        <span className={`badge ml-1 ${subHistoryRow.subscriptionExpireDate && new Date(subHistoryRow.subscriptionExpireDate).getTime() < Date.now() ? 'badge-outline-danger' : 'badge-outline-success'}`}>
-                                                            {subHistoryRow.subscriptionExpireDate && new Date(subHistoryRow.subscriptionExpireDate).getTime() < Date.now() ? 'Expired' : 'Active'}
+                                            <div className="border border-white-light dark:border-slate-800 rounded-xl p-4 bg-gray-50 dark:bg-[#07121c]/70">
+                                                <div className="grid grid-cols-2 gap-2 text-sm dark:text-slate-300">
+                                                    <p>
+                                                        <strong className="dark:text-white">Plan:</strong> {subHistoryRow.posSubscriptionId?.name || '—'}
+                                                    </p>
+                                                    <p>
+                                                        <strong className="dark:text-white">Price:</strong>{' '}
+                                                        {subHistoryRow.posSubscriptionId?.price != null ? subHistoryRow.posSubscriptionId.price + ' PKR' : '—'}
+                                                    </p>
+                                                    <p>
+                                                        <strong className="dark:text-white">Start:</strong> {formatDate(subHistoryRow.subscriptionStartDate)}
+                                                    </p>
+                                                    <p>
+                                                        <strong className="dark:text-white">Expire:</strong> {formatDate(subHistoryRow.subscriptionExpireDate)}
+                                                    </p>
+                                                    <p>
+                                                        <strong className="dark:text-white">Status:</strong>
+                                                        <span
+                                                            className={`ml-1 inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium border ${
+                                                                subHistoryRow.subscriptionExpireDate &&
+                                                                new Date(subHistoryRow.subscriptionExpireDate).getTime() < Date.now()
+                                                                    ? 'bg-red-50 text-rose-700 border-red-200 dark:bg-red-950/80 dark:text-rose-300 dark:border-red-500/40'
+                                                                    : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-500/40'
+                                                            }`}
+                                                        >
+                                                            {subHistoryRow.subscriptionExpireDate &&
+                                                            new Date(subHistoryRow.subscriptionExpireDate).getTime() < Date.now()
+                                                                ? 'Expired'
+                                                                : 'Active'}
                                                         </span>
                                                     </p>
                                                 </div>
                                             </div>
                                         )}
                                         <div className="flex justify-end pt-4">
-                                            <button type="button" className="btn btn-outline-secondary" onClick={() => setSubHistoryModal(false)}>Close</button>
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-secondary rounded-xl dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                                                onClick={() => setSubHistoryModal(false)}
+                                            >
+                                                Close
+                                            </button>
                                         </div>
                                     </div>
                                 </Dialog.Panel>
@@ -433,14 +537,14 @@ const PosOwnersList = () => {
                     color: #374151 !important;
                 }
                 .dark .pos-owners-table > div > div:last-child {
-                    background-color: #0b1526 !important;
-                    color: #93c5fd !important;
-                    border-top-color: #166534;
+                    background-color: #0b1a26 !important;
+                    color: #6ee7b7 !important;
+                    border-top-color: #132b3d;
                 }
                 .dark .pos-owners-table > div > div:last-child button,
                 .dark .pos-owners-table > div > div:last-child input {
-                    background-color: #0b1526 !important;
-                    color: #93c5fd !important;
+                    background-color: #0b1a26 !important;
+                    color: #6ee7b7 !important;
                 }
             `}</style>
         </div>

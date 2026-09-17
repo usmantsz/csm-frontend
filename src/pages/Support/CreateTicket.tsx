@@ -12,16 +12,17 @@ import IconPaperclip from '../../components/Icon/IconPaperclip';
 import IconArrowLeft from '../../components/Icon/IconArrowLeft';
 import SupportRichEditor from '../../components/SupportRichEditor';
 
-// Shared style tokens — matched to AddNewCrop.tsx so this page stays visually
-// consistent with the rest of the app.
+// Shared style tokens — dark variant matched to the Stitch "Create Support
+// Ticket" design (obsidian panel / emerald accents); light mode keeps the
+// app's existing look so nothing breaks outside dark mode.
 const card =
-    'rounded-[2rem] border border-white-light bg-white/95 p-6 shadow-sm transition-shadow hover:shadow-md dark:border-white/10 dark:bg-[#0b1526]/85';
+    'rounded-2xl border border-white-light bg-white/95 p-6 shadow-sm transition-shadow hover:shadow-md dark:border-[#162744] dark:bg-[#0a1322] dark:shadow-2xl dark:shadow-black/60 sm:p-8';
 const iconBadge =
     'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary dark:bg-primary/20';
 const inputBase =
-    'form-input w-full rounded-2xl border bg-white/80 px-4 py-2.5 text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 dark:bg-white/5 dark:text-white';
-const inputOk = 'border-gray-300 focus:border-primary dark:border-white/10 dark:focus:border-primary';
-const labelCls = 'mb-1.5 text-sm font-semibold text-gray-700 dark:text-gray-200';
+    'form-input w-full rounded-xl border bg-white/80 px-4 py-3 text-sm text-gray-800 transition-colors focus:outline-none focus:ring-1 focus:ring-primary/30 dark:bg-[#060c18] dark:text-slate-200 dark:placeholder-slate-500';
+const inputOk = 'border-gray-300 focus:border-primary dark:border-[#192b49] dark:focus:border-emerald-500 dark:focus:ring-emerald-500';
+const labelCls = 'mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-slate-300';
 const errorCls = 'mt-1 block text-sm text-red-500';
 
 const MAX_REF_FILES = 5;
@@ -149,169 +150,171 @@ const CreateTicket = () => {
     };
 
     return (
-        <div className="space-y-6">
-            <button
-                type="button"
-                onClick={() => navigate(`${supportBase}/list`)}
-                className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
-            >
-                <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
-                {t('support_back_tickets')}
-            </button>
+        <div className="flex flex-1 items-center justify-center px-4 py-8 md:py-10">
+            <div className="w-full space-y-6">
+                <button
+                    type="button"
+                    onClick={() => navigate(`${supportBase}/list`)}
+                    className="inline-flex items-center gap-2 rounded-full border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-emerald-600/40 dark:bg-[#09182a] dark:text-emerald-400 dark:hover:border-emerald-500 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-400"
+                >
+                    <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                    {t('support_back_tickets')}
+                </button>
 
-            <div className={`${card} mx-auto max-w-md`}>
-                <div className="space-y-5">
-                    <div className="text-center">
-                        <h1 className="text-xl font-bold text-success sm:text-2xl">{t('support_create_title')}</h1>
-                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t('support_create_desc')}</p>
-                    </div>
-
-                    {/* Subject */}
-                    <div className="flex flex-col">
-                        <label htmlFor="subject" className={labelCls}>
-                            {t('support_subject')}
-                        </label>
-                        <input
-                            id="subject"
-                            name="subject"
-                            type="text"
-                            placeholder={t('support_subject_ph')}
-                            className={`${inputBase} ${subjectError ? 'border-red-400 focus:border-red-500 dark:border-red-500/70' : inputOk}`}
-                            value={subject}
-                            onChange={(e) => {
-                                setSubject(e.target.value);
-                                if (subjectError) setSubjectError('');
-                            }}
-                        />
-                        {subjectError && <span className={errorCls}>{subjectError}</span>}
-                    </div>
-
-                    {/* Category + Priority */}
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div className="flex flex-col">
-                            <label htmlFor="category" className={labelCls}>
-                                {t('support_category')}
-                            </label>
-                            <select
-                                id="category"
-                                name="category"
-                                className={`form-select ${inputBase} ${inputOk}`}
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                            >
-                                {CATEGORIES.map((c) => (
-                                    <option key={c.value} value={c.value}>{c.label}</option>
-                                ))}
-                            </select>
+                <div className={`${card} mx-auto max-w-2xl`}>
+                    <div className="space-y-5">
+                        <div className="text-center">
+                            <h1 className="text-xl font-bold text-success sm:text-2xl dark:text-emerald-400">{t('support_create_title')}</h1>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{t('support_create_desc')}</p>
                         </div>
-                        <div className="flex flex-col">
-                            <label htmlFor="priority" className={labelCls}>
-                                {t('support_priority')}
-                            </label>
-                            <select
-                                id="priority"
-                                name="priority"
-                                className={`form-select ${inputBase} ${inputOk}`}
-                                value={priority}
-                                onChange={(e) => setPriority(Number(e.target.value))}
-                            >
-                                {PRIORITIES.map((p) => (
-                                    <option key={p.value} value={p.value}>{p.label}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
 
-                    {/* Description */}
-                    <div className="flex flex-col">
-                        <label className={labelCls}>{t('support_description')}</label>
-                        <div className="overflow-hidden rounded-2xl border border-gray-300 dark:border-white/10">
-                            <SupportRichEditor
-                                value={description}
-                                onChange={setDescription}
-                                placeholder={t('support_desc_placeholder')}
-                                minHeight="140px"
+                        {/* Subject */}
+                        <div className="flex flex-col">
+                            <label htmlFor="subject" className={labelCls}>
+                                {t('support_subject')}
+                            </label>
+                            <input
+                                id="subject"
+                                name="subject"
+                                type="text"
+                                placeholder={t('support_subject_ph')}
+                                className={`${inputBase} ${subjectError ? 'border-red-400 focus:border-red-500 dark:border-red-500/70' : inputOk}`}
+                                value={subject}
+                                onChange={(e) => {
+                                    setSubject(e.target.value);
+                                    if (subjectError) setSubjectError('');
+                                }}
                             />
+                            {subjectError && <span className={errorCls}>{subjectError}</span>}
                         </div>
-                    </div>
 
-                    {/* Reference files */}
-                    <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-4 dark:border-white/10 dark:bg-white/5">
-                        <label className={labelCls}>{t('support_ref_files_optional')}</label>
-                        <p className="mb-3 text-xs text-gray-500 dark:text-gray-400">
-                            {t('support_ref_files_hint', { max: MAX_REF_FILES })}
-                        </p>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            className="hidden"
-                            accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,.jpg,.jpeg,.png,.gif,.webp,.pdf"
-                            multiple
-                            onChange={onRefFilesChange}
-                        />
-                        <button
-                            type="button"
-                            className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={referenceFiles.length >= MAX_REF_FILES}
-                        >
-                            <IconPaperclip className="w-4 h-4 shrink-0" />
-                            {t('support_add_ref_images')}
-                        </button>
-                        {referenceFiles.length > 0 && (
-                            <div className="mt-3 flex flex-wrap gap-3">
-                                {referenceFiles.map((file, i) => (
-                                    <div
-                                        key={i}
-                                        className="relative overflow-hidden rounded-2xl border border-white-light bg-white shadow-sm dark:border-white/10 dark:bg-white/5"
-                                    >
-                                        {file.type.startsWith('image/') ? (
-                                            <img
-                                                src={URL.createObjectURL(file)}
-                                                alt=""
-                                                className="h-20 w-20 object-cover"
-                                                onLoad={(e) => URL.revokeObjectURL((e.target as HTMLImageElement).src)}
-                                            />
-                                        ) : (
-                                            <div className={`${iconBadge} m-2 h-16 w-16 rounded-2xl text-2xl`}>📎</div>
-                                        )}
-                                        <span className="block max-w-[100px] truncate px-2 py-1 text-xs" title={file.name}>
-                                            {file.name}
-                                        </span>
-                                        <button
-                                            type="button"
-                                            className="absolute right-0 top-0 flex h-6 w-6 items-center justify-center rounded-bl-lg bg-danger/90 text-sm text-white transition-colors hover:bg-danger"
-                                            onClick={() => removeRefFile(i)}
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                ))}
+                        {/* Category + Priority */}
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className="flex flex-col">
+                                <label htmlFor="category" className={labelCls}>
+                                    {t('support_category')}
+                                </label>
+                                <select
+                                    id="category"
+                                    name="category"
+                                    className={`form-select cursor-pointer ${inputBase} ${inputOk}`}
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                >
+                                    {CATEGORIES.map((c) => (
+                                        <option key={c.value} value={c.value}>{c.label}</option>
+                                    ))}
+                                </select>
                             </div>
-                        )}
-                    </div>
+                            <div className="flex flex-col">
+                                <label htmlFor="priority" className={labelCls}>
+                                    {t('support_priority')}
+                                </label>
+                                <select
+                                    id="priority"
+                                    name="priority"
+                                    className={`form-select cursor-pointer ${inputBase} ${inputOk}`}
+                                    value={priority}
+                                    onChange={(e) => setPriority(Number(e.target.value))}
+                                >
+                                    {PRIORITIES.map((p) => (
+                                        <option key={p.value} value={p.value}>{p.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
 
-                    {/* Submit */}
-                    <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row">
-                        <button
-                            type="button"
-                            className="flex-1 rounded-2xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-transparent dark:text-gray-300 dark:hover:bg-white/5"
-                            onClick={() => navigate(supportBase)}
-                        >
-                            {t('support_cancel')}
-                        </button>
-                        <button
-                            type="button"
-                            className={`flex flex-1 items-center justify-center gap-2 rounded-2xl bg-success px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-success/90 ${submitting ? 'cursor-not-allowed opacity-50' : ''
-                                }`}
-                            onClick={handleSubmit}
-                            disabled={submitting}
-                        >
-                            {submitting && (
-                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        {/* Description */}
+                        <div className="flex flex-col">
+                            <label className={labelCls}>{t('support_description')}</label>
+                            <div className="overflow-hidden rounded-xl border border-gray-300 transition-colors dark:border-[#192b49] dark:bg-[#060c18] dark:focus-within:border-emerald-500 dark:focus-within:ring-1 dark:focus-within:ring-emerald-500">
+                                <SupportRichEditor
+                                    value={description}
+                                    onChange={setDescription}
+                                    placeholder={t('support_desc_placeholder')}
+                                    minHeight="140px"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Reference files */}
+                        <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4 dark:border-[#1c3358] dark:bg-[#081120]">
+                            <label className={labelCls}>{t('support_ref_files_optional')}</label>
+                            <p className="mb-3 text-xs text-gray-500 dark:text-slate-400">
+                                {t('support_ref_files_hint', { max: MAX_REF_FILES })}
+                            </p>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,.jpg,.jpeg,.png,.gif,.webp,.pdf"
+                                multiple
+                                onChange={onRefFilesChange}
+                            />
+                            <button
+                                type="button"
+                                className="inline-flex items-center gap-1.5 rounded-full border-2 border-green-600 bg-green-50 px-4 py-2 text-xs font-medium text-green-700 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-50 dark:border dark:border-emerald-500/50 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30 sm:text-sm sm:font-semibold hover:bg-green-600 hover:text-white dark:hover:text-emerald-400"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={referenceFiles.length >= MAX_REF_FILES}
+                            >
+                                <IconPaperclip className="w-4 h-4 shrink-0" />
+                                {t('support_add_ref_images')}
+                            </button>
+                            {referenceFiles.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-3">
+                                    {referenceFiles.map((file, i) => (
+                                        <div
+                                            key={i}
+                                            className="relative overflow-hidden rounded-xl border border-white-light bg-white shadow-sm dark:border-[#192b49] dark:bg-[#060c18]"
+                                        >
+                                            {file.type.startsWith('image/') ? (
+                                                <img
+                                                    src={URL.createObjectURL(file)}
+                                                    alt=""
+                                                    className="h-20 w-20 object-cover"
+                                                    onLoad={(e) => URL.revokeObjectURL((e.target as HTMLImageElement).src)}
+                                                />
+                                            ) : (
+                                                <div className={`${iconBadge} m-2 h-16 w-16 rounded-2xl text-2xl`}>📎</div>
+                                            )}
+                                            <span className="block max-w-[100px] truncate px-2 py-1 text-xs dark:text-slate-300" title={file.name}>
+                                                {file.name}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                className="absolute right-0 top-0 flex h-6 w-6 items-center justify-center rounded-bl-lg bg-danger/90 text-sm text-white transition-colors hover:bg-danger"
+                                                onClick={() => removeRefFile(i)}
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
-                            {submitting ? t('support_creating') : t('support_create_ticket_btn')}
-                        </button>
+                        </div>
+
+                        {/* Submit */}
+                        <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
+                            <button
+                                type="button"
+                                className="rounded-xl border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-[#1c3050] dark:bg-[#0c182c] dark:text-slate-300 dark:hover:bg-[#12223e]"
+                                onClick={() => navigate(supportBase)}
+                            >
+                                {t('support_cancel')}
+                            </button>
+                            <button
+                                type="button"
+                                className={`flex items-center justify-center gap-2 rounded-xl bg-success px-7 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-success/90 dark:bg-emerald-500 dark:text-gray-950 dark:shadow-[0_0_20px_-4px_rgba(16,185,129,0.35)] dark:hover:bg-emerald-400 ${submitting ? 'cursor-not-allowed opacity-50' : ''
+                                    }`}
+                                onClick={handleSubmit}
+                                disabled={submitting}
+                            >
+                                {submitting && (
+                                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent dark:border-gray-950 dark:border-t-transparent" />
+                                )}
+                                {submitting ? t('support_creating') : t('support_create_ticket_btn')}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

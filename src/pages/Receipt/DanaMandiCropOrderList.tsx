@@ -859,47 +859,73 @@ const DanaMandiCropOrderList = () => {
     };
 
     return (
-        <div>
+        <div className="bg-[#070f1a] min-h-full -m-5 p-5">
+            {/* Back to Crop Menu */}
             <div className="flex justify-end mb-4">
                 <button
                     type="button"
                     onClick={() => navigate(userId && cropId ? `/cropmenu/${userId}/${cropId}` : '/getassginshopcrops')}
-                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-950/30 hover:bg-emerald-900/40 px-4 py-2 text-xs font-semibold tracking-wide text-emerald-400 hover:text-emerald-300 transition-all shadow-sm"
                 >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
                     {t('back_to_crop_menu')}
                 </button>
             </div>
-            <div className="panel shadow-md dark:shadow-none">
-                <div className="flex md:items-center md:justify-between flex-col md:flex-row mb-5 gap-4">
-                    <h5 className="font-semibold text-lg dark:text-white-light">
+
+            {/* Main Card */}
+            <div className="bg-[#0b1725] border border-slate-800 rounded-xl overflow-hidden shadow-xl shadow-black/40">
+                {/* Card Header: Title + Search + Date */}
+                <div className="px-6 py-4 border-b border-slate-800/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <h5 className="text-base font-semibold text-slate-100 tracking-tight">
                         {isSabziMandi ? t('sabzi_mandi_orders_list') : t('dana_mandi_orders_list')}
                     </h5>
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-                        <input
-                            type="text"
-                            className="form-input w-full sm:w-auto"
-                            placeholder={t('search_orders_placeholder')}
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                        <input
-                            type="date"
-                            className="form-input w-full sm:w-auto"
-                            value={filterDate}
-                            onChange={(e) => setFilterDate(e.target.value)}
-                        />
+                    <div className="flex flex-wrap items-center gap-3">
+                        {/* Search Input */}
+                        <div className="relative w-full sm:w-64 md:w-72">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input
+                                type="text"
+                                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[#070e17] border border-slate-700/80 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                                placeholder={t('search_orders_placeholder')}
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                        </div>
+                        {/* Date Filter */}
+                        <div className="relative w-full sm:w-40">
+                            <input
+                                type="date"
+                                className="w-full pl-3 pr-8 py-1.5 text-xs rounded-lg bg-[#070e17] border border-slate-700/80 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all [color-scheme:dark]"
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
+                            />
+                        </div>
                     </div>
                 </div>
 
+                {/* Table Body */}
                 {isLoading ? (
-                    <div className="flex justify-center items-center h-20">
-                        <span className="animate-[spin_2s_linear_infinite] border-8 border-[#f1f2f3] border-l-primary border-r-primary rounded-full w-14 h-14 inline-block align-middle m-auto mb-10"></span>
+                    <div className="flex justify-center items-center h-20 py-10">
+                        <span className="animate-[spin_2s_linear_infinite] border-8 border-slate-800 border-l-emerald-500 border-r-emerald-500 rounded-full w-14 h-14 inline-block align-middle m-auto"></span>
                     </div>
                 ) : (
-                    <div className="datatables">
+                    <div className="datatables px-4 pb-3 [&_.mantine-datatable-footer]:px-2 [&_.mantine-datatable-footer]:mt-2">
                         <DataTable
                             highlightOnHover
-                            className="whitespace-nowrap table-hover"
+                            className="whitespace-nowrap table-hover !bg-transparent !text-slate-200
+                                [&_table]:!bg-transparent
+                                [&_thead]:!bg-[#081320]
+                                [&_thead_th]:!text-slate-400 [&_thead_th]:!text-[11px] [&_thead_th]:!font-semibold [&_thead_th]:!uppercase [&_thead_th]:!tracking-wider [&_thead_th]:!border-slate-800
+                                [&_tbody_tr]:!border-slate-800/70 [&_tbody_tr]:!bg-transparent
+                                [&_tbody_tr:hover]:!bg-slate-800/40
+                                [&_.mantine-Pagination-root]:!text-slate-400
+                                [&_select]:!bg-[#070e17] [&_select]:!border-slate-700/80 [&_select]:!text-slate-300"
                             records={recordsData}
                             columns={isSabziMandi ? [
                                 // Vegetable Orders Columns
@@ -908,7 +934,7 @@ const DanaMandiCropOrderList = () => {
                                     title: t('receipt_id'),
                                     sortable: true,
                                     render: ({ receiptId, _id }: any) => (
-                                        <span className="font-mono text-sm font-semibold text-primary-600 dark:text-primary-400">
+                                        <span className="font-mono text-sm font-semibold text-emerald-400">
                                             {receiptId || _id?.slice(-8)?.toUpperCase() || t('na')}
                                         </span>
                                     ),
@@ -917,60 +943,60 @@ const DanaMandiCropOrderList = () => {
                                     accessor: "vegetableOrderCusId",
                                     title: t('customer'),
                                     render: ({ vegetableOrderCusId }: any) => {
-                                        if (!vegetableOrderCusId) return t('na');
+                                        if (!vegetableOrderCusId) return <span className="text-slate-300">{t('na')}</span>;
                                         // Handle both object and string ID
                                         if (typeof vegetableOrderCusId === 'object' && vegetableOrderCusId !== null) {
                                             const name = `${vegetableOrderCusId?.cusNameF || ''} ${vegetableOrderCusId?.cusNameL || ''}`.trim();
                                             if (name) {
-                                                return name;
+                                                return <span className="text-slate-300">{name}</span>;
                                             }
                                         }
-                                        return t('na');
+                                        return <span className="text-slate-300">{t('na')}</span>;
                                     },
                                 },
                                 {
                                     accessor: "vegetableOrderShopId",
                                     title: t('shop'),
                                     render: ({ vegetableOrderShopId }: any) => {
-                                        if (!vegetableOrderShopId) return t('na');
+                                        if (!vegetableOrderShopId) return <span className="text-slate-300">{t('na')}</span>;
                                         // Handle both object and string ID
                                         if (typeof vegetableOrderShopId === 'object') {
-                                            return vegetableOrderShopId?.shopName || t('na');
+                                            return <span className="text-slate-300">{vegetableOrderShopId?.shopName || t('na')}</span>;
                                         }
-                                        return t('na');
+                                        return <span className="text-slate-300">{t('na')}</span>;
                                     },
                                 },
                                 {
                                     accessor: "vegetableOrderCusId.cusCNIC",
                                     title: t('cnic'),
                                     render: ({ vegetableOrderCusId }: any) => {
-                                        if (!vegetableOrderCusId) return t('na');
+                                        if (!vegetableOrderCusId) return <span className="text-slate-300">{t('na')}</span>;
                                         if (typeof vegetableOrderCusId === 'object' && vegetableOrderCusId !== null) {
-                                            return vegetableOrderCusId?.cusCNIC || t('na');
+                                            return <span className="text-slate-300">{vegetableOrderCusId?.cusCNIC || t('na')}</span>;
                                         }
-                                        return t('na');
+                                        return <span className="text-slate-300">{t('na')}</span>;
                                     }
                                 },
                                 {
                                     accessor: "vegetableOrderCusId.cusNumber",
                                     title: t('phone'),
                                     render: ({ vegetableOrderCusId }: any) => {
-                                        if (!vegetableOrderCusId) return t('na');
+                                        if (!vegetableOrderCusId) return <span className="text-slate-300">{t('na')}</span>;
                                         if (typeof vegetableOrderCusId === 'object' && vegetableOrderCusId !== null) {
-                                            return vegetableOrderCusId?.cusNumber || t('na');
+                                            return <span className="text-slate-300">{vegetableOrderCusId?.cusNumber || t('na')}</span>;
                                         }
-                                        return t('na');
+                                        return <span className="text-slate-300">{t('na')}</span>;
                                     }
                                 },
                                 {
                                     accessor: "vegetableOrderBapariId",
                                     title: t('buyer_name'),
-                                    render: ({ vegetableOrderBapariId }: any) => vegetableOrderBapariId || t('na')
+                                    render: ({ vegetableOrderBapariId }: any) => <span className="text-slate-300">{vegetableOrderBapariId || t('na')}</span>
                                 },
                                 {
                                     accessor: "totalPisces",
                                     title: t('total_pieces'),
-                                    render: ({ totalPisces }: any) => totalPisces || '0'
+                                    render: ({ totalPisces }: any) => <span className="text-slate-300">{totalPisces || '0'}</span>
                                 },
                                 {
                                     accessor: "totalAmount",
@@ -980,7 +1006,7 @@ const DanaMandiCropOrderList = () => {
                                         const q = Number(totalPisces) || 0;
                                         const amt = (isNaN(p) || isNaN(q)) ? 0 : p * q;
                                         return (
-                                            <span className="font-semibold text-gray-800 dark:text-gray-200">
+                                            <span className="font-semibold text-slate-200">
                                                 Rs. {amt.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </span>
                                         );
@@ -990,7 +1016,7 @@ const DanaMandiCropOrderList = () => {
                                     accessor: "totalPrice",
                                     title: t('net_price'),
                                     render: ({ totalPrice }: any) => (
-                                        <span className="font-semibold text-success-600 dark:text-success-400">
+                                        <span className="font-semibold text-emerald-400">
                                             Rs. {parseFloat(totalPrice || '0').toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </span>
                                     ),
@@ -999,26 +1025,29 @@ const DanaMandiCropOrderList = () => {
                                     accessor: "createdAt",
                                     title: t('date'),
                                     sortable: true,
-                                    render: (row: any) =>
-                                        new Date(row.createdAt).toLocaleDateString("en-GB", {
-                                            day: "2-digit",
-                                            month: "2-digit",
-                                            year: "numeric",
-                                        })
+                                    render: (row: any) => (
+                                        <span className="text-slate-300">
+                                            {new Date(row.createdAt).toLocaleDateString("en-GB", {
+                                                day: "2-digit",
+                                                month: "2-digit",
+                                                year: "numeric",
+                                            })}
+                                        </span>
+                                    )
                                 },
                                 {
                                     accessor: "action",
                                     title: t('action'),
                                     render: (order: any) => (
                                         <button
-                                            className="btn btn-sm btn-outline-primary flex items-center gap-2 hover:bg-primary hover:text-white transition-all duration-200"
+                                            className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/40 bg-emerald-950/30 px-2.5 py-1 text-xs font-medium text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition-all"
                                             onClick={() => {
                                                 setSelectedOrder(order);
                                                 setViewModal(true);
                                             }}
                                             title={t('view_receipt')}
                                         >
-                                            <FaEye className="w-4 h-4" />
+                                            <FaEye className="w-3.5 h-3.5" />
                                             <span className="hidden sm:inline">{t('view')}</span>
                                         </button>
                                     ),
@@ -1030,7 +1059,7 @@ const DanaMandiCropOrderList = () => {
                                     title: t('receipt_id'),
                                     sortable: true,
                                     render: ({ receiptId, _id }: any) => (
-                                        <span className="font-mono text-sm font-semibold text-primary-600 dark:text-primary-400">
+                                        <span className="font-mono text-sm font-semibold text-emerald-400">
                                             {receiptId || _id?.slice(-8)?.toUpperCase() || t('na')}
                                         </span>
                                     ),
@@ -1038,22 +1067,37 @@ const DanaMandiCropOrderList = () => {
                                 {
                                     accessor: "danaMandiOrderCusId",
                                     title: t('customer'),
-                                    render: ({ danaMandiOrderCusId }: any) =>
-                                        danaMandiOrderCusId ? `${danaMandiOrderCusId?.cusNameF || ''} ${danaMandiOrderCusId?.cusNameL || ''}`.trim() : t('na'),
+                                    render: ({ danaMandiOrderCusId }: any) => (
+                                        <span className="text-slate-300">
+                                            {danaMandiOrderCusId ? `${danaMandiOrderCusId?.cusNameF || ''} ${danaMandiOrderCusId?.cusNameL || ''}`.trim() : t('na')}
+                                        </span>
+                                    ),
                                 },
                                 {
                                     accessor: "danaMandiOrderShopId",
                                     title: t('shop'),
-                                    render: ({ danaMandiOrderShopId }: any) => danaMandiOrderShopId?.shopName || t('na'),
+                                    render: ({ danaMandiOrderShopId }: any) => <span className="text-slate-300">{danaMandiOrderShopId?.shopName || t('na')}</span>,
                                 },
-                                { accessor: "danaMandiOrderCusId.cusCNIC", title: t('cnic'), render: ({ danaMandiOrderCusId }: any) => danaMandiOrderCusId?.cusCNIC || t('na') },
-                                { accessor: "danaMandiOrderCusId.cusNumber", title: t('phone'), render: ({ danaMandiOrderCusId }: any) => danaMandiOrderCusId?.cusNumber || t('na') },
-                                { accessor: "danaMandiOrderBapariId", title: t('bapari_name') },
+                                {
+                                    accessor: "danaMandiOrderCusId.cusCNIC",
+                                    title: t('cnic'),
+                                    render: ({ danaMandiOrderCusId }: any) => <span className="text-slate-300">{danaMandiOrderCusId?.cusCNIC || t('na')}</span>
+                                },
+                                {
+                                    accessor: "danaMandiOrderCusId.cusNumber",
+                                    title: t('phone'),
+                                    render: ({ danaMandiOrderCusId }: any) => <span className="text-slate-300">{danaMandiOrderCusId?.cusNumber || t('na')}</span>
+                                },
+                                {
+                                    accessor: "danaMandiOrderBapariId",
+                                    title: t('bapari_name'),
+                                    render: ({ danaMandiOrderBapariId }: any) => <span className="text-slate-300">{danaMandiOrderBapariId}</span>
+                                },
                                 {
                                     accessor: "totalPrice",
                                     title: t('total_amount'),
                                     render: ({ totalPrice }: any) => (
-                                        <span className="font-semibold text-gray-800 dark:text-gray-200">
+                                        <span className="font-semibold text-slate-200">
                                             Rs. {Number(totalPrice || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </span>
                                     ),
@@ -1068,7 +1112,7 @@ const DanaMandiCropOrderList = () => {
                                         const rent = Number(row.RentDelivery) || 0;
                                         const net = total - commission - mazdori - rent;
                                         return (
-                                            <span className="font-semibold text-success-600 dark:text-success-400">
+                                            <span className="font-semibold text-emerald-400">
                                                 Rs. {Math.max(0, net).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </span>
                                         );
@@ -1078,26 +1122,29 @@ const DanaMandiCropOrderList = () => {
                                     accessor: "createdAt",
                                     title: t('date'),
                                     sortable: true,
-                                    render: (row: any) =>
-                                        new Date(row.createdAt).toLocaleDateString("en-GB", {
-                                            day: "2-digit",
-                                            month: "2-digit",
-                                            year: "numeric",
-                                        })
+                                    render: (row: any) => (
+                                        <span className="text-slate-300">
+                                            {new Date(row.createdAt).toLocaleDateString("en-GB", {
+                                                day: "2-digit",
+                                                month: "2-digit",
+                                                year: "numeric",
+                                            })}
+                                        </span>
+                                    )
                                 },
                                 {
                                     accessor: "action",
                                     title: t('action'),
                                     render: (order: any) => (
                                         <button
-                                            className="btn btn-sm btn-outline-primary flex items-center gap-2 hover:bg-primary hover:text-white transition-all duration-200"
+                                            className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/40 bg-emerald-950/30 px-2.5 py-1 text-xs font-medium text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition-all"
                                             onClick={() => {
                                                 setSelectedOrder(order);
                                                 setViewModal(true);
                                             }}
                                             title={t('view_receipt')}
                                         >
-                                            <FaEye className="w-4 h-4" />
+                                            <FaEye className="w-3.5 h-3.5" />
                                             <span className="hidden sm:inline">{t('view')}</span>
                                         </button>
                                     ),
@@ -1118,7 +1165,7 @@ const DanaMandiCropOrderList = () => {
                 )}
             </div>
 
-            {/* Receipt Modal */}
+            {/* Receipt Modal (kept light — intended for printing) */}
             <Modal
                 opened={viewModal}
                 onClose={() => setViewModal(false)}

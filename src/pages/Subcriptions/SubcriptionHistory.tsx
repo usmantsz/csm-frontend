@@ -52,7 +52,6 @@ const SubscriptionHistory = () => {
     const fetchHistory = () => {
         if (!token) return;
         setIsLoading(true);
-        // Shop owner: backend forces own userId; admin/team may omit userId for full list or pass userId to filter
         const body =
             isShopOwner && (user as { _id?: string })?._id
                 ? { userId: (user as { _id: string })._id }
@@ -382,44 +381,46 @@ const SubscriptionHistory = () => {
     return (
         <div className="space-y-6">
             <div className="w-full flex justify-end">
-        <button
-        type="button"
-        onClick={() => navigate('/dashboard')}
-        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
-        >
-            <IconArrowRight className="w-4 h-4 rtl:rotate-180"/>
-            {t('back_to_dashboard')}
-        </button>
+                <button
+                    type="button"
+                    onClick={() => navigate('/dashboard')}
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-emerald-500/50 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-600 dark:hover:text-white"
+                >
+                    <IconArrowRight className="w-4 h-4 rtl:rotate-180" />
+                    {t('back_to_dashboard')}
+                </button>
             </div>
+
+            {/* Stat cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <div className="rounded-2xl border border-green-200 dark:border-green-800 bg-gradient-to-br from-primary/10 to-primary/5 p-5 flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-        <span className="inline-flex h-11 w-11 shadow-gray-500/40 shadow-lg shrink-0 items-center justify-center rounded-xl dark:shadow-none text-primary">
-            <IconMenuInvoice className="w-5 h-5" />
-        </span>
-        <div className="min-w-0">
-            <p className="text-sm font-medium text-stone-600 dark:text-stone-400">{t('exp_total_records')}</p>
-            <p className="text-2xl font-bold text-primary">{rowData.length}</p>
-        </div>
-    </div>
-    <div className="rounded-2xl border border-green-200 dark:border-green-800 bg-gradient-to-br from-success/10 to-success/5 p-5 flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-        <span className="inline-flex h-11 w-11 dark:shadow-none shadow-gray-500/40 shadow-lg shrink-0 items-center justify-center rounded-xl text-success">
-            <IconCircleCheck className="w-5 h-5" />
-        </span>
-        <div className="min-w-0">
-            <p className="text-sm font-medium text-stone-600 dark:text-stone-400">{t('active')}</p>
-            <p className="text-2xl font-bold text-success">{activeCount}</p>
-        </div>
-    </div>
-    <div className="rounded-2xl border border-green-200 dark:border-green-800 bg-gradient-to-br from-danger/10 to-danger/5 p-5 flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-        <span className="inline-flex h-11 w-11 dark:shadow-none shadow-gray-500/40 shadow-lg shrink-0 items-center justify-center rounded-xl bg-danger/15 text-danger">
-            <IconXCircle className="w-5 h-5" />
-        </span>
-        <div className="min-w-0">
-            <p className="text-sm font-medium text-stone-600 dark:text-stone-400">{t('expired')}</p>
-            <p className="text-2xl font-bold text-danger">{expiredCount}</p>
-        </div>
-    </div>
-</div>
+                <div className="rounded-2xl border border-green-200 dark:border-slate-800 bg-gradient-to-br from-primary/10 to-primary/5 dark:from-transparent dark:to-transparent dark:bg-[#0b1a24] p-5 flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:hover:border-slate-700">
+                    <span className="inline-flex h-11 w-11 shadow-gray-500/40 shadow-lg dark:shadow-none shrink-0 items-center justify-center rounded-xl text-primary dark:bg-slate-900 dark:border dark:border-slate-800 dark:text-emerald-400">
+                        <IconMenuInvoice className="w-5 h-5" />
+                    </span>
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-stone-600 dark:text-slate-400">{t('exp_total_records')}</p>
+                        <p className="text-2xl font-bold text-primary dark:text-white">{rowData.length}</p>
+                    </div>
+                </div>
+                <div className="rounded-2xl border border-green-200 dark:border-emerald-500/20 bg-gradient-to-br from-success/10 to-success/5 dark:from-transparent dark:to-transparent dark:bg-[#0b1a24] dark:shadow-[0_4px_20px_-2px_rgba(16,185,129,0.15)] p-5 flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:hover:border-emerald-500/40">
+                    <span className="inline-flex h-11 w-11 dark:shadow-none shadow-gray-500/40 shadow-lg shrink-0 items-center justify-center rounded-xl text-success dark:bg-emerald-950/60 dark:border dark:border-emerald-500/30 dark:text-emerald-400">
+                        <IconCircleCheck className="w-5 h-5" />
+                    </span>
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-stone-600 dark:text-emerald-400">{t('active')}</p>
+                        <p className="text-2xl font-bold text-success dark:text-white">{activeCount}</p>
+                    </div>
+                </div>
+                <div className="rounded-2xl border border-green-200 dark:border-rose-900/30 bg-gradient-to-br from-danger/10 to-danger/5 dark:from-transparent dark:to-transparent dark:bg-[#0b1a24] p-5 flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:hover:border-rose-800/50">
+                    <span className="inline-flex h-11 w-11 dark:shadow-none shadow-gray-500/40 shadow-lg shrink-0 items-center justify-center rounded-xl bg-danger/15 text-danger dark:bg-rose-950/40 dark:border dark:border-rose-900/40 dark:text-rose-400">
+                        <IconXCircle className="w-5 h-5" />
+                    </span>
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-stone-600 dark:text-rose-400">{t('expired')}</p>
+                        <p className="text-2xl font-bold text-danger dark:text-white">{expiredCount}</p>
+                    </div>
+                </div>
+            </div>
 
             <TableCard
                 title={t('subscription_history_page')}
@@ -442,73 +443,78 @@ const SubscriptionHistory = () => {
                 actions={
                     <div className="flex flex-wrap items-center gap-2">
                         {!isShopOwner && (
-                            <button type="button" onClick={() => { setShowFindByCNIC(true); setFindResult(null); setCnicInput(''); setShowChangePlanForm(false); }} className="btn btn-sm rounded-xl shadow-none flex items-center !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]">
-<IconUser duotone={false} className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5" />                                {t('find_by_cnic')}
+                            <button type="button" onClick={() => { setShowFindByCNIC(true); setFindResult(null); setCnicInput(''); setShowChangePlanForm(false); }} className="btn btn-sm rounded-xl shadow-none flex items-center !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] dark:shadow-md dark:shadow-emerald-950/40">
+                                <IconUser duotone={false} className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5" />
+                                {t('find_by_cnic')}
                             </button>
                         )}
-                        <button type="button" onClick={() => exportTable('csv')} className="btn btn-outline-success btn-sm rounded-xl">{t('csv')}</button>
-                        <button type="button" onClick={() => exportTable('txt')} className="btn btn-outline-success btn-sm rounded-xl">{t('txt')}</button>
-                        <button type="button" onClick={handleDownloadExcel} className="btn btn-outline-success btn-sm rounded-xl">{t('excel')}</button>
-                        <button type="button" onClick={() => exportTable('print')} className="btn btn-outline-success btn-sm rounded-xl">{t('print')}</button>
-                        
+                        <div className="inline-flex items-center rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-[#08131d] p-1 gap-1">
+                            <button type="button" onClick={() => exportTable('csv')} className="px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded transition-colors">{t('csv')}</button>
+                            <span className="w-px h-3 bg-gray-200 dark:bg-slate-800"></span>
+                            <button type="button" onClick={() => exportTable('txt')} className="px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded transition-colors">{t('txt')}</button>
+                            <span className="w-px h-3 bg-gray-200 dark:bg-slate-800"></span>
+                            <button type="button" onClick={handleDownloadExcel} className="px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded transition-colors">{t('excel')}</button>
+                            <span className="w-px h-3 bg-gray-200 dark:bg-slate-800"></span>
+                            <button type="button" onClick={() => exportTable('print')} className="px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded transition-colors">{t('print')}</button>
+                        </div>
                     </div>
                 }
             />
 
-            <div className="rounded-2xl border border-[#c7ddf7] dark:border-[#1f3d7f] bg-white dark:bg-[#0b1526]/60 p-5 flex flex-wrap items-center justify-between gap-4">
-                <p className="text-sm text-stone-600 dark:text-stone-400">{t('sorted_by_expire_date')}</p>
-                <p className="font-semibold">{t('total_subscription_value')}: <span className="text-primary">{totalPrice.toFixed(2)} PKR</span></p>
+            <div className="rounded-2xl border border-[#c7ddf7] dark:border-slate-800/90 bg-white dark:bg-gradient-to-r dark:from-slate-900/90 dark:to-[#08131d] p-5 flex flex-wrap items-center justify-between gap-4">
+                <p className="text-sm text-stone-600 dark:text-slate-400">{t('sorted_by_expire_date')}</p>
+                <p className="font-semibold text-gray-900 dark:text-slate-200">{t('total_subscription_value')}: <span className="text-primary dark:text-emerald-400 font-mono">{totalPrice.toFixed(2)} PKR</span></p>
             </div>
 
             {/* Find by CNIC Modal */}
             {showFindByCNIC && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
-                    <div className="rounded-2xl border border-[#c7ddf7] dark:border-[#1f3d7f] bg-white dark:bg-[#0b1526] w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 shadow-xl">
+                    <div className="rounded-2xl border border-[#c7ddf7] dark:border-slate-800 bg-white dark:bg-[#0b1a24] w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 shadow-xl dark:shadow-2xl dark:shadow-black/60">
                         <div className="flex justify-between items-center mb-4 gap-2">
-                            <h5 className="text-lg font-semibold truncate">{t('find_shop_owner_by_cnic')}</h5>
+                            <h5 className="text-lg font-semibold truncate text-gray-900 dark:text-white">{t('find_shop_owner_by_cnic')}</h5>
                             <button type="button" className="btn btn-sm btn-outline-danger rounded-xl shrink-0" onClick={() => { setShowFindByCNIC(false); setShowRenewForm(false); setShowUpdateForm(false); setShowChangePlanForm(false); setFindResult(null); }}>{t('close')}</button>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2 mb-4">
-                            <input type="text" className="form-input flex-1 min-w-0" placeholder={t('enter_shop_owner_cnic')} value={cnicInput} onChange={e => setCnicInput(e.target.value)} />
-                            <button type="button" className="btn btn-primary rounded-xl shrink-0" onClick={handleFindByCNIC} disabled={findLoading}>{findLoading ? t('searching') : t('search')}</button>
+                            <input type="text" className="form-input flex-1 min-w-0 dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" placeholder={t('enter_shop_owner_cnic')} value={cnicInput} onChange={e => setCnicInput(e.target.value)} />
+                            <button type="button" className="btn btn-primary rounded-xl shrink-0 dark:!bg-emerald-600 dark:hover:!bg-emerald-500 dark:!border-emerald-600" onClick={handleFindByCNIC} disabled={findLoading}>{findLoading ? t('searching') : t('search')}</button>
                         </div>
                         {findResult && (
                             <>
-                                <div className="border border-[#c7ddf7] dark:border-[#1f3d7f] rounded-xl p-4 mb-4 space-y-2 bg-[#f8fbff] dark:bg-white/[0.02]">
-                                    <h6 className="font-semibold text-primary">{t('shop_owner')}</h6>
-                                    <p className="break-words"><strong>{t('name')}:</strong> {findResult.user?.userNameF} {findResult.user?.userNameL}</p>
-                                    <p className="break-words"><strong>{t('cnic_label')}:</strong> {findResult.user?.userCNIC}</p>
-                                    <p className="break-words"><strong>{t('email')}:</strong> {findResult.user?.userEmail}</p>
-                                    <p className="break-words"><strong>{t('phone')}:</strong> {findResult.user?.userPhone}</p>
-                                    <p className="break-words"><strong>{t('address')}:</strong> {findResult.user?.userAddress}</p>
+                                <div className="border border-[#c7ddf7] dark:border-slate-800 rounded-xl p-4 mb-4 space-y-2 bg-[#f8fbff] dark:bg-[#08131d]">
+                                    <h6 className="font-semibold text-primary dark:text-emerald-400">{t('shop_owner')}</h6>
+                                    <p className="break-words text-gray-700 dark:text-slate-300"><strong className="text-gray-900 dark:text-white">{t('name')}:</strong> {findResult.user?.userNameF} {findResult.user?.userNameL}</p>
+                                    <p className="break-words text-gray-700 dark:text-slate-300"><strong className="text-gray-900 dark:text-white">{t('cnic_label')}:</strong> {findResult.user?.userCNIC}</p>
+                                    <p className="break-words text-gray-700 dark:text-slate-300"><strong className="text-gray-900 dark:text-white">{t('email')}:</strong> {findResult.user?.userEmail}</p>
+                                    <p className="break-words text-gray-700 dark:text-slate-300"><strong className="text-gray-900 dark:text-white">{t('phone')}:</strong> {findResult.user?.userPhone}</p>
+                                    <p className="break-words text-gray-700 dark:text-slate-300"><strong className="text-gray-900 dark:text-white">{t('address')}:</strong> {findResult.user?.userAddress}</p>
                                 </div>
                                 {findResult.shop && (
-                                    <div className="border border-[#c7ddf7] dark:border-[#1f3d7f] rounded-xl p-4 mb-4 bg-[#f8fbff] dark:bg-white/[0.02]">
-                                        <h6 className="font-semibold text-primary">{t('shop')}</h6>
-                                        <p className="break-words"><strong>{t('name')}:</strong> {findResult.shop.shopName}</p>
-                                        <p className="break-words"><strong>{t('number')}:</strong> {findResult.shop.shopNumber}</p>
-                                        <p className="break-words"><strong>{t('address')}:</strong> {findResult.shop.shopAddress}</p>
+                                    <div className="border border-[#c7ddf7] dark:border-slate-800 rounded-xl p-4 mb-4 bg-[#f8fbff] dark:bg-[#08131d]">
+                                        <h6 className="font-semibold text-primary dark:text-emerald-400">{t('shop')}</h6>
+                                        <p className="break-words text-gray-700 dark:text-slate-300"><strong className="text-gray-900 dark:text-white">{t('name')}:</strong> {findResult.shop.shopName}</p>
+                                        <p className="break-words text-gray-700 dark:text-slate-300"><strong className="text-gray-900 dark:text-white">{t('number')}:</strong> {findResult.shop.shopNumber}</p>
+                                        <p className="break-words text-gray-700 dark:text-slate-300"><strong className="text-gray-900 dark:text-white">{t('address')}:</strong> {findResult.shop.shopAddress}</p>
                                     </div>
                                 )}
-                                <div className="border border-[#c7ddf7] dark:border-[#1f3d7f] rounded-xl p-4 mb-4 bg-[#f8fbff] dark:bg-white/[0.02]">
-                                    <h6 className="font-semibold text-primary">{t('subscriptions')}</h6>
+                                <div className="border border-[#c7ddf7] dark:border-slate-800 rounded-xl p-4 mb-4 bg-[#f8fbff] dark:bg-[#08131d]">
+                                    <h6 className="font-semibold text-primary dark:text-emerald-400">{t('subscriptions')}</h6>
                                     {findResult.subscriptions?.length ? (
-                                        <ul className="list-disc list-inside space-y-1">
+                                        <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-slate-300">
                                             {findResult.subscriptions.map((s: any, i: number) => (
                                                 <li key={i} className="break-words">
                                                     {t('plan')}: {s.subId?.subName || s.subId} | {t('status')}: {s.status} | {t('table_expires')}: {formatDate(s.expireDate)}
-                                                    {s._id && <span className="ml-2 text-stone-500">({t('id')}: {s._id})</span>}
+                                                    {s._id && <span className="ml-2 text-stone-500 dark:text-slate-500">({t('id')}: {s._id})</span>}
                                                 </li>
                                             ))}
                                         </ul>
                                     ) : (
-                                        <p className="text-stone-500">{t('no_subscription_record')}</p>
+                                        <p className="text-stone-500 dark:text-slate-500">{t('no_subscription_record')}</p>
                                     )}
                                 </div>
                                 {findResult.subscriptionHistory?.length > 0 && (
-                                    <div className="border border-[#c7ddf7] dark:border-[#1f3d7f] rounded-xl p-4 mb-4 bg-[#f8fbff] dark:bg-white/[0.02]">
-                                        <h6 className="font-semibold text-primary">{t('recent_history')}</h6>
-                                        <ul className="text-sm space-y-1">
+                                    <div className="border border-[#c7ddf7] dark:border-slate-800 rounded-xl p-4 mb-4 bg-[#f8fbff] dark:bg-[#08131d]">
+                                        <h6 className="font-semibold text-primary dark:text-emerald-400">{t('recent_history')}</h6>
+                                        <ul className="text-sm space-y-1 text-gray-700 dark:text-slate-300">
                                             {findResult.subscriptionHistory.slice(0, 5).map((h: any, i: number) => (
                                                 <li key={i} className="break-words">{formatDate(h.startDateHistory)} - {formatDate(h.expireDateHistory)} | {t('table_payment')}: {h.paymentMethod || '-'} | {h.transactionId ? `${t('txn')}: ${h.transactionId}` : ''}</li>
                                             ))}
@@ -516,37 +522,37 @@ const SubscriptionHistory = () => {
                                     </div>
                                 )}
                                 <div className="flex flex-wrap gap-2">
-                                    <button type="button" className="btn btn-success flex-1 sm:flex-none rounded-xl" onClick={() => { setShowRenewForm(true); setShowUpdateForm(false); setShowChangePlanForm(false); }}>{t('renew_subscription')}</button>
+                                    <button type="button" className="btn btn-success flex-1 sm:flex-none rounded-xl dark:!bg-emerald-600 dark:hover:!bg-emerald-500 dark:!border-emerald-600" onClick={() => { setShowRenewForm(true); setShowUpdateForm(false); setShowChangePlanForm(false); }}>{t('renew_subscription')}</button>
                                     <button type="button" className="btn btn-warning flex-1 sm:flex-none rounded-xl" onClick={() => { setShowChangePlanForm(true); setShowRenewForm(false); setShowUpdateForm(false); setChangePlanForm({ newSubId: '', months: 1, paymentMethod: 'bank', remarks: '', transactionId: '' }); if (subPlans.length === 0) fetchSubscriptionPlans(); }}>{t('change_plan_new_subscription')}</button>
-                                    <button type="button" className="btn btn-outline-primary flex-1 sm:flex-none rounded-xl" onClick={() => { setShowUpdateForm(true); setShowRenewForm(false); setShowChangePlanForm(false); setUpdateForm({ subscriptionId: findResult.subscriptions?.[0]?._id || '', startDate: '', expireDate: '', status: 'active' }); }}>{t('update_dates_status')}</button>
+                                    <button type="button" className="btn btn-outline-primary flex-1 sm:flex-none rounded-xl dark:!border-emerald-500/40 dark:!text-emerald-400 dark:hover:!bg-emerald-600 dark:hover:!text-white" onClick={() => { setShowUpdateForm(true); setShowRenewForm(false); setShowChangePlanForm(false); setUpdateForm({ subscriptionId: findResult.subscriptions?.[0]?._id || '', startDate: '', expireDate: '', status: 'active' }); }}>{t('update_dates_status')}</button>
                                 </div>
                                 {showRenewForm && (
-                                    <div className="mt-4 p-4 border border-success/30 rounded-xl bg-success/5 dark:bg-success/10">
-                                        <h6 className="font-semibold mb-3">{t('renew_with_payment_details')}</h6>
+                                    <div className="mt-4 p-4 border border-success/30 dark:border-emerald-500/20 rounded-xl bg-success/5 dark:bg-emerald-950/10">
+                                        <h6 className="font-semibold mb-3 text-gray-900 dark:text-white">{t('renew_with_payment_details')}</h6>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             <div className="min-w-0">
-                                                <label className="form-label">{t('months')}</label>
-                                                <input type="number" min={1} className="form-input w-full" value={renewForm.months} onChange={e => setRenewForm(f => ({ ...f, months: parseInt(e.target.value, 10) || 1 }))} />
+                                                <label className="form-label dark:text-slate-300">{t('months')}</label>
+                                                <input type="number" min={1} className="form-input w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" value={renewForm.months} onChange={e => setRenewForm(f => ({ ...f, months: parseInt(e.target.value, 10) || 1 }))} />
                                             </div>
                                             <div className="min-w-0">
-                                                <label className="form-label">{t('payment_method')}</label>
-                                                <select className="form-select w-full" value={renewForm.paymentMethod} onChange={e => setRenewForm(f => ({ ...f, paymentMethod: e.target.value }))}>
+                                                <label className="form-label dark:text-slate-300">{t('payment_method')}</label>
+                                                <select className="form-select w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" value={renewForm.paymentMethod} onChange={e => setRenewForm(f => ({ ...f, paymentMethod: e.target.value }))}>
                                                     <option value="bank">{t('bank')}</option>
                                                     <option value="cash">{t('cash')}</option>
                                                     <option value="mobile_wallet">{t('mobile_wallet')}</option>
                                                 </select>
                                             </div>
                                             <div className="md:col-span-2 min-w-0">
-                                                <label className="form-label">{t('remarks')}</label>
-                                                <input type="text" className="form-input w-full" placeholder={t('remarks')} value={renewForm.remarks} onChange={e => setRenewForm(f => ({ ...f, remarks: e.target.value }))} />
+                                                <label className="form-label dark:text-slate-300">{t('remarks')}</label>
+                                                <input type="text" className="form-input w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" placeholder={t('remarks')} value={renewForm.remarks} onChange={e => setRenewForm(f => ({ ...f, remarks: e.target.value }))} />
                                             </div>
                                             <div className="md:col-span-2 min-w-0">
-                                                <label className="form-label">{t('transaction_id')}</label>
-                                                <input type="text" className="form-input w-full" placeholder={t('transaction_id')} value={renewForm.transactionId} onChange={e => setRenewForm(f => ({ ...f, transactionId: e.target.value }))} />
+                                                <label className="form-label dark:text-slate-300">{t('transaction_id')}</label>
+                                                <input type="text" className="form-input w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" placeholder={t('transaction_id')} value={renewForm.transactionId} onChange={e => setRenewForm(f => ({ ...f, transactionId: e.target.value }))} />
                                             </div>
                                         </div>
                                         <div className="flex flex-wrap gap-2 mt-3">
-                                            <button type="button" className="btn btn-success flex-1 sm:flex-none rounded-xl" onClick={handleRenew}>{t('confirm_renew')}</button>
+                                            <button type="button" className="btn btn-success flex-1 sm:flex-none rounded-xl dark:!bg-emerald-600 dark:hover:!bg-emerald-500 dark:!border-emerald-600" onClick={handleRenew}>{t('confirm_renew')}</button>
                                             <button type="button" className="btn btn-outline-secondary flex-1 sm:flex-none rounded-xl" onClick={() => setShowRenewForm(false)}>{t('cancel')}</button>
                                         </div>
                                     </div>
@@ -556,8 +562,8 @@ const SubscriptionHistory = () => {
                                         <h6 className="font-semibold mb-3 text-warning">{t('change_plan_desc')}</h6>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             <div className="md:col-span-2 min-w-0">
-                                                <label className="form-label">{t('new_plan')}</label>
-                                                <select className="form-select w-full" value={changePlanForm.newSubId} onChange={e => setChangePlanForm(f => ({ ...f, newSubId: e.target.value }))} required>
+                                                <label className="form-label dark:text-slate-300">{t('new_plan')}</label>
+                                                <select className="form-select w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" value={changePlanForm.newSubId} onChange={e => setChangePlanForm(f => ({ ...f, newSubId: e.target.value }))} required>
                                                     <option value="">{subPlans.length === 0 ? t('loading_plans') : t('select_plan')}</option>
                                                     {subPlans.map((p: any) => (
                                                         <option key={p._id || p.id} value={String(p._id || p.id)}>{p.subName || p.subscriptionName} - {p.subPrice != null ? p.subPrice : ''} PKR</option>
@@ -565,24 +571,24 @@ const SubscriptionHistory = () => {
                                                 </select>
                                             </div>
                                             <div className="min-w-0">
-                                                <label className="form-label">{t('months')}</label>
-                                                <input type="number" min={1} className="form-input w-full" value={changePlanForm.months} onChange={e => setChangePlanForm(f => ({ ...f, months: parseInt(e.target.value, 10) || 1 }))} />
+                                                <label className="form-label dark:text-slate-300">{t('months')}</label>
+                                                <input type="number" min={1} className="form-input w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" value={changePlanForm.months} onChange={e => setChangePlanForm(f => ({ ...f, months: parseInt(e.target.value, 10) || 1 }))} />
                                             </div>
                                             <div className="min-w-0">
-                                                <label className="form-label">{t('payment_method')}</label>
-                                                <select className="form-select w-full" value={changePlanForm.paymentMethod} onChange={e => setChangePlanForm(f => ({ ...f, paymentMethod: e.target.value }))}>
+                                                <label className="form-label dark:text-slate-300">{t('payment_method')}</label>
+                                                <select className="form-select w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" value={changePlanForm.paymentMethod} onChange={e => setChangePlanForm(f => ({ ...f, paymentMethod: e.target.value }))}>
                                                     <option value="bank">{t('bank')}</option>
                                                     <option value="cash">{t('cash')}</option>
                                                     <option value="mobile_wallet">{t('mobile_wallet')}</option>
                                                 </select>
                                             </div>
                                             <div className="md:col-span-2 min-w-0">
-                                                <label className="form-label">{t('remarks')}</label>
-                                                <input type="text" className="form-input w-full" placeholder={t('remarks')} value={changePlanForm.remarks} onChange={e => setChangePlanForm(f => ({ ...f, remarks: e.target.value }))} />
+                                                <label className="form-label dark:text-slate-300">{t('remarks')}</label>
+                                                <input type="text" className="form-input w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" placeholder={t('remarks')} value={changePlanForm.remarks} onChange={e => setChangePlanForm(f => ({ ...f, remarks: e.target.value }))} />
                                             </div>
                                             <div className="md:col-span-2 min-w-0">
-                                                <label className="form-label">{t('transaction_id')}</label>
-                                                <input type="text" className="form-input w-full" placeholder={t('transaction_id')} value={changePlanForm.transactionId} onChange={e => setChangePlanForm(f => ({ ...f, transactionId: e.target.value }))} />
+                                                <label className="form-label dark:text-slate-300">{t('transaction_id')}</label>
+                                                <input type="text" className="form-input w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" placeholder={t('transaction_id')} value={changePlanForm.transactionId} onChange={e => setChangePlanForm(f => ({ ...f, transactionId: e.target.value }))} />
                                             </div>
                                         </div>
                                         <div className="flex flex-wrap gap-2 mt-3">
@@ -592,13 +598,13 @@ const SubscriptionHistory = () => {
                                     </div>
                                 )}
                                 {showUpdateForm && (
-                                    <div className="mt-4 p-4 border border-primary/30 rounded-xl bg-primary/5 dark:bg-primary/10">
-                                        <h6 className="font-semibold mb-3">{t('update_dates_status')}</h6>
-                                        <p className="text-sm text-stone-600 dark:text-stone-400 mb-3">{t('update_dates_status_desc')}</p>
+                                    <div className="mt-4 p-4 border border-primary/30 dark:border-emerald-500/20 rounded-xl bg-primary/5 dark:bg-emerald-950/10">
+                                        <h6 className="font-semibold mb-3 text-gray-900 dark:text-white">{t('update_dates_status')}</h6>
+                                        <p className="text-sm text-stone-600 dark:text-slate-400 mb-3">{t('update_dates_status_desc')}</p>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             <div className="md:col-span-2 min-w-0">
-                                                <label className="form-label">{t('select_subscription_to_update')}</label>
-                                                <select className="form-select w-full" value={updateForm.subscriptionId} onChange={e => setUpdateForm(f => ({ ...f, subscriptionId: e.target.value }))}>
+                                                <label className="form-label dark:text-slate-300">{t('select_subscription_to_update')}</label>
+                                                <select className="form-select w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" value={updateForm.subscriptionId} onChange={e => setUpdateForm(f => ({ ...f, subscriptionId: e.target.value }))}>
                                                     <option value="">{t('select_subscription')}</option>
                                                     {findResult.subscriptions?.map((s: any) => (
                                                         <option key={s._id} value={String(s._id)}>{s.subId?.subName || t('plan')} - {s.status} ({t('table_expires')}: {formatDate(s.expireDate)})</option>
@@ -606,16 +612,16 @@ const SubscriptionHistory = () => {
                                                 </select>
                                             </div>
                                             <div className="min-w-0">
-                                                <label className="form-label">{t('table_start_date')}</label>
-                                                <input type="date" className="form-input w-full" value={updateForm.startDate} onChange={e => setUpdateForm(f => ({ ...f, startDate: e.target.value }))} />
+                                                <label className="form-label dark:text-slate-300">{t('table_start_date')}</label>
+                                                <input type="date" className="form-input w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" value={updateForm.startDate} onChange={e => setUpdateForm(f => ({ ...f, startDate: e.target.value }))} />
                                             </div>
                                             <div className="min-w-0">
-                                                <label className="form-label">{t('table_expire_date')}</label>
-                                                <input type="date" className="form-input w-full" value={updateForm.expireDate} onChange={e => setUpdateForm(f => ({ ...f, expireDate: e.target.value }))} />
+                                                <label className="form-label dark:text-slate-300">{t('table_expire_date')}</label>
+                                                <input type="date" className="form-input w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" value={updateForm.expireDate} onChange={e => setUpdateForm(f => ({ ...f, expireDate: e.target.value }))} />
                                             </div>
                                             <div className="min-w-0">
-                                                <label className="form-label">{t('status')}</label>
-                                                <select className="form-select w-full" value={updateForm.status} onChange={e => setUpdateForm(f => ({ ...f, status: e.target.value }))}>
+                                                <label className="form-label dark:text-slate-300">{t('status')}</label>
+                                                <select className="form-select w-full dark:bg-[#08131d] dark:border-slate-700 dark:text-slate-200 dark:focus:border-emerald-500 dark:focus:ring-emerald-500" value={updateForm.status} onChange={e => setUpdateForm(f => ({ ...f, status: e.target.value }))}>
                                                     <option value="active">{t('active')}</option>
                                                     <option value="expired">{t('expired')}</option>
                                                     <option value="canceled">{t('canceled')}</option>
@@ -623,7 +629,7 @@ const SubscriptionHistory = () => {
                                             </div>
                                         </div>
                                         <div className="flex flex-wrap gap-2 mt-3">
-                                            <button type="button" className="btn btn-primary flex-1 sm:flex-none rounded-xl" onClick={handleUpdateSubscription}>{t('update')}</button>
+                                            <button type="button" className="btn btn-primary flex-1 sm:flex-none rounded-xl dark:!bg-emerald-600 dark:hover:!bg-emerald-500 dark:!border-emerald-600" onClick={handleUpdateSubscription}>{t('update')}</button>
                                             <button type="button" className="btn btn-outline-secondary flex-1 sm:flex-none rounded-xl" onClick={() => setShowUpdateForm(false)}>{t('cancel')}</button>
                                         </div>
                                     </div>

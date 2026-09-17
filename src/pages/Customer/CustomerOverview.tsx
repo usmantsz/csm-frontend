@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
@@ -10,6 +11,7 @@ import IconTag from '../../components/Icon/IconTag';
 import IconFile from '../../components/Icon/IconFile';
 import IconMenu from '../../components/Icon/IconMenu';
 import IconX from '../../components/Icon/IconX';
+import IconArrowLeft from '../../components/Icon/IconArrowLeft';
 
 const CUSTOMER_API = `${ServerSetting.serUrl}/api/customer`;
 
@@ -174,26 +176,65 @@ const CustomerOverview = () => {
     if (loadingShops) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <span className="animate-spin border-4 border-primary-600 border-t-transparent rounded-full w-12 h-12 inline-block mb-4" />
-                <p className="text-stone-600 dark:text-stone-400">{t('loading_your_shops')}</p>
+                <span className="animate-spin border-4 border-green-600 border-t-transparent rounded-full w-12 h-12 inline-block mb-4" />
+                <p className="text-gray-600 dark:text-gray-400">{t('loading_your_shops')}</p>
             </div>
         );
     }
 
     if (shops.length === 0) {
         return (
-            <div className="rounded-2xl bg-white dark:bg-white/5 p-8 text-center shadow-lg shadow-black/10 dark:shadow-none">
-                <p className="text-stone-700 dark:text-stone-300 font-medium">{t('no_shop_found')}</p>
-                <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{t('not_registered_any_shop')}</p>
+            <div className="space-y-6">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <ul className="flex flex-wrap items-center gap-2 text-sm">
+                        <li>
+                            <Link to="/dashboard" className="text-green-600 hover:underline dark:text-green-400">
+                                {t('dashboard')}
+                            </Link>
+                        </li>
+                        <li className="text-gray-500 before:mr-2 before:content-['/'] dark:text-gray-400 ltr:before:mr-2 rtl:before:ml-2">
+                            {t('customer_dashboard')}
+                        </li>
+                    </ul>
+                    <Link
+                        to="/dashboard"
+                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                    >
+                        <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                        {t('back_to_dashboard')}
+                    </Link>
+                </div>
+                <div className="rounded-2xl bg-white dark:bg-white/5 p-8 text-center shadow-lg shadow-black/10 dark:shadow-none">
+                    <p className="text-gray-700 dark:text-gray-300 font-medium">{t('no_shop_found')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{t('not_registered_any_shop')}</p>
+                </div>
             </div>
         );
     }
 
     return (
         <div className="space-y-6">
-            <ul className="flex flex-wrap items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
-                <li><span className="text-primary-600 dark:text-primary-400 font-medium">{t('dashboard')}</span></li>
-            </ul>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+                <ul className="flex flex-wrap items-center gap-2 text-sm">
+                    <li>
+                        <Link to="/dashboard" className="text-green-600 hover:underline dark:text-green-400">
+                            {t('dashboard')}
+                        </Link>
+                    </li>
+                    <li className="text-gray-500 before:mr-2 before:content-['/'] dark:text-gray-400 ltr:before:mr-2 rtl:before:ml-2">
+                        {t('customer_dashboard')}
+                    </li>
+                </ul>
+
+                <Link
+                    to="/dashboard"
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                >
+                    <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                    {t('back_to_dashboard')}
+                </Link>
+            </div>
+
             {dataError && selectedShop && (
                 <div className="rounded-2xl border-2 border-danger/30 bg-danger/5 dark:bg-danger/10 text-danger px-4 py-3 shadow-lg shadow-black/10 dark:shadow-none">
                     {dataError}
@@ -202,7 +243,7 @@ const CustomerOverview = () => {
 
             {/* Shop selector */}
             <div className="rounded-2xl bg-white dark:bg-white/5 p-6 shadow-lg shadow-black/10 dark:shadow-none">
-                <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-primary-600 dark:text-primary-400">
+                <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-green-600 dark:text-green-400">
                     <IconMenu className="w-5 h-5 shrink-0" />
                     {t('select_shop')}
                 </h5>
@@ -214,13 +255,13 @@ const CustomerOverview = () => {
                             onClick={() => setSelectedShop(shop)}
                             className={`min-w-0 max-w-full px-4 py-3 rounded-xl border-2 text-left transition-all duration-200 ${
                                 selectedShop?.shopId === shop.shopId
-                                    ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300'
-                                    : 'border-primary-200 dark:border-white/10 hover:border-primary-500/50'
+                                    ? 'border-green-600 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-300'
+                                    : 'border-green-200 dark:border-white/10 hover:border-green-500/50'
                             }`}
                         >
                             <span className="font-semibold block truncate">{shop.shopName}</span>
-                            {shop.shopNumber && <span className="text-sm text-stone-500 dark:text-stone-400">#{shop.shopNumber}</span>}
-                            {shop.shopCity && <span className="text-sm text-stone-500 dark:text-stone-400 ml-1">• {shop.shopCity}</span>}
+                            {shop.shopNumber && <span className="text-sm text-gray-500 dark:text-gray-400">#{shop.shopNumber}</span>}
+                            {shop.shopCity && <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">• {shop.shopCity}</span>}
                         </button>
                     ))}
                 </div>
@@ -228,8 +269,8 @@ const CustomerOverview = () => {
 
             {!selectedShop ? null : loadingData ? (
                 <div className="rounded-2xl bg-white dark:bg-white/5 p-12 shadow-lg shadow-black/10 dark:shadow-none flex flex-col items-center justify-center">
-                    <span className="animate-spin border-4 border-primary-600 border-t-transparent rounded-full w-10 h-10 inline-block mb-3" />
-                    <p className="text-stone-600 dark:text-stone-400">{t('loading_data_for')} {selectedShop.shopName}…</p>
+                    <span className="animate-spin border-4 border-green-600 border-t-transparent rounded-full w-10 h-10 inline-block mb-3" />
+                    <p className="text-gray-600 dark:text-gray-400">{t('loading_data_for')} {selectedShop.shopName}…</p>
                 </div>
             ) : (
                 <>
@@ -238,23 +279,23 @@ const CustomerOverview = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="rounded-2xl bg-white dark:bg-white/5 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 shadow-gray-500/40 shadow-lg dark:shadow-none flex items-center justify-center">
-                                        <IconCashBanknotes className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-green-50 dark:bg-green-900/20 shadow-gray-500/40 shadow-lg dark:shadow-none flex items-center justify-center">
+                                        <IconCashBanknotes className="w-6 h-6 text-green-600 dark:text-green-400" />
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-sm text-stone-600 dark:text-stone-400">{t('pay_to_shop_owner')}</p>
-                                        <p className="text-xl font-bold text-primary-600 dark:text-primary-400 truncate">{formatRs(dashboard.balance.receivable)}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('pay_to_shop_owner')}</p>
+                                        <p className="text-xl font-bold text-green-600 dark:text-green-400 truncate">{formatRs(dashboard.balance.receivable)}</p>
                                     </div>
                                 </div>
                             </div>
                             <div className="rounded-2xl bg-white dark:bg-white/5 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 shadow-gray-500/40 shadow-lg dark:shadow-none flex items-center justify-center">
-                                        <IconTag className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-green-50 dark:bg-green-900/20 shadow-gray-500/40 shadow-lg dark:shadow-none flex items-center justify-center">
+                                        <IconTag className="w-6 h-6 text-green-600 dark:text-green-400" />
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-sm text-stone-600 dark:text-stone-400">{t('shop_owner_will_pay_you')}</p>
-                                        <p className="text-xl font-bold text-primary-600 dark:text-primary-400 truncate">{formatRs(dashboard.balance.payable)}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('shop_owner_will_pay_you')}</p>
+                                        <p className="text-xl font-bold text-green-600 dark:text-green-400 truncate">{formatRs(dashboard.balance.payable)}</p>
                                     </div>
                                 </div>
                             </div>
@@ -264,19 +305,19 @@ const CustomerOverview = () => {
                                         <IconFile className="w-6 h-6 text-warning" />
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-sm text-stone-600 dark:text-stone-400">{t('loans_outstanding')}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('loans_outstanding')}</p>
                                         <p className="text-xl font-bold text-warning truncate">{formatRs(dashboard.loans.outstanding)}</p>
                                     </div>
                                 </div>
                             </div>
                             <div className="rounded-2xl bg-white dark:bg-white/5 p-5 shadow-lg shadow-black/10 dark:shadow-none transition-transform duration-200 hover:-translate-y-0.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-50 dark:bg-primary-900/20 shadow-gray-500/40 shadow-lg dark:shadow-none flex items-center justify-center">
-                                        <IconMenu className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                                    <div className="w-12 h-12 shrink-0 rounded-xl bg-green-50 dark:bg-green-900/20 shadow-gray-500/40 shadow-lg dark:shadow-none flex items-center justify-center">
+                                        <IconMenu className="w-6 h-6 text-green-600 dark:text-green-400" />
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-sm text-stone-600 dark:text-stone-400">{t('vegetable_orders')}</p>
-                                        <p className="text-xl font-bold text-stone-800 dark:text-stone-200">{dashboard.ordersCount}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('vegetable_orders')}</p>
+                                        <p className="text-xl font-bold text-gray-800 dark:text-gray-200">{dashboard.ordersCount}</p>
                                     </div>
                                 </div>
                             </div>
@@ -289,22 +330,22 @@ const CustomerOverview = () => {
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {profile && (
                                     <div className="min-w-0">
-                                        <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-stone-900 dark:text-white">
-                                            <IconUser className="w-5 h-5 text-primary-600 dark:text-primary-400 shrink-0" />
+                                        <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
+                                            <IconUser className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" />
                                             <span className="truncate">{t('profile')} – {selectedShop.shopName}</span>
                                         </h5>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                            <p className="break-words"><span className="text-stone-500 dark:text-stone-400">{t('name')}:</span> <span className="font-medium">{profile.cusNameF} {profile.cusNameL}</span></p>
-                                            <p className="break-words"><span className="text-stone-500 dark:text-stone-400">{t('phone')}:</span> <span className="font-medium">{profile.cusNumber || '–'}</span></p>
-                                            <p className="break-words"><span className="text-stone-500 dark:text-stone-400">{t('cnic')}:</span> <span className="font-medium">{profile.cusCNIC || '–'}</span></p>
-                                            <p className="sm:col-span-2 break-words"><span className="text-stone-500 dark:text-stone-400">{t('address')}:</span> <span className="font-medium">{profile.cusAddress || '–'}</span></p>
+                                            <p className="break-words"><span className="text-gray-500 dark:text-gray-400">{t('name')}:</span> <span className="font-medium">{profile.cusNameF} {profile.cusNameL}</span></p>
+                                            <p className="break-words"><span className="text-gray-500 dark:text-gray-400">{t('phone')}:</span> <span className="font-medium">{profile.cusNumber || '–'}</span></p>
+                                            <p className="break-words"><span className="text-gray-500 dark:text-gray-400">{t('cnic')}:</span> <span className="font-medium">{profile.cusCNIC || '–'}</span></p>
+                                            <p className="sm:col-span-2 break-words"><span className="text-gray-500 dark:text-gray-400">{t('address')}:</span> <span className="font-medium">{profile.cusAddress || '–'}</span></p>
                                         </div>
                                     </div>
                                 )}
 
                                 {dashboard?.crops && dashboard.crops.length > 0 && (
-                                    <div className={`min-w-0 ${profile ? 'lg:border-l lg:border-stone-200 dark:lg:border-white/10 lg:pl-6' : ''}`}>
-                                        <h5 className="font-semibold text-lg mb-3 text-stone-900 dark:text-white">{t('crops_in_shop_hint')}</h5>
+                                    <div className={`min-w-0 ${profile ? 'lg:border-l lg:border-gray-200 dark:lg:border-white/10 lg:pl-6' : ''}`}>
+                                        <h5 className="font-semibold text-lg mb-3 text-gray-900 dark:text-white">{t('crops_in_shop_hint')}</h5>
                                         <div className="flex flex-wrap gap-2">
                                             {dashboard.crops.map((c) => {
                                                 const isSelected = selectedCropId === c._id;
@@ -315,8 +356,8 @@ const CustomerOverview = () => {
                                                         onClick={() => setSelectedCropId(isSelected ? null : c._id)}
                                                         className={`px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all duration-200 max-w-full truncate ${
                                                             isSelected
-                                                                ? 'border-primary-600 bg-primary-600 text-white'
-                                                                : 'border-primary-200 dark:border-white/10 bg-primary-50/40 dark:bg-primary-900/20 text-primary-600 dark:text-primary-300 hover:border-primary-500/50'
+                                                                ? 'border-green-600 bg-green-600 text-white'
+                                                                : 'border-green-200 dark:border-white/10 bg-green-50/40 dark:bg-green-900/20 text-green-600 dark:text-green-300 hover:border-green-500/50'
                                                         }`}
                                                     >
                                                         {c.cropName || c._id}
@@ -327,15 +368,15 @@ const CustomerOverview = () => {
                                                 <button
                                                     type="button"
                                                     onClick={() => setSelectedCropId(null)}
-                                                    className="px-4 py-2 rounded-xl border-2 border-stone-300 dark:border-stone-600 bg-stone-100 dark:bg-white/5 text-stone-700 dark:text-stone-300 text-sm flex items-center gap-1 shrink-0"
+                                                    className="px-4 py-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 text-sm flex items-center gap-1 shrink-0"
                                                 >
                                                     <IconX className="w-4 h-4" /> {t('clear_filter')}
                                                 </button>
                                             )}
                                         </div>
                                         {selectedCropId && selectedCropName && (
-                                            <p className="text-xs text-stone-500 dark:text-stone-400 mt-3">
-                                                {t('filtered_by')}: <span className="font-medium text-primary-600 dark:text-primary-400">{selectedCropName}</span> — {t('loan_list')} {t('and') || '&'} {t('vegetable_crop_order_list')} {t('below') || 'below'}
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                                                {t('filtered_by')}: <span className="font-medium text-green-600 dark:text-green-400">{selectedCropName}</span> — {t('loan_list')} {t('and') || '&'} {t('vegetable_crop_order_list')} {t('below') || 'below'}
                                             </p>
                                         )}
                                     </div>
@@ -347,12 +388,12 @@ const CustomerOverview = () => {
                     {/* Loans + Orders — merged into one card, side by side, both respecting the crop filter above */}
                     <div className="rounded-2xl bg-white dark:bg-white/5 p-6 shadow-lg shadow-black/10 dark:shadow-none">
                         <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
-                            <h5 className="font-semibold text-lg flex items-center gap-2 text-stone-900 dark:text-white">
-                                <IconFile className="w-5 h-5 text-primary-600 dark:text-primary-400 shrink-0" />
+                            <h5 className="font-semibold text-lg flex items-center gap-2 text-gray-900 dark:text-white">
+                                <IconFile className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" />
                                 <span className="truncate">{t('loan_list')} {t('and') || '&'} {t('vegetable_crop_order_list')}</span>
                             </h5>
                             {selectedCropId && selectedCropName && (
-                                <span className="text-xs px-2.5 py-1 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium">
+                                <span className="text-xs px-2.5 py-1 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 font-medium">
                                     {t('filtered_by')}: {selectedCropName}
                                 </span>
                             )}
@@ -362,15 +403,15 @@ const CustomerOverview = () => {
                             {/* Loans */}
                             <div className="min-w-0">
                                 <h6 className="text-sm font-semibold text-warning mb-3 flex items-center gap-1.5">
-                                    {t('loans')} <span className="text-stone-400 dark:text-stone-500 font-normal">({filteredLoans.length})</span>
+                                    {t('loans')} <span className="text-gray-400 dark:text-gray-500 font-normal">({filteredLoans.length})</span>
                                 </h6>
                                 {filteredLoans.length === 0 ? (
-                                    <p className="text-stone-500 dark:text-stone-400 text-sm">{selectedCropId ? t('no_loans_for_crop') : t('no_loans_in_shop')}</p>
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm">{selectedCropId ? t('no_loans_for_crop') : t('no_loans_in_shop')}</p>
                                 ) : (
                                     <div className="overflow-x-auto">
                                         <table className="table-auto w-full text-sm">
                                             <thead>
-                                                <tr className="border-b border-primary-200 dark:border-white/10">
+                                                <tr className="border-b border-green-200 dark:border-white/10">
                                                     <th className="text-left py-2">{t('crop')}</th>
                                                     <th className="text-left py-2">{t('date')}</th>
                                                     <th className="text-right py-2">{t('amount')}</th>
@@ -380,7 +421,7 @@ const CustomerOverview = () => {
                                             </thead>
                                             <tbody>
                                                 {filteredLoans.map((l) => (
-                                                    <tr key={l._id} className="border-b border-primary-100 dark:border-white/5 hover:bg-primary-50/50 dark:hover:bg-white/[0.03]">
+                                                    <tr key={l._id} className="border-b border-green-100 dark:border-white/5 hover:bg-green-50/50 dark:hover:bg-white/[0.03]">
                                                         <td className="py-2 truncate max-w-[100px]" title={getCropNameFromRef(l.finaceCropId)}>{getCropNameFromRef(l.finaceCropId)}</td>
                                                         <td className="py-2 whitespace-nowrap">{formatDate(l.createdAt)}</td>
                                                         <td className="text-right whitespace-nowrap">{formatRs(l.loanAmount)}</td>
@@ -395,17 +436,17 @@ const CustomerOverview = () => {
                             </div>
 
                             {/* Orders */}
-                            <div className="min-w-0 lg:border-l lg:border-stone-200 dark:lg:border-white/10 lg:pl-6">
-                                <h6 className="text-sm font-semibold text-primary-600 dark:text-primary-400 mb-3 flex items-center gap-1.5">
-                                    {t('orders')} <span className="text-stone-400 dark:text-stone-500 font-normal">({filteredOrders.length})</span>
+                            <div className="min-w-0 lg:border-l lg:border-gray-200 dark:lg:border-white/10 lg:pl-6">
+                                <h6 className="text-sm font-semibold text-green-600 dark:text-green-400 mb-3 flex items-center gap-1.5">
+                                    {t('orders')} <span className="text-gray-400 dark:text-gray-500 font-normal">({filteredOrders.length})</span>
                                 </h6>
                                 {filteredOrders.length === 0 ? (
-                                    <p className="text-stone-500 dark:text-stone-400 text-sm">{selectedCropId ? t('no_orders_for_crop') : t('no_orders_in_shop')}</p>
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm">{selectedCropId ? t('no_orders_for_crop') : t('no_orders_in_shop')}</p>
                                 ) : (
                                     <div className="overflow-x-auto">
                                         <table className="table-auto w-full text-sm">
                                             <thead>
-                                                <tr className="border-b border-primary-200 dark:border-white/10">
+                                                <tr className="border-b border-green-200 dark:border-white/10">
                                                     <th className="text-left py-2">{t('crop')}</th>
                                                     <th className="text-left py-2">{t('date')}</th>
                                                     <th className="text-right py-2">{t('pcs')}</th>
@@ -415,7 +456,7 @@ const CustomerOverview = () => {
                                             </thead>
                                             <tbody>
                                                 {filteredOrders.map((o) => (
-                                                    <tr key={o._id} className="border-b border-primary-100 dark:border-white/5 hover:bg-primary-50/50 dark:hover:bg-white/[0.03]">
+                                                    <tr key={o._id} className="border-b border-green-100 dark:border-white/5 hover:bg-green-50/50 dark:hover:bg-white/[0.03]">
                                                         <td className="py-2 truncate max-w-[100px]" title={getCropNameFromRef(o.vegetableOrderCropId)}>{getCropNameFromRef(o.vegetableOrderCropId)}</td>
                                                         <td className="py-2 whitespace-nowrap">{formatDate(o.createdAt)}</td>
                                                         <td className="text-right whitespace-nowrap">{o.totalPisces ?? '–'}</td>

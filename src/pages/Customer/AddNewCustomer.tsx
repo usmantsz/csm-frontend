@@ -208,7 +208,7 @@ const AddNewCustomer: React.FC = () => {
                     onChange={handleChange}
                     placeholder={placeholder}
                     className={`autofill-fix w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-[#0e1726] border ${
-                        errors[name] ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-emerald-500/40'
+                        errors[name] ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-green-500/40'
                     } text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition`}
                 />
             </div>
@@ -226,9 +226,9 @@ const AddNewCustomer: React.FC = () => {
         </div>
     );
 
-            return (
-        <div>
-            {/* Override browser autofill text color so it stays blue instead of the browser's default white/black */}
+    return (
+        <div className="space-y-6">
+            {/* Override browser autofill text color so it stays consistent instead of the browser's default white/black */}
             <style>{`
                 input.autofill-fix:-webkit-autofill,
                 input.autofill-fix:-webkit-autofill:hover,
@@ -273,21 +273,37 @@ const AddNewCustomer: React.FC = () => {
                     border-color: rgba(255, 255, 255, 0.1);
                 }
             `}</style>
-            {/* Back to Customer List - outside the card, top left */}
-            <div className="flex justify-end"> 
-            <button
-                            type="button"
-                            onClick={() => navigate('/customerlist')}
-                            className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
-                        >
-                            <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
-                            {t('back_to_customer_list')}
-            </button>
+
+            {/* Breadcrumb + Back button row - matches PosShopManagement layout */}
+            <div className="flex flex-wrap items-center justify-between gap-2">
+                <ul className="flex flex-wrap items-center gap-2 text-sm">
+                    <li>
+                        <Link to="/dashboard" className="text-green-600 hover:underline dark:text-green-400">
+                            {t('dashboard')}
+                        </Link>
+                    </li>
+                    <li className="text-gray-500 before:mr-2 before:content-['/'] dark:text-gray-400 ltr:before:mr-2 rtl:before:ml-2">
+                        <Link to="/customerlist" className="text-green-600 hover:underline dark:text-green-400">
+                            {t('customer_list')}
+                        </Link>
+                    </li>
+                    <li className="text-gray-500 before:mr-2 before:content-['/'] dark:text-gray-400 ltr:before:mr-2 rtl:before:ml-2">
+                        {t('add_new_customer_page')}
+                    </li>
+                </ul>
+
+                <button
+                    type="button"
+                    onClick={() => navigate('/customerlist')}
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                >
+                    <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                    {t('back_to_customer_list')}
+                </button>
             </div>
-            
 
             {/* Form Card */}
-            <div className="rounded-xl mt-4 bg-white dark:bg-[#0e1726] border border-gray-300 dark:border-white/10 shadow-sm p-6 sm:p-8">
+            <div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-300 dark:border-white/10 shadow-sm p-6 sm:p-8">
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                         {t('add_new_customer_page')}
@@ -300,7 +316,7 @@ const AddNewCustomer: React.FC = () => {
                 <form onSubmit={handleSubmit} noValidate>
                     {/* Personal Info Section */}
                     <div className="mb-8">
-                        <h3 className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-4">
+                        <h3 className="text-sm font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-4">
                             {t('personal_information')}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -313,7 +329,7 @@ const AddNewCustomer: React.FC = () => {
 
                     {/* Security Section */}
                     <div className="mb-8">
-                        <h3 className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-4">
+                        <h3 className="text-sm font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-4">
                             {t('account_security')}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -333,7 +349,7 @@ const AddNewCustomer: React.FC = () => {
                                         onChange={handleChange}
                                         placeholder={t('form_enter_password')}
                                         className={`autofill-fix-pw w-full pl-10 pr-10 py-2.5 rounded-lg bg-gray-50 dark:bg-[#171f2f] border ${
-                                            errors.cusPassword ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-emerald-500/40'
+                                            errors.cusPassword ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-green-500/40'
                                         } text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition`}
                                     />
                                     <button
@@ -380,7 +396,7 @@ const AddNewCustomer: React.FC = () => {
                                         onChange={handleChange}
                                         placeholder={t('confirm_password_placeholder')}
                                         className={`autofill-fix-pw w-full pl-10 pr-10 py-2.5 rounded-lg bg-gray-50 dark:bg-[#171f2f] border ${
-                                            errors.confirmPassword ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-emerald-500/40'
+                                            errors.confirmPassword ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-green-500/40'
                                         } text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition`}
                                     />
                                     <button
@@ -415,7 +431,7 @@ const AddNewCustomer: React.FC = () => {
 
                     {/* Address Section */}
                     <div className="mb-2">
-                        <h3 className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-4">
+                        <h3 className="text-sm font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-4">
                             {t('address')}
                         </h3>
                         <div>
@@ -433,7 +449,7 @@ const AddNewCustomer: React.FC = () => {
                                     placeholder={t('enter_complete_address')}
                                     rows={4}
                                     className={`w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-[#0e1726] border ${
-                                        errors.cusAddress ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-emerald-500/40'
+                                        errors.cusAddress ? 'border-red-500 focus:ring-red-500/40' : 'border-gray-300 dark:border-white/10 focus:ring-green-500/40'
                                     } text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 transition resize-none`}
                                 />
                             </div>
@@ -459,7 +475,7 @@ const AddNewCustomer: React.FC = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition ${
+                            className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition ${
                                 loading ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                         >

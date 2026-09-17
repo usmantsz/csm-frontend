@@ -112,18 +112,18 @@ const CropPosRecord = () => {
 
     if (!paramUserId || !cropId) {
         return (
-            <div>
+            <div className="bg-[#060d16] min-h-full -m-4 p-4 md:-m-6 md:p-6">
                 <div className="flex justify-end mb-4">
                     <button
                         type="button"
                         onClick={() => window.history.back()}
-                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                        className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-emerald-500/30 bg-[#08121d]/80 hover:bg-emerald-500/10 hover:border-emerald-400 text-emerald-400 text-sm font-medium tracking-wide shadow-sm transition-all duration-200 group"
                     >
-                        <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                        <IconArrowLeft className="w-4 h-4 rtl:rotate-180 transform group-hover:-translate-x-0.5 transition-transform" />
                         {t('posrecord_back')}
                     </button>
                 </div>
-                <div className="panel p-6 text-center text-gray-500 dark:text-gray-400">
+                <div className="rounded-2xl border border-[#14273b]/60 bg-gradient-to-b from-[#0c1926]/95 to-[#08121d]/90 p-6 text-center text-slate-400 shadow-2xl backdrop-blur-xl">
                     {t('posrecord_missing_crop_user')}
                 </div>
             </div>
@@ -131,81 +131,129 @@ const CropPosRecord = () => {
     }
 
     return (
-        <div>
-            <ul className="flex flex-wrap items-center gap-2 text-sm mb-6">
-                <li><Link to="/dashboard" className="text-primary hover:underline">{t('posrecord_breadcrumb_dashboard')}</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><Link to="/getassginshopcrops" className="text-primary hover:underline">{t('posrecord_breadcrumb_my_crops')}</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <Link to={cropMenuPath} className="text-primary hover:underline">{t('posrecord_breadcrumb_crop_menu')}</Link>
-                </li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 text-gray-500 dark:text-gray-400">{t('posrecord_breadcrumb_pos_record')}</li>
-            </ul>
+        <div className="bg-[#060d16] min-h-full -m-4 p-4 md:-m-6 md:p-6">
+            <div className="max-w-7xl w-full mx-auto space-y-6">
+                <ul className="flex flex-wrap items-center gap-2 text-sm">
+                    <li>
+                        <Link to="/dashboard" className="text-emerald-500 hover:text-emerald-400 transition-colors">
+                            {t('posrecord_breadcrumb_dashboard')}
+                        </Link>
+                    </li>
+                    <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 before:text-slate-600">
+                        <Link to="/getassginshopcrops" className="text-emerald-500 hover:text-emerald-400 transition-colors">
+                            {t('posrecord_breadcrumb_my_crops')}
+                        </Link>
+                    </li>
+                    <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 before:text-slate-600">
+                        <Link to={cropMenuPath} className="text-emerald-500 hover:text-emerald-400 transition-colors">
+                            {t('posrecord_breadcrumb_crop_menu')}
+                        </Link>
+                    </li>
+                    <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 before:text-slate-600 text-slate-300 font-normal">
+                        {t('posrecord_breadcrumb_pos_record')}
+                    </li>
+                </ul>
 
-            {/* Back button - top right, outside card */}
-            <div className="flex justify-end mb-4">
-                <button
-                    type="button"
-                    onClick={() => window.history.back()}
-                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
-                >
-                    <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
-                    {t('posrecord_back_to_crop_menu')}
-                </button>
-            </div>
-
-            <div className="panel bg-white dark:bg-[#0e1726] p-5 rounded-2xl border border-white-dark/10 shadow-sm">
-                {apiError && (
-                    <div className="mb-4 p-3 rounded-lg bg-danger/10 text-danger text-sm">{apiError}</div>
-                )}
-                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                    <h5 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {t('posrecord_title')}{cropName ? ` – ${cropName}` : ''}
-                    </h5>
-                    <Link
-                        to="/pos-payments"
-                        className="btn !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] shadow-none rounded-xl px-4 py-2"
+                {/* Back button - top right, outside card */}
+                <div className="flex justify-end">
+                    <button
+                        type="button"
+                        onClick={() => window.history.back()}
+                        className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-emerald-500/30 bg-[#08121d]/80 hover:bg-emerald-500/10 hover:border-emerald-400 text-emerald-400 text-sm font-medium tracking-wide shadow-sm transition-all duration-200 group"
                     >
-                        {t('posrecord_pos_payments_btn')}
-                    </Link>
+                        <IconArrowLeft className="w-4 h-4 rtl:rotate-180 transform group-hover:-translate-x-0.5 transition-transform" />
+                        {t('posrecord_back_to_crop_menu')}
+                    </button>
                 </div>
-                {!cropId || !shopId ? (
-                    <div className="text-center py-8 text-gray-500">{t('posrecord_crop_shop_unresolved')}</div>
-                ) : loading ? (
-                    <div className="flex justify-center py-8"><span className="animate-spin inline-block w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full" /></div>
-                ) : list.length === 0 ? (
-                    <p className="text-center text-gray-500 dark:text-gray-400 py-8">{t('posrecord_no_records')}</p>
-                ) : (
-                    <div className="overflow-x-auto rounded-xl border border-white-dark/10 dark:border-white/10">
-                        <table className="table-auto w-full text-sm">
-                            <thead>
-                                <tr className="bg-gray-50 dark:bg-white/5 border-b border-white-dark/10">
-                                    <th className="text-left py-3 px-4 font-semibold">{t('posrecord_col_receipt')}</th>
-                                    <th className="text-left py-3 px-4 font-semibold">{t('posrecord_col_customer')}</th>
-                                    <th className="text-left py-3 px-4 font-semibold">{t('posrecord_col_pos_user')}</th>
-                                    <th className="text-right py-3 px-4 font-semibold">{t('posrecord_col_amount')}</th>
-                                    <th className="text-left py-3 px-4 font-semibold">{t('posrecord_col_status')}</th>
-                                    <th className="text-left py-3 px-4 font-semibold">{t('posrecord_col_date')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {list.map((r) => (
-                                    <tr key={r._id} className="border-b border-white-dark/5 hover:bg-white-dark/5 dark:hover:bg-white/5">
-                                        <td className="py-3 px-4 font-mono text-gray-800 dark:text-white">{r.receiptNumber}</td>
-                                        <td className="py-3 px-4 text-gray-700 dark:text-gray-300">{r.customerName} ({r.customerCNIC})</td>
-                                        <td className="py-3 px-4 text-gray-700 dark:text-gray-300">{r.posUserName || '—'}</td>
-                                        <td className="py-3 px-4 text-right font-medium">Rs {Number(r.totalAmount || 0).toLocaleString()}</td>
-                                        <td className="py-3 px-4">
-                                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${r.status === 'fulfilled' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300' : r.status === 'pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300'}`}>
-                                                {r.status}
-                                            </span>
-                                        </td>
-                                        <td className="py-3 px-4 text-gray-500 dark:text-gray-400">{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—'}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+
+                <section className="rounded-2xl border border-[#14273b]/60 bg-gradient-to-b from-[#0c1926]/95 to-[#08121d]/90 shadow-2xl backdrop-blur-xl overflow-hidden">
+                    {apiError && (
+                        <div className="mx-6 mt-5 p-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 text-sm">{apiError}</div>
+                    )}
+
+                    {/* Card Header Bar */}
+                    <div className="px-6 py-5 border-b border-[#14273b]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0c1926]/60">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-2.5 h-7 rounded-full bg-emerald-500 shadow-[0_0_10px_-2px_rgba(16,185,129,0.4)]"></div>
+                            <h5 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                                {t('posrecord_title')}
+                                {cropName ? ` – ${cropName}` : ''}
+                            </h5>
+                        </div>
+                        <Link
+                            to="/pos-payments"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#04080e] font-semibold text-sm shadow-[0_0_20px_-3px_rgba(16,185,129,0.35)] hover:shadow-emerald-400/40 transition-all duration-200 transform active:scale-[0.98]"
+                        >
+                            {t('posrecord_pos_payments_btn')}
+                        </Link>
                     </div>
-                )}
+
+                    {!cropId || !shopId ? (
+                        <div className="text-center py-8 text-slate-400">{t('posrecord_crop_shop_unresolved')}</div>
+                    ) : loading ? (
+                        <div className="flex justify-center py-8">
+                            <span className="animate-spin inline-block w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full" />
+                        </div>
+                    ) : list.length === 0 ? (
+                        <div className="py-20 px-6 flex flex-col items-center justify-center text-center">
+                            <div className="relative mb-5 flex items-center justify-center">
+                                <div className="absolute w-24 h-24 rounded-full bg-emerald-500/10 blur-xl"></div>
+                                <div className="relative w-16 h-16 rounded-2xl bg-[#0e2030] border border-[#1b334d]/80 flex items-center justify-center text-emerald-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+                                    <svg className="w-8 h-8 opacity-85" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="1.6"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+                            <p className="text-slate-300 text-base md:text-lg font-normal tracking-wide max-w-md">{t('posrecord_no_records')}</p>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="table-auto w-full text-sm">
+                                <thead>
+                                    <tr className="bg-[#0e1726]/60 border-b border-[#14273b]/60">
+                                        <th className="text-left py-3 px-6 font-semibold text-slate-300">{t('posrecord_col_receipt')}</th>
+                                        <th className="text-left py-3 px-4 font-semibold text-slate-300">{t('posrecord_col_customer')}</th>
+                                        <th className="text-left py-3 px-4 font-semibold text-slate-300">{t('posrecord_col_pos_user')}</th>
+                                        <th className="text-right py-3 px-4 font-semibold text-slate-300">{t('posrecord_col_amount')}</th>
+                                        <th className="text-left py-3 px-4 font-semibold text-slate-300">{t('posrecord_col_status')}</th>
+                                        <th className="text-left py-3 px-6 font-semibold text-slate-300">{t('posrecord_col_date')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {list.map((r) => (
+                                        <tr key={r._id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                            <td className="py-3 px-6 font-mono text-white">{r.receiptNumber}</td>
+                                            <td className="py-3 px-4 text-slate-300">
+                                                {r.customerName} ({r.customerCNIC})
+                                            </td>
+                                            <td className="py-3 px-4 text-slate-300">{r.posUserName || '—'}</td>
+                                            <td className="py-3 px-4 text-right font-medium text-white">Rs {Number(r.totalAmount || 0).toLocaleString()}</td>
+                                            <td className="py-3 px-4">
+                                                <span
+                                                    className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                                        r.status === 'fulfilled'
+                                                            ? 'bg-emerald-500/15 text-emerald-300'
+                                                            : r.status === 'pending'
+                                                            ? 'bg-amber-500/15 text-amber-300'
+                                                            : 'bg-slate-500/15 text-slate-300'
+                                                    }`}
+                                                >
+                                                    {r.status}
+                                                </span>
+                                            </td>
+                                            <td className="py-3 px-6 text-slate-500">{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </section>
             </div>
         </div>
     );

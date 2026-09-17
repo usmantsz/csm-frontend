@@ -130,6 +130,7 @@ const CropMenuCards = () => {
                 route: receiptRoute,
                 icon: <IconFile className="w-8 h-8" />,
                 color: 'primary',
+                tag: t('crop_menu_tag_mandi_pos', 'Mandi POS'),
             },
         {
             title: t('receipt_list'),
@@ -138,6 +139,7 @@ const CropMenuCards = () => {
             route: `/crop-receipt-list/${userId}/${cropId}`,
             icon: <IconMenuCalendar className="w-8 h-8" />,
             color: 'info',
+            tag: t('crop_menu_tag_orders_log', 'Orders Log'),
         },
         {
             title: t('buyer_list'),
@@ -146,6 +148,7 @@ const CropMenuCards = () => {
             route: `/crop-buyer-list/${userId}/${cropId}`,
             icon: <IconMenuUsers className="w-8 h-8" />,
             color: 'success',
+            tag: t('crop_menu_tag_payments', 'Payments'),
         },
         {
             title: t('malakhta'),
@@ -154,6 +157,7 @@ const CropMenuCards = () => {
             route: `/crop-malakhta-list/${userId}/${cropId}`,
             icon: <IconCashBanknotes className="w-8 h-8" />,
             color: 'harvest',
+            tag: t('crop_menu_tag_payouts', 'Payouts'),
         },
         {
             title: t('customer_list'),
@@ -162,6 +166,7 @@ const CropMenuCards = () => {
             route: `/crop-customer-list/${userId}/${cropId}`,
             icon: <IconUsers className="w-8 h-8" />,
             color: 'success',
+            tag: t('crop_menu_tag_farmers', 'Farmers & Growers'),
         },
         {
             title: t('give_loan'),
@@ -170,6 +175,7 @@ const CropMenuCards = () => {
             route: `/finance-form/${userId}/${cropId}`,
             icon: <IconCashBanknotes className="w-8 h-8" />,
             color: 'harvest',
+            tag: t('crop_menu_tag_disbursement', 'Disbursement'),
         },
         {
             title: t('loan_list'),
@@ -178,6 +184,7 @@ const CropMenuCards = () => {
             route: `/loan/${userId}/${cropId}`,
             icon: <IconMenuCalendar className="w-8 h-8" />,
             color: 'warning',
+            tag: t('crop_menu_tag_recovery', 'Recovery Record'),
         },
         {
             title: t('pos_user_record'),
@@ -186,6 +193,7 @@ const CropMenuCards = () => {
             route: getRouteWithShopId(`/crop-pos-record/${userId}/${cropId}`),
             icon: <IconCashBanknotes className="w-8 h-8" />,
             color: 'info',
+            tag: t('crop_menu_tag_terminal', 'Terminal Logs'),
         },
         {
             title: t('history_label'),
@@ -194,30 +202,32 @@ const CropMenuCards = () => {
             route: `/history/${userId}/${cropId}`,
             icon: <IconNotes className="w-8 h-8" />,
             color: 'crop',
+            tag: t('crop_menu_tag_audit', 'Audit Trail'),
         },
     ];
     }, [getReceiptDescription, getReceiptRoute, getRouteWithShopId, userId, cropId, t]);
 
-    // Sub-card shell: matches the Admin Overview stat-card look — dark navy
-    // bg with a green border in dark mode, light tint + border in light mode.
+    // Card shell — dark mode is a uniform obsidian/emerald tile (matched to
+    // the Stitch "Crop Dashboard" design); light mode keeps the per-category
+    // tint so the existing look outside dark mode doesn't change.
     const colorClasses = {
-        primary: 'bg-primary-50 hover:bg-primary-100 border-primary-200 dark:bg-[#0e1726] dark:hover:bg-[#0e1726] dark:border-green-800/40 dark:hover:border-green-600/60',
-        success: 'bg-success-50 hover:bg-success-100 border-success-200 dark:bg-[#0e1726] dark:hover:bg-[#0e1726] dark:border-green-800/40 dark:hover:border-green-600/60',
-        info: 'bg-info-50 hover:bg-info-100 border-info-200 dark:bg-[#0e1726] dark:hover:bg-[#0e1726] dark:border-green-800/40 dark:hover:border-green-600/60',
-        harvest: 'bg-harvest-50 hover:bg-harvest-100 border-harvest-200 dark:bg-[#0e1726] dark:hover:bg-[#0e1726] dark:border-green-800/40 dark:hover:border-green-600/60',
-        warning: 'bg-warning-50 hover:bg-warning-100 border-warning-200 dark:bg-[#0e1726] dark:hover:bg-[#0e1726] dark:border-green-800/40 dark:hover:border-green-600/60',
-        crop: 'bg-crop-50 hover:bg-crop-100 border-crop-200 dark:bg-[#0e1726] dark:hover:bg-[#0e1726] dark:border-green-800/40 dark:hover:border-green-600/60',
+        primary: 'bg-primary-50 hover:bg-primary-100 border-primary-200 dark:bg-[#0b1725] dark:hover:bg-[#0b1725] dark:border-[#14283f] dark:hover:border-emerald-500/50',
+        success: 'bg-success-50 hover:bg-success-100 border-success-200 dark:bg-[#0b1725] dark:hover:bg-[#0b1725] dark:border-[#14283f] dark:hover:border-emerald-500/50',
+        info: 'bg-info-50 hover:bg-info-100 border-info-200 dark:bg-[#0b1725] dark:hover:bg-[#0b1725] dark:border-[#14283f] dark:hover:border-emerald-500/50',
+        harvest: 'bg-harvest-50 hover:bg-harvest-100 border-harvest-200 dark:bg-[#0b1725] dark:hover:bg-[#0b1725] dark:border-[#14283f] dark:hover:border-emerald-500/50',
+        warning: 'bg-warning-50 hover:bg-warning-100 border-warning-200 dark:bg-[#0b1725] dark:hover:bg-[#0b1725] dark:border-[#14283f] dark:hover:border-emerald-500/50',
+        crop: 'bg-crop-50 hover:bg-crop-100 border-crop-200 dark:bg-[#0b1725] dark:hover:bg-[#0b1725] dark:border-[#14283f] dark:hover:border-emerald-500/50',
     };
 
     // Icon tile: light mode keeps the category tint, dark mode always shows
-    // the green icon-on-dark-green-tile look from the dashboard cards.
+    // the emerald icon-on-dark tile look from the Stitch cards.
     const iconColorClasses = {
-        primary: 'bg-primary-100 text-primary-600 dark:bg-green-900/30 dark:text-green-400',
-        success: 'bg-success-100 text-success-600 dark:bg-green-900/30 dark:text-green-400',
-        info: 'bg-info-100 text-info-600 dark:bg-green-900/30 dark:text-green-400',
-        harvest: 'bg-harvest-100 text-harvest-600 dark:bg-green-900/30 dark:text-green-400',
-        warning: 'bg-warning-100 text-warning-600 dark:bg-green-900/30 dark:text-green-400',
-        crop: 'bg-crop-100 text-crop-600 dark:bg-green-900/30 dark:text-green-400',
+        primary: 'bg-primary-100 text-primary-600 dark:bg-emerald-500/10 dark:border dark:border-emerald-500/20 dark:text-emerald-400',
+        success: 'bg-success-100 text-success-600 dark:bg-emerald-500/10 dark:border dark:border-emerald-500/20 dark:text-emerald-400',
+        info: 'bg-info-100 text-info-600 dark:bg-emerald-500/10 dark:border dark:border-emerald-500/20 dark:text-emerald-400',
+        harvest: 'bg-harvest-100 text-harvest-600 dark:bg-emerald-500/10 dark:border dark:border-emerald-500/20 dark:text-emerald-400',
+        warning: 'bg-warning-100 text-warning-600 dark:bg-emerald-500/10 dark:border dark:border-emerald-500/20 dark:text-emerald-400',
+        crop: 'bg-crop-100 text-crop-600 dark:bg-emerald-500/10 dark:border dark:border-emerald-500/20 dark:text-emerald-400',
     };
 
     return (
@@ -239,63 +249,78 @@ const CropMenuCards = () => {
                 </li>
             </ul>
 
-            {/* Back button - top right, outside card */}
-            <div className="flex justify-end mb-4">
+            {/* Action banner: title + description + Back to Crops */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+                <div>
+                    <h2 className="text-2xl font-bold text-stone-900 dark:text-white tracking-tight">{t('crop_management')}</h2>
+                    <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{t('crop_management_desc')}</p>
+                </div>
                 <button
                     type="button"
                     onClick={() => navigate(-1)}
-                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border dark:border-emerald-500/40 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:border-emerald-500 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 shrink-0"
                 >
-                    <span>←</span> {t('back_to_crops')}
+                    <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                    {t('back_to_crops')}
                 </button>
             </div>
 
-            {/* Single main panel — title + description + all sub-cards inside,
-                same shell as the Admin Overview dashboard panel */}
-            <div className="panel shadow-md dark:shadow-none rounded-2xl">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-xl">
+            {/* Crop header banner */}
+            <div className="relative overflow-hidden rounded-2xl border border-green-200 dark:border-[#172d47] bg-white dark:bg-gradient-to-r dark:from-[#0d1d2e] dark:via-[#0c1a29] dark:to-[#0a1523] p-6 shadow-sm dark:shadow-md mb-6">
+                <div className="relative z-10 flex items-center gap-4">
+                    <div className="w-13 h-13 shrink-0 rounded-2xl bg-green-100 dark:bg-emerald-500/10 border border-green-200 dark:border-emerald-500/30 flex items-center justify-center p-3 text-xl">
                         🌾
                     </div>
                     <div>
-                        <h5 className="font-semibold text-lg dark:text-white-light">{t('crop_management')}</h5>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('crop_management_desc')}</p>
+                        <h3 className="text-xl font-bold text-stone-900 dark:text-white tracking-tight flex items-center gap-2 flex-wrap">
+                            <span>{t('crop_management')}</span>
+                            <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400">
+                                {t('crop_menu_active_season', 'Active Season')}
+                            </span>
+                        </h3>
+                        <p className="text-gray-500 dark:text-slate-400 text-sm mt-0.5">{t('crop_management_desc')}</p>
                     </div>
                 </div>
+                <div className="pointer-events-none absolute -right-10 -bottom-10 hidden h-48 w-48 rounded-full bg-emerald-500/5 blur-3xl dark:block" />
+            </div>
 
-                {loadingCrop ? (
-                    <div className="text-center py-12">
-                        <div className="animate-spin border-4 border-green-600 border-t-transparent rounded-full w-12 h-12 mx-auto mb-4"></div>
-                        <p className="text-gray-600 dark:text-gray-400">{t('loading_crop_details')}</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {menuItems.map((item) => (
-                            <div
-                                key={item.title}
-                                onClick={() => navigate(getRouteWithShopId(item.route))}
-                                className={`group cursor-pointer border-2 ${colorClasses[item.color as keyof typeof colorClasses]} rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 transform`}
-                            >
-                                <div className="flex items-start space-x-6 rtl:space-x-reverse">
-                                    <div className={`flex-shrink-0 w-16 h-16 rounded-xl flex items-center justify-center ${iconColorClasses[item.color as keyof typeof iconColorClasses]} shadow-md dark:shadow-none group-hover:shadow-lg dark:group-hover:shadow-md transition-shadow`}>
+            {loadingCrop ? (
+                <div className="text-center py-12">
+                    <div className="animate-spin border-4 border-green-600 border-t-transparent rounded-full w-12 h-12 mx-auto mb-4 dark:border-emerald-500 dark:border-t-transparent"></div>
+                    <p className="text-gray-600 dark:text-slate-400">{t('loading_crop_details')}</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {menuItems.map((item) => (
+                        <div
+                            key={item.title}
+                            onClick={() => navigate(getRouteWithShopId(item.route))}
+                            className={`group cursor-pointer border-2 ${colorClasses[item.color as keyof typeof colorClasses]} rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 transform flex flex-col justify-between`}
+                        >
+                            <div>
+                                <div className="flex items-start space-x-4 rtl:space-x-reverse sm:space-x-6">
+                                    <div className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center ${iconColorClasses[item.color as keyof typeof iconColorClasses]} shadow-md dark:shadow-none group-hover:shadow-lg dark:group-hover:shadow-md group-hover:scale-105 transition-all duration-200`}>
                                         {item.icon}
                                     </div>
-                                    <div className="flex-1">
-                                        <h3 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">{item.title}</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">{item.description}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-gray-800 dark:text-white dark:group-hover:text-emerald-300 transition truncate">{item.title}</h3>
+                                        <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{item.description}</p>
                                     </div>
                                 </div>
-                                <div className="mt-4 flex items-center text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                            </div>
+                            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-[#132439] flex items-center justify-between text-sm font-medium text-gray-500 dark:text-emerald-400/90 group-hover:text-green-600 dark:group-hover:text-emerald-300 transition-colors">
+                                <span className="inline-flex items-center gap-1">
                                     <span>{t('click_to_open')}</span>
-                                    <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                     </svg>
-                                </div>
+                                </span>
+                                <span className="hidden text-xs text-slate-500 dark:inline">{item.tag}</span>
                             </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

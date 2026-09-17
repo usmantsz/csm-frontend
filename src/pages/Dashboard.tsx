@@ -24,14 +24,46 @@ import IconTrendingUp from '../components/Icon/IconTrendingUp';
 import IconMenuCalendar from '../components/Icon/Menu/IconMenuCalendar';
 
 // Shared style tokens so this page stays visually consistent with the rest
-// of the app (see AdminOverview / Header / TableCard).
-const card =
-    'rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-900';
-const iconBadge =
-    'inline-flex shadow-gray-600/40 shadow-lg h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-primary-700 shadow-md ring-1 ring-gray-100 dark:bg-primary-900/30 dark:text-primary-300 dark:shadow-none dark:ring-0';
-const sectionHeading = 'text-lg font-semibold text-gray-900 dark:text-white';
-// Reusable divider between merged sections inside a single card.
-const sectionDivider = 'my-6 border-t border-gray-200 dark:border-gray-700';
+// of the app (obsidian / emerald glass-panel theme — see CropHistory / CropPosRecord).
+// NOTE: these are now split into dark/light variants and resolved inside the
+// component based on `isDark`, so the page actually respects the app's theme
+// toggle instead of always rendering the dark palette.
+
+const getCardGlass = (isDark: boolean) => ({
+    background: isDark
+        ? 'linear-gradient(135deg, rgba(14, 32, 48, 0.75) 0%, rgba(9, 21, 33, 0.85) 100%)'
+        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(236, 253, 245, 0.9) 100%)',
+    backdropFilter: 'blur(12px)',
+});
+
+const cardBase = 'rounded-2xl border p-6';
+const cardDark = 'border-[#1b344d]/80 shadow-[0_4px_20px_-2px_rgba(4,9,16,0.7)]';
+const cardLight = 'border-emerald-100 shadow-[0_4px_20px_-2px_rgba(16,185,129,0.10)]';
+
+const iconBadgeDark =
+    'inline-flex shrink-0 h-10 w-10 items-center justify-center rounded-2xl bg-[#092233] border border-emerald-500/30 text-emerald-400 shadow-inner';
+const iconBadgeLight =
+    'inline-flex shrink-0 h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 shadow-inner';
+
+const sectionHeadingDark = 'text-lg font-semibold text-white';
+const sectionHeadingLight = 'text-lg font-semibold text-slate-800';
+
+const sectionDividerDark = 'my-6 border-t border-[#142a40]/70';
+const sectionDividerLight = 'my-6 border-t border-emerald-100';
+
+const filterBoxDark = 'rounded-2xl border border-[#1b3650] bg-[#081522]/60 p-4 transition-colors focus-within:border-emerald-500';
+const filterBoxLight = 'rounded-2xl border border-emerald-100 bg-white p-4 transition-colors focus-within:border-emerald-500 shadow-sm';
+
+const filterLabelDark = 'mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-300';
+const filterLabelLight = 'mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-600';
+
+const filterSelectDark =
+    'form-select w-full rounded-xl border-[#1b3650] bg-[#081522] text-slate-100 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20';
+const filterSelectLight =
+    'form-select w-full rounded-xl border-emerald-100 bg-white text-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20';
+
+const pageBgDark = 'bg-[#060d16]';
+const pageBgLight = 'bg-slate-50';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const currentYear = new Date().getFullYear();
@@ -77,6 +109,22 @@ const Dashboard = () => {
     const shopId = urlShopId || userShopId;
 
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
+
+    // Resolve the shared tokens against the current theme once per render.
+    const cardGlass = getCardGlass(isDark);
+    const card = `${cardBase} ${isDark ? cardDark : cardLight}`;
+    const iconBadge = isDark ? iconBadgeDark : iconBadgeLight;
+    const sectionHeading = isDark ? sectionHeadingDark : sectionHeadingLight;
+    const sectionDivider = isDark ? sectionDividerDark : sectionDividerLight;
+    const filterBox = isDark ? filterBoxDark : filterBoxLight;
+    const filterLabel = isDark ? filterLabelDark : filterLabelLight;
+    const filterSelect = isDark ? filterSelectDark : filterSelectLight;
+    const pageBg = isDark ? pageBgDark : pageBgLight;
+
+    const mutedText = isDark ? 'text-slate-400' : 'text-slate-500';
+    const strongText = isDark ? 'text-slate-200' : 'text-slate-800';
+    const emeraldValueText = isDark ? 'text-emerald-400' : 'text-emerald-600';
+    const dividerBorder = isDark ? 'border-[#142a40]' : 'border-emerald-100';
 
     const [year, setYear] = useState(currentYear.toString());
     const [quarter, setQuarter] = useState('');
@@ -235,7 +283,10 @@ const Dashboard = () => {
         return () => ac.abort();
     }, [shopId, token]);
 
-    const chartColors = isDark ? ['#2d8659', '#22c55e', '#f59e0b', '#3b82f6'] : ['#2d8659', '#22c55e', '#eab308', '#3b82f6'];
+    const chartColors = ['#10b981', '#34d399', '#f59e0b', '#3b82f6'];
+    const axisLabelColor = isDark ? '#94a3b8' : '#475569';
+    const gridColor = isDark ? '#142a40' : '#e2e8f0';
+    const apexTheme = isDark ? 'dark' : 'light';
 
     const byMonth = commission?.byMonth || {};
     const commissionSeries = [{
@@ -243,28 +294,31 @@ const Dashboard = () => {
         data: MONTHS.map((_, i) => Math.round((byMonth[i + 1] || 0) * 100) / 100),
     }];
     const commissionChartOptions: any = {
-        chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily: 'Nunito, sans-serif' },
+        chart: { type: 'bar', height: 280, toolbar: { show: false }, fontFamily: 'Inter, sans-serif', background: 'transparent' },
         plotOptions: { bar: { borderRadius: 4, columnWidth: '60%' } },
         colors: [chartColors[0]],
         dataLabels: { enabled: false },
-        xaxis: { categories: MONTHS },
+        xaxis: { categories: MONTHS, labels: { style: { colors: axisLabelColor } } },
         yaxis: {
             labels: {
+                style: { colors: axisLabelColor },
                 formatter: (val: number) => 'Rs. ' + (val >= 1000 ? (val / 1000).toFixed(1) + 'K' : val),
             },
         },
-        grid: { borderColor: isDark ? '#191E3A' : '#E0E6ED', strokeDashArray: 5 },
+        grid: { borderColor: gridColor, strokeDashArray: 5 },
+        theme: { mode: apexTheme },
     };
 
     const totalGiven = loans?.totalGiven ?? 0;
     const totalReturned = loans?.totalReturned ?? 0;
     const loanChartSeries = totalGiven + totalReturned > 0 ? [totalGiven, totalReturned] : [1, 0];
     const loanChartOptions: any = {
-        chart: { type: 'donut', height: 280 },
+        chart: { type: 'donut', height: 280, background: 'transparent' },
         labels: [t('loan_given'), t('loan_returned')],
         colors: [chartColors[2], chartColors[1]],
-        legend: { position: 'bottom' },
+        legend: { position: 'bottom', labels: { colors: axisLabelColor } },
         dataLabels: { formatter: (val: number) => Math.round(val) + '%' },
+        theme: { mode: apexTheme },
     };
 
     const formatRs = (n: number) =>
@@ -272,10 +326,10 @@ const Dashboard = () => {
 
     if (shopIdLoading && !shopId) {
         return (
-            <div>
-                <div className={`${card} flex flex-col items-center justify-center py-20`}>
-                    <span className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                    <p className="text-gray-600 dark:text-gray-400">{t('loading_dashboard')}</p>
+            <div className={`${pageBg} min-h-full -m-4 p-4 md:-m-6 md:p-6`}>
+                <div className={`${card} flex flex-col items-center justify-center py-20`} style={cardGlass}>
+                    <span className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
+                    <p className={mutedText}>{t('loading_dashboard')}</p>
                 </div>
             </div>
         );
@@ -283,29 +337,29 @@ const Dashboard = () => {
 
     if (!shopId) {
         return (
-            <div>
-                <div className={`${card} p-8 text-center`}>
-                    <p className="font-medium text-gray-700 dark:text-gray-300">{t('shop_not_found')}</p>
-                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{t('contact_admin_shop_assigned')}</p>
+            <div className={`${pageBg} min-h-full -m-4 p-4 md:-m-6 md:p-6`}>
+                <div className={`${card} p-8 text-center`} style={cardGlass}>
+                    <p className={`font-medium ${strongText}`}>{t('shop_not_found')}</p>
+                    <p className={`mt-2 text-sm ${mutedText}`}>{t('contact_admin_shop_assigned')}</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className={`${pageBg} min-h-full -m-4 p-4 md:-m-6 md:p-6 space-y-6`}>
             {/* Overview + Filters — merged into a single card */}
-            <div className={card}>
-                <div className="mb-2 flex items-center gap-3">
+            <div className={`${card} relative overflow-hidden`} style={cardGlass}>
+                <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div className="mb-2 flex items-center gap-3 relative">
                     <span className={iconBadge}>
                         <IconMenuDashboard className="w-5 h-5" />
                     </span>
                     <h5 className={sectionHeading}>{t('overview')}</h5>
                 </div>
-                <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-                    {t('shop_summary_desc')}
-                </p>
-                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+                <p className={`mb-4 text-sm ${mutedText} relative`}>{t('shop_summary_desc')}</p>
+                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4 relative">
                     <AgriculturalCard
                         title={t('total_customers')}
                         value={loadingOverview ? '…' : (overview?.totalCustomers ?? 0)}
@@ -337,45 +391,37 @@ const Dashboard = () => {
                 </div>
 
                 {/* Divider between overview stats and filters */}
-                <div className={sectionDivider} />
+                <div className={`${sectionDivider} relative`} />
 
                 {/* Filters */}
-                <div className="mb-4 flex items-center gap-3">
+                <div className="mb-4 flex items-center gap-3 relative">
                     <span className={iconBadge}>
                         <IconMenuCalendar className="w-5 h-5" />
                     </span>
                     <div>
                         <h5 className={sectionHeading}>{t('filter_year_quarter_crop')}</h5>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard_filters_debounced_hint')}</p>
+                        <p className={`text-xs ${mutedText}`}>{t('dashboard_filters_debounced_hint')}</p>
                     </div>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-3">
-                    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 transition-colors focus-within:border-primary-400 dark:border-gray-700 dark:bg-gray-800/40 dark:focus-within:border-primary-500">
-                        <label className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
-                            <IconMenuCalendar className="h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
+                <div className="grid gap-4 sm:grid-cols-3 relative">
+                    <div className={filterBox}>
+                        <label className={filterLabel}>
+                            <IconMenuCalendar className="h-4 w-4 shrink-0 text-emerald-400" />
                             {t('year')}
                         </label>
-                        <select
-                            value={year}
-                            onChange={(e) => setYear(e.target.value)}
-                            className="form-select w-full rounded-xl border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
-                        >
+                        <select value={year} onChange={(e) => setYear(e.target.value)} className={filterSelect}>
                             <option value="">{t('all_time')}</option>
                             {years.map((y) => (
                                 <option key={y} value={y}>{y}</option>
                             ))}
                         </select>
                     </div>
-                    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 transition-colors focus-within:border-primary-400 dark:border-gray-700 dark:bg-gray-800/40 dark:focus-within:border-primary-500">
-                        <label className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
-                            <IconMenuCalendar className="h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
+                    <div className={filterBox}>
+                        <label className={filterLabel}>
+                            <IconMenuCalendar className="h-4 w-4 shrink-0 text-emerald-400" />
                             {t('quarter_label')}
                         </label>
-                        <select
-                            value={quarter}
-                            onChange={(e) => setQuarter(e.target.value)}
-                            className="form-select w-full rounded-xl border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
-                        >
+                        <select value={quarter} onChange={(e) => setQuarter(e.target.value)} className={filterSelect}>
                             <option value="">{t('full_year')}</option>
                             <option value="1">{t('quarter_q1')}</option>
                             <option value="2">{t('quarter_q2')}</option>
@@ -383,15 +429,15 @@ const Dashboard = () => {
                             <option value="4">{t('quarter_q4')}</option>
                         </select>
                     </div>
-                    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 transition-colors focus-within:border-primary-400 dark:border-gray-700 dark:bg-gray-800/40 dark:focus-within:border-primary-500">
-                        <label className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
-                            <IconTag className="h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
+                    <div className={filterBox}>
+                        <label className={filterLabel}>
+                            <IconTag className="h-4 w-4 shrink-0 text-emerald-400" />
                             {t('crop')}
                         </label>
                         <select
                             value={cropId}
                             onChange={(e) => setCropId(e.target.value)}
-                            className="form-select w-full rounded-xl border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                            className={filterSelect}
                             disabled={loadingCrops}
                         >
                             <option value="">{t('view_all_crops')}</option>
@@ -404,26 +450,26 @@ const Dashboard = () => {
             </div>
 
             {/* Commission, Loans & POS dues — merged into a single card */}
-            <div className={card}>
+            <div className={card} style={cardGlass}>
                 {posOwedTotal !== null && (
                     <>
-                        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-primary-200 bg-primary-50 p-5 dark:border-primary-900/40 dark:bg-primary-900/10">
+                        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-500/25 bg-emerald-500/5 p-5">
                             <div className="flex items-center gap-3">
                                 <span className={iconBadge}>
                                     <IconCashBanknotes className="w-5 h-5" />
                                 </span>
                                 <div>
                                     <h5 className={sectionHeading}>{t('dashboard_pos_total_owed')}</h5>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard_pos_total_owed_desc')}</p>
+                                    <p className={`text-sm ${mutedText}`}>{t('dashboard_pos_total_owed_desc')}</p>
                                 </div>
                             </div>
                             <div className="flex flex-wrap items-center gap-4">
-                                <p className="text-2xl font-bold text-primary-700 dark:text-primary-300">
+                                <p className={`text-2xl font-bold ${emeraldValueText}`}>
                                     {loadingPosOwed ? '…' : formatRs(posOwedTotal)}
                                 </p>
                                 <Link
                                     to="/pos-payments"
-                                    className="btn btn-primary shrink-0 rounded-2xl px-5 py-2.5 font-medium"
+                                    className="inline-flex items-center justify-center shrink-0 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] transition duration-150 shadow-lg shadow-emerald-950/40"
                                 >
                                     {t('dashboard_pos_record_payments')}
                                 </Link>
@@ -446,17 +492,17 @@ const Dashboard = () => {
                         </div>
                         {loadingCommission ? (
                             <div className="flex h-[280px] items-center justify-center">
-                                <span className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                                <span className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
                             </div>
                         ) : (
                             <>
-                                <p className="mb-4 text-2xl font-bold text-primary-700 dark:text-primary-300">
+                                <p className={`mb-4 text-2xl font-bold ${emeraldValueText}`}>
                                     {t('total_label')}: {formatRs(commission?.total ?? 0)}
                                 </p>
                                 {commissionSeries[0].data.some((d: number) => d > 0) ? (
                                     <ReactApexChart series={commissionSeries} options={commissionChartOptions} type="bar" height={280} />
                                 ) : (
-                                    <div className="flex h-[260px] items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-gray-50 text-gray-500 dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
+                                    <div className={`flex h-[260px] items-center justify-center rounded-2xl border border-dashed ${isDark ? 'border-[#1b3650] bg-[#081522]/40' : 'border-emerald-200 bg-white'} ${mutedText}`}>
                                         {t('no_commission_data')}
                                     </div>
                                 )}
@@ -465,7 +511,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Loans */}
-                    <div className="xl:border-l xl:border-gray-200 xl:pl-6 dark:xl:border-gray-700">
+                    <div className={`xl:border-l ${dividerBorder} xl:pl-6`}>
                         <div className="mb-4 flex items-center gap-3">
                             <span className={iconBadge}>
                                 <IconCashBanknotes className="w-5 h-5" />
@@ -476,28 +522,28 @@ const Dashboard = () => {
                         </div>
                         {loadingLoans ? (
                             <div className="flex h-[280px] items-center justify-center">
-                                <span className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                                <span className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
                             </div>
                         ) : (
                             <>
                                 <div className="mb-4 grid grid-cols-3 gap-2">
-                                    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
-                                        <p className="text-xs font-medium text-amber-700 dark:text-amber-400">{t('given')}</p>
-                                        <p className="font-bold text-amber-700 dark:text-amber-300">{formatRs(totalGiven)}</p>
+                                    <div className="rounded-2xl border border-amber-500/25 bg-amber-500/10 p-3">
+                                        <p className={`text-xs font-medium ${isDark ? 'text-amber-400' : 'text-amber-700'}`}>{t('given')}</p>
+                                        <p className={`font-bold ${isDark ? 'text-amber-300' : 'text-amber-700'}`}>{formatRs(totalGiven)}</p>
                                     </div>
-                                    <div className="rounded-2xl border border-success-200 bg-success-50 p-3 dark:border-success-800 dark:bg-success-900/20">
-                                        <p className="text-xs font-medium text-success-700 dark:text-success-400">{t('returned')}</p>
-                                        <p className="font-bold text-success-700 dark:text-success-300">{formatRs(totalReturned)}</p>
+                                    <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/10 p-3">
+                                        <p className={`text-xs font-medium ${emeraldValueText}`}>{t('returned')}</p>
+                                        <p className={`font-bold ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`}>{formatRs(totalReturned)}</p>
                                     </div>
-                                    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-700/50">
-                                        <p className="text-xs font-medium text-gray-600 dark:text-gray-400">{t('remaining')}</p>
-                                        <p className="font-bold text-gray-800 dark:text-gray-200">{formatRs(loans?.remaining ?? 0)}</p>
+                                    <div className={`rounded-2xl border ${isDark ? 'border-[#1b3650] bg-[#081522]/60' : 'border-slate-200 bg-white'} p-3`}>
+                                        <p className={`text-xs font-medium ${mutedText}`}>{t('remaining')}</p>
+                                        <p className={`font-bold ${strongText}`}>{formatRs(loans?.remaining ?? 0)}</p>
                                     </div>
                                 </div>
                                 {totalGiven + totalReturned > 0 ? (
                                     <ReactApexChart series={loanChartSeries} options={loanChartOptions} type="donut" height={260} />
                                 ) : (
-                                    <div className="flex h-[220px] items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-gray-50 text-gray-500 dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
+                                    <div className={`flex h-[220px] items-center justify-center rounded-2xl border border-dashed ${isDark ? 'border-[#1b3650] bg-[#081522]/40' : 'border-emerald-200 bg-white'} ${mutedText}`}>
                                         {t('no_loan_data')}
                                     </div>
                                 )}
@@ -508,13 +554,13 @@ const Dashboard = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className={card}>
+            <div className={card} style={cardGlass}>
                 <div className="mb-4 flex items-center gap-3">
-    <span className={iconBadge}>
-        <IconTag className="w-5 h-5" />
-    </span>
-    <h5 className={sectionHeading}>{t('quick_actions_title')}</h5>
-</div>
+                    <span className={iconBadge}>
+                        <IconTag className="w-5 h-5" />
+                    </span>
+                    <h5 className={sectionHeading}>{t('quick_actions_title')}</h5>
+                </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <QuickActionButton to="/getassginshopcrops" icon={<IconPlus className="w-6 h-6" />} label={t('new_order')} description={t('crop_select_receipt')} color="primary" />
                     <QuickActionButton to="/addnewcustomer" icon={<IconUser className="w-6 h-6" />} label={t('add_customer')} description={t('naya_customer_register')} color="success" />

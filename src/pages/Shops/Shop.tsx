@@ -145,7 +145,7 @@ const Shop = () => {
                     {shopBillImageTop ? (
                         <img
                             src={`${ServerSetting.serUrl}/shop/${shopBillImageTop}`}
-                            className="h-10 w-10 rounded-full object-cover border-2 border-primary-200"
+                            className="h-10 w-10 rounded-full object-cover border-2 border-primary-200 dark:border-emerald-500/40 dark:shadow-sm dark:shadow-emerald-500/10"
                             alt="Shop"
                             onError={(e: any) => {
                                 e.target.style.display = 'none';
@@ -154,10 +154,10 @@ const Shop = () => {
                         />
                     ) : null}
                     <div
-                        className="h-10 w-10 rounded-full border-2 border-primary-200 bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center"
+                        className="h-10 w-10 rounded-full border-2 border-primary-200 bg-primary-50 dark:border-emerald-500/40 dark:bg-[#07131d] flex items-center justify-center"
                         style={{ display: shopBillImageTop ? 'none' : 'flex' }}
                     >
-                        <IconShop className="w-5 h-5 text-primary-600" />
+                        <IconShop className="w-5 h-5 text-primary-600 dark:text-emerald-400" />
                     </div>
                 </div>
             ),
@@ -168,7 +168,7 @@ const Shop = () => {
             sortable: true,
             textAlignment: 'left',
             render: ({ shopName }: Shop) => (
-                <div className="font-semibold text-primary-600 dark:text-primary-400">
+                <div className="font-semibold text-primary-600 dark:text-emerald-400">
                     {shopName || '-'}
                 </div>
             ),
@@ -179,7 +179,7 @@ const Shop = () => {
             sortable: true,
             textAlignment: 'center',
             render: ({ shopRegistrationNumber }: Shop) => (
-                <span className="font-mono text-sm" dir="ltr">{shopRegistrationNumber || '-'}</span>
+                <span className="font-mono text-sm dark:text-slate-300" dir="ltr">{shopRegistrationNumber || '-'}</span>
             ),
         },
         {
@@ -188,7 +188,7 @@ const Shop = () => {
             sortable: true,
             textAlignment: 'center',
             render: ({ shopNumber }: Shop) => (
-                <span className="font-mono" dir="ltr">{shopNumber || '-'}</span>
+                <span className="font-mono dark:text-slate-300" dir="ltr">{shopNumber || '-'}</span>
             ),
         },
         {
@@ -198,8 +198,8 @@ const Shop = () => {
             textAlignment: 'left',
             render: ({ shopCity, shopProvince }: Shop) => (
                 <div>
-                    <div className="font-medium">{shopCity || '-'}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">{shopProvince || ''}</div>
+                    <div className="font-medium dark:text-slate-200">{shopCity || '-'}</div>
+                    <div className="text-xs text-gray-500 dark:text-slate-500">{shopProvince || ''}</div>
                 </div>
             ),
         },
@@ -210,10 +210,10 @@ const Shop = () => {
             textAlignment: 'center',
             render: ({ shopStatus }: Shop) => (
                 <span
-                    className={`badge ${
+                    className={`inline-block px-3 py-0.5 text-xs font-semibold rounded-full border ${
                         shopStatus === '0' || shopStatus === 0
-                            ? 'badge-outline-success'
-                            : 'badge-outline-danger'
+                            ? 'badge-outline-success dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400'
+                            : 'badge-outline-danger dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400'
                     }`}
                 >
                     {shopStatus === '0' || shopStatus === 0 ? t('active') : t('inactive')}
@@ -226,7 +226,7 @@ const Shop = () => {
             sortable: true,
             textAlignment: 'center',
             render: ({ createdAt }: Shop) => (
-                <span className="text-sm">{formatDate(createdAt)}</span>
+                <span className="text-sm dark:text-slate-400">{formatDate(createdAt)}</span>
             ),
         },
         {
@@ -238,7 +238,7 @@ const Shop = () => {
                     <button
                         type="button"
                         onClick={() => handleViewShop(shop)}
-                        className="btn btn-sm flex items-center gap-2 !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] !shadow-none"
+                        className="btn btn-sm flex items-center gap-2 !bg-emerald-600 !text-white !border-emerald-600 hover:!bg-emerald-500 !shadow-none dark:!shadow-sm dark:!shadow-emerald-500/20"
                         title={t('view_shop_details')}
                     >
                         <FaEye className="w-4 h-4" />
@@ -269,12 +269,12 @@ const Shop = () => {
                 searchValue={search}
                 onSearchChange={setSearch}
                 searchPlaceholder={t('search_shop_placeholder')}
-                className="shadow-lg hover:shadow-xl transition-shadow"
+                className="shadow-lg hover:shadow-xl transition-shadow dark:border-[#162a3d] dark:bg-[#0b1622] dark:shadow-2xl"
                 actions={
                     <button
                         type="button"
                         onClick={() => navigate('/dashboard')}
-                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-emerald-500/40 dark:bg-emerald-500/5 dark:text-emerald-400 dark:hover:bg-emerald-500/15 dark:hover:text-emerald-300"
                     >
                         <IconArrowRight className="w-4 h-4 rtl:rotate-180" />
                         {t('back_to_dashboard')}

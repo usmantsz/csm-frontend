@@ -294,7 +294,7 @@ const PosPayments = () => {
 
                 <Link
                     to="/pos-shop-management"
-                            className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-emerald-600 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-600 hover:text-white dark:border-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 dark:hover:bg-emerald-700 dark:hover:text-white"
                 >
                     <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
                     {t('back_to_pos_shop_management')}
@@ -311,7 +311,7 @@ const PosPayments = () => {
                     <div className="panel bg-white dark:bg-[#0e1726] p-5 sm:p-6 rounded-2xl border border-gray-300 dark:border-white/10 shadow-md">
                         <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
                             <div className="flex items-center gap-3">
-                                <span className="flex h-9 shadow-lg shadow-gray-600/40 w-9 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 shrink-0">
+                                <span className="flex h-9 w-9 shadow-lg shadow-gray-600/40 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 shrink-0">
                                     <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 100-8 4 4 0 000 8zm6 3v-2a4 4 0 00-3-3.87M7 10a4 4 0 108 0 4 4 0 00-8 0z" />
                                     </svg>
@@ -357,7 +357,7 @@ const PosPayments = () => {
                     <div className="panel bg-white dark:bg-[#0e1726] p-5 sm:p-6 rounded-2xl border border-gray-300 dark:border-white/10 shadow-md">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5">
                             <div className="flex items-center gap-3">
-                                <span className="flex shadow-lg shadow-gray-600/40 h-9 w-9 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 shrink-0">
+                                <span className="flex h-9 w-9 shadow-lg shadow-gray-600/40 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 shrink-0">
                                     <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                                     </svg>

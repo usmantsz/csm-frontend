@@ -306,7 +306,7 @@ const DanaMandiCustomerList = () => {
   }, [search, initialRecords, page, pageSize]);
 
   return (
-    <div>
+    <div className="bg-[#070f1a] min-h-full -m-5 p-5">
       {/* Back button - top right, outside card */}
       <div className="flex justify-end mb-4">
         <button
@@ -316,21 +316,26 @@ const DanaMandiCustomerList = () => {
               userId && cropId ? `/cropmenu/${userId}/${cropId}` : '/getassginshopcrops'
             )
           }
-                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+          className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-950/30 hover:bg-emerald-900/40 px-4 py-2 text-xs font-semibold tracking-wide text-emerald-400 hover:text-emerald-300 transition-all shadow-sm"
         >
-          <span>←</span> {t('back_to_crop_menu')}
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          {t('back_to_crop_menu')}
         </button>
       </div>
 
       {/* Admin View Badge */}
       {(isAdminViewing || (isAdmin && isViewingAsAdmin)) && (
         <div className="mb-4">
-          <div className="panel bg-warning-100 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-lg px-4 py-2 flex items-center gap-3">
-            <span className="badge badge-lg bg-warning text-white">👑 {t('admin_view')}</span>
-            <span className="text-sm text-warning-700 dark:text-warning-300">{t('viewing_customers_as_admin')}</span>
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-2 flex items-center gap-3">
+            <span className="inline-flex items-center rounded-full bg-amber-500/20 border border-amber-500/40 px-3 py-1 text-xs font-semibold text-amber-300">
+              👑 {t('admin_view')}
+            </span>
+            <span className="text-sm text-amber-300/90">{t('viewing_customers_as_admin')}</span>
             <button
               onClick={() => navigate(shopId ? `/shop/view/${shopId}` : '/shop')}
-              className="btn btn-sm btn-outline-warning ltr:ml-auto rtl:mr-auto"
+              className="inline-flex items-center gap-1.5 rounded-md border border-amber-500/40 bg-amber-950/30 px-2.5 py-1 text-xs font-medium text-amber-300 hover:bg-amber-500 hover:text-slate-950 transition-all ltr:ml-auto rtl:mr-auto"
             >
               <IconArrowLeft className="w-4 h-4 mr-1" />
               {t('back_to_shop_view')}
@@ -339,37 +344,44 @@ const DanaMandiCustomerList = () => {
         </div>
       )}
 
-      <div className="panel mt-6 shadow-md dark:shadow-none">
+      {/* Main Card */}
+      <div className="bg-[#0b1725] border border-slate-800 rounded-xl overflow-hidden shadow-xl shadow-black/40">
         {/* Shop Info Section */}
         {shopInfo && (
-          <div className="mb-5 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow flex gap-8">
-            <p>
-              <strong>{t('crop')}:</strong> {shopInfo.cropName}
+          <div className="mx-6 mt-6 mb-1 bg-[#081320] border border-slate-800 p-4 rounded-lg flex flex-wrap gap-8">
+            <p className="text-slate-300 text-sm">
+              <strong className="text-slate-100">{t('crop')}:</strong> {shopInfo.cropName}
             </p>
-            <p>
-              <strong>{t('shop')}:</strong> {shopInfo.shopName}
+            <p className="text-slate-300 text-sm">
+              <strong className="text-slate-100">{t('shop')}:</strong> {shopInfo.shopName}
             </p>
-            <p>
-              <strong>{t('reg_number')}:</strong> {shopInfo.shopRegistrationNumber}
+            <p className="text-slate-300 text-sm">
+              <strong className="text-slate-100">{t('reg_number')}:</strong> {shopInfo.shopRegistrationNumber}
             </p>
           </div>
         )}
 
-        <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
+        {/* Card Header: Title + Search */}
+        <div className="px-6 py-4 border-b border-slate-800/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <h5 className="font-semibold text-lg dark:text-white-light">
+            <h5 className="text-base font-semibold text-slate-100 tracking-tight">
               {isSabziMandi ? t('sabzi_mandi_customers_list') : t('dana_mandi_customers_list')}
             </h5>
             {(isAdminViewing || (isAdmin && isViewingAsAdmin)) && (
-              <span className="badge badge-outline-primary">
+              <span className="inline-flex items-center rounded-full border border-emerald-500/40 bg-emerald-950/30 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">
                 {t('admin_view')}
               </span>
             )}
           </div>
-          <div className="ltr:ml-auto rtl:mr-auto flex gap-3">
+          <div className="relative w-full sm:w-64 md:w-72">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
             <input
               type="text"
-              className="form-input w-auto"
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-[#070e17] border border-slate-700/80 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
               placeholder={t('search_by_cnic_phone_placeholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -378,37 +390,53 @@ const DanaMandiCustomerList = () => {
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center items-center h-20">
-            <span className="animate-[spin_2s_linear_infinite] border-8 border-[#f1f2f3] border-l-primary border-r-primary rounded-full w-14 h-14 inline-block align-middle m-auto mb-10"></span>
+          <div className="flex justify-center items-center h-20 py-10">
+            <span className="animate-[spin_2s_linear_infinite] border-8 border-slate-800 border-l-emerald-500 border-r-emerald-500 rounded-full w-14 h-14 inline-block align-middle m-auto"></span>
           </div>
         ) : (
-          <div className="datatables">
+          <div className="datatables px-4 pb-3 [&_.mantine-datatable-footer]:px-2 [&_.mantine-datatable-footer]:mt-2">
             <DataTable
               highlightOnHover
-              className="whitespace-nowrap table-hover"
+              className="whitespace-nowrap table-hover !bg-transparent !text-slate-200
+                [&_table]:!bg-transparent
+                [&_thead]:!bg-[#081320]
+                [&_thead_th]:!text-slate-400 [&_thead_th]:!text-[11px] [&_thead_th]:!font-semibold [&_thead_th]:!uppercase [&_thead_th]:!tracking-wider [&_thead_th]:!border-slate-800
+                [&_tbody_tr]:!border-slate-800/70 [&_tbody_tr]:!bg-transparent
+                [&_tbody_tr:hover]:!bg-slate-800/40
+                [&_.mantine-Pagination-root]:!text-slate-400
+                [&_select]:!bg-[#070e17] [&_select]:!border-slate-700/80 [&_select]:!text-slate-300"
               records={recordsData}
               columns={[
                 {
                   accessor: "name",
                   title: t('name'),
-                  render: (customer) =>
-                    `${customer.cusNameF} ${customer.cusNameL}`,
+                  render: (customer) => (
+                    <span className="text-slate-300">{`${customer.cusNameF} ${customer.cusNameL}`}</span>
+                  ),
                 },
-                { accessor: "cusCNIC", title: t('cnic') },
-                { accessor: "cusNumber", title: t('phone') },
+                {
+                  accessor: "cusCNIC",
+                  title: t('cnic'),
+                  render: (customer) => <span className="text-slate-300">{customer.cusCNIC}</span>,
+                },
+                {
+                  accessor: "cusNumber",
+                  title: t('phone'),
+                  render: (customer) => <span className="text-slate-300">{customer.cusNumber}</span>,
+                },
                 {
                   accessor: "action",
                   title: t('action'),
                   render: (customer) => (
                     <button
-                      className="text-blue-500 hover:text-blue-700"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/40 bg-emerald-950/30 px-2.5 py-1 text-xs font-medium text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition-all"
                       onClick={() =>
                         navigate(
                           `/scrop-customer-list/${shopId}/${cropId}/${customer._id}`
                         )
                       }
                     >
-                      <FaEye />
+                      <FaEye className="w-3.5 h-3.5" />
                     </button>
                   ),
                 },

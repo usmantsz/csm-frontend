@@ -59,6 +59,26 @@ function extractDisplayName(raw: Record<string, any> | null | undefined): string
     return (single || '').trim();
 }
 
+// Route groups for each dropdown menu — used so the parent button stays
+// highlighted green whenever the active page is one of its children, even
+// after the dropdown itself has been collapsed again.
+const MENU_ROUTES: Record<string, string[]> = {
+    team: ['/admin/team', '/admin/team/add'],
+    employees: ['/shopowner', '/creatshopowner'],
+    subscriptions: ['/subcriptions', '/addsubcription', '/SubcriptionHistory'],
+    support: ['/support/new', '/support', '/support/all'],
+    pesticidePos: [
+        '/pesticide-pos/register',
+        '/pesticide-pos/subscriptions',
+        '/pesticide-pos/subscription-history',
+        '/pesticide-pos/owners',
+        '/pesticide-pos/shops',
+    ],
+    crops: ['/viewcrops', '/addnewcrop'],
+    customers: ['/customerlist', '/addnewcustomer', '/customerbalance'],
+    finance: ['/finance', '/expense-management'],
+};
+
 const Sidebar = () => {
     const [currentMenu, setCurrentMenu] = useState<string>('');
     const [errorSubMenu, setErrorSubMenu] = useState(false);
@@ -129,6 +149,14 @@ const Sidebar = () => {
         });
     };
 
+    // A dropdown's parent button should stay highlighted whenever the
+    // currently open route belongs to it — not just while it's expanded.
+    const isMenuActive = (key: string) => {
+        if (currentMenu === key) return true;
+        const paths = MENU_ROUTES[key] || [];
+        return paths.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
+    };
+
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
         if (selector) {
@@ -153,22 +181,23 @@ const Sidebar = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location]);
 
-    // ---- Green active/hover helpers (arbitrary hex so it doesn't depend on
-    // the project's tailwind.config.js color tokens) ----
-    const activeBtnClass = (isOn: boolean) => (isOn ? '!bg-[#16a34a] !text-white cs-active' : '');
+    // ---- Green active/hover helpers ----
+    // Uses the exact same hex values as Header.tsx's ".cs-icon-btn" /
+    // ".dropdown:focus-within" active state (#16a34a light / #10b981 dark),
+    // instead of Tailwind's named "emerald-500" token, so the sidebar's
+    // selected-button color is guaranteed to match the header pixel-for-pixel
+    // regardless of how the project's Tailwind color palette is configured.
+    const activeBtnClass = (isOn: boolean) => (isOn ? '!bg-[#16a34a] dark:!bg-[#10b981] !text-white cs-active' : '');
     const activeIconClass = (isOn: boolean) =>
         isOn
             ? '!text-white'
-            : '!text-[#506690] dark:!text-white-dark group-hover:!text-[#16a34a]';
+            : '!text-[#506690] dark:!text-slate-400 group-hover:!text-[#16a34a] dark:group-hover:!text-emerald-400';
     const activeLabelClass = (isOn: boolean) =>
-        isOn ? '!text-white' : 'text-black dark:text-[#506690] dark:group-hover:text-white-dark';
+        isOn ? '!text-white' : 'text-black dark:text-slate-300 dark:group-hover:text-white';
 
     return (
         <div className={semidark ? 'dark' : ''}>
-            {/* Scoped override — guaranteed to win over any conflicting global CSS
-                (width/display/colors) because it's a more specific selector with
-                !important, rendered after the app's global stylesheet. */}
-   <style>{`
+            <style>{`
     .sidebar {
         container-type: inline-size !important;
         container-name: cs-sidebar !important;
@@ -222,6 +251,12 @@ const Sidebar = () => {
         outline: 1px solid #16a34a !important;
         box-shadow: 0 10px 20px 0 rgba(22, 163, 74, 0.35) !important;
     }
+    .dark .cs-sidebar-nav .nav-link.cs-active {
+        background-color: #10b981 !important;
+        border: 1px solid #10b981 !important;
+        outline: 1px solid #10b981 !important;
+        box-shadow: 0 10px 20px 0 rgba(16, 185, 129, 0.3) !important;
+    }
     .cs-sidebar-nav .nav-link.cs-active,
     .cs-sidebar-nav .nav-link.cs-active span,
     .cs-sidebar-nav .nav-link.cs-active svg {
@@ -231,25 +266,31 @@ const Sidebar = () => {
         overflow: hidden !important;
     }
 
-    /* ---- Sub-menu (dropdown) link active/click state ----
-       Previously these links only had "text-gray-500" with no explicit
-       active-state color, so in dark mode the text stayed gray even after
-       being clicked/selected. Now: green in light mode, white in dark mode. */
-    .sidebar .sub-menu li a.active,
-    .dark .sidebar .sub-menu li a.active {
+    .dark .sidebar .cs-sidebar-nav .nav-link:hover {
+        background-color: #0c1a28 !important;
+    }
+    .dark .sidebar .sub-menu {
+        border-left: 1px solid #162b3d !important;
+    }
+
+    .sidebar .sub-menu li a.active {
         color: #16a34a !important;
         font-weight: 600 !important;
     }
-    .sidebar .sub-menu li a:hover,
-    .dark .sidebar .sub-menu li a:hover {
+    .dark .sidebar .sub-menu li a.active {
+        color: #34d399 !important;
+        font-weight: 600 !important;
+    }
+    .sidebar .sub-menu li a:hover {
         color: #16a34a !important;
     }
+    .dark .sidebar .sub-menu li a:hover {
+        color: #34d399 !important;
+    }
+    .dark .sidebar .sub-menu li a {
+        color: #94a3b8 !important;
+    }
 
-    /* ---- Dropdown TOGGLE buttons (Shop Owners, Team, Finance, Support, etc.) ----
-       These get a plain "active" class (not just "cs-active") when their
-       dropdown is open. Some global/template CSS was winning over our
-       Tailwind !text-white on this specific class, so force it here with
-       higher specificity for both light and dark mode. */
     .sidebar .cs-sidebar-nav .nav-link.active,
     .sidebar .cs-sidebar-nav .nav-link.active span,
     .sidebar .cs-sidebar-nav .nav-link.active svg,
@@ -261,10 +302,6 @@ const Sidebar = () => {
         color: #ffffff !important;
     }
 
-    /* ---- Dashboard link is NOT a dropdown toggle, so it must never pick up
-       the generic ".nav-link.active" white-text rule above. Force it black
-       in light mode / theme-dark text in dark mode, always, with higher
-       specificity than the rule above. ---- */
     .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link,
     .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link span,
     .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.active,
@@ -275,9 +312,8 @@ const Sidebar = () => {
     .dark .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link span,
     .dark .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.active,
     .dark .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.active span {
-        color: #e0e6ed !important;
+        color: #cbd5e1 !important;
     }
-    /* But when Dashboard route itself is actually active (green pill / cs-active), text should be white */
     .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.cs-active,
     .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.cs-active span,
     .dark .sidebar .cs-sidebar-nav a[href="/dashboard"] .nav-link.cs-active,
@@ -285,7 +321,32 @@ const Sidebar = () => {
         color: #ffffff !important;
     }
 
-    /* ---- Collapsed sidebar state: icons centered, equal green padding both sides ---- */
+    .sidebar .collapse-icon:hover {
+        background-color: rgba(22, 163, 74, 0.08) !important;
+        color: #16a34a !important;
+    }
+    .dark .sidebar .collapse-icon:hover {
+        background-color: #0c1a28 !important;
+        color: #34d399 !important;
+    }
+
+    .sidebar .collapse-icon:active {
+        background-color: #16a34a !important;
+        color: #ffffff !important;
+        box-shadow: 0 10px 20px 0 rgba(22, 163, 74, 0.35) !important;
+    }
+    .sidebar .collapse-icon:active svg {
+        color: #ffffff !important;
+    }
+    .dark .sidebar .collapse-icon:active {
+        background-color: #10b981 !important;
+        color: #ffffff !important;
+        box-shadow: 0 10px 20px 0 rgba(16, 185, 129, 0.3) !important;
+    }
+    .dark .sidebar .collapse-icon:active svg {
+        color: #ffffff !important;
+    }
+
     @container cs-sidebar (max-width: 100px) {
         .cs-sidebar-nav {
             padding-left: 0.5rem !important;
@@ -319,20 +380,20 @@ const Sidebar = () => {
     }
 `}</style>
             <nav
-                className={`sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-50 transition-all duration-300 ${semidark ? 'text-white-dark' : ''}`}
+                className={`sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] dark:shadow-[5px_0_25px_0_rgba(0,0,0,0.4)] z-50 transition-all duration-300 ${semidark ? 'text-white-dark' : ''}`}
             >
-                <div className="bg-white dark:bg-black h-full">
-                    <div className="flex justify-between items-center  py-3">
-                        <div className="main-logo flex items-center shrink-0 gap-2">
+                <div className="bg-white dark:bg-[#07111b] dark:border-r dark:border-[#162b3d] h-full">
+                    <div className="flex justify-between items-center py-3 dark:border-b dark:border-[#162b3d]/60">
+                        <div className="main-logo flex items-center shrink-0 gap-2 px-1">
                             <img src="/assets/images/commission-shop-logo.png" alt="Commission Shop" className="h-14 w-14 object-contain flex-none rounded-lg" />
-                            <span className="text-xl ltr:ml-1 rtl:mr-1 font-bold align-middle lg:inline dark:text-white-light text-[#15803d] dark:text-[#4ade80] truncate max-w-[150px]">
+                            <span className="text-xl ltr:ml-1 rtl:mr-1 font-bold align-middle lg:inline text-[#15803d] dark:text-emerald-400 truncate max-w-[150px]">
                                 {userName || t('app_name')}
                             </span>
                         </div>
 
                         <button
                             type="button"
-                            className="collapse-icon w-8 h-8 rounded-full flex items-center hover:bg-gray-500/10 dark:hover:bg-dark-light/10 dark:text-white-light transition duration-300 rtl:rotate-180"
+                            className="collapse-icon w-8 h-8 rounded-full flex items-center dark:text-slate-400 transition duration-300 rtl:rotate-180"
                             onClick={() => dispatch(toggleSidebar())}
                         >
                             <IconCaretsDown className="m-auto rotate-90" />
@@ -353,7 +414,6 @@ const Sidebar = () => {
                                 </NavLink>
                             </li>
 
-                            {/* Team Member (2, 3): only permitted sections – Shops, Team, Shop Owners, Subscriptions, Support */}
                             {isTeamMember && (
                                 <>
                                     {canViewShops && (
@@ -372,12 +432,12 @@ const Sidebar = () => {
                                     )}
                                     {canViewTeam && (
                                         <li className="menu nav-item">
-                                            <button type="button" className={`${currentMenu === 'team' ? 'active' : ''} ${activeBtnClass(currentMenu === 'team')} nav-link group !flex !w-full`} onClick={() => toggleMenu('team')}>
+                                            <button type="button" className={`${currentMenu === 'team' ? 'active' : ''} ${activeBtnClass(isMenuActive('team'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('team')}>
                                                 <div className="flex items-center">
-                                                    <IconMenuUsers className={`${activeIconClass(currentMenu === 'team')} shrink-0`} />
-                                                    <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'team')}`}>{t('team')}</span>
+                                                    <IconMenuUsers className={`${activeIconClass(isMenuActive('team'))} shrink-0`} />
+                                                    <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('team'))}`}>{t('team')}</span>
                                                 </div>
-                                                <div className={`cs-caret ${currentMenu !== 'team' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'team' ? '!text-white' : ''}`}>
+                                                <div className={`cs-caret ${currentMenu !== 'team' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('team') ? '!text-white' : ''}`}>
                                                     <IconCaretDown />
                                                 </div>
                                             </button>
@@ -391,12 +451,12 @@ const Sidebar = () => {
                                     )}
                                     {canViewShopOwners && (
                                         <li className="menu nav-item">
-                                            <button type="button" className={`${currentMenu === 'employees' ? 'active' : ''} ${activeBtnClass(currentMenu === 'employees')} nav-link group !flex !w-full`} onClick={() => toggleMenu('employees')}>
+                                            <button type="button" className={`${currentMenu === 'employees' ? 'active' : ''} ${activeBtnClass(isMenuActive('employees'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('employees')}>
                                                 <div className="flex items-center">
-                                                    <IconMenuUsers className={`${activeIconClass(currentMenu === 'employees')} shrink-0`} />
-                                                    <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'employees')}`}>{t('shop_owners')}</span>
+                                                    <IconMenuUsers className={`${activeIconClass(isMenuActive('employees'))} shrink-0`} />
+                                                    <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('employees'))}`}>{t('shop_owners')}</span>
                                                 </div>
-                                                <div className={`cs-caret ${currentMenu !== 'employees' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'employees' ? '!text-white' : ''}`}>
+                                                <div className={`cs-caret ${currentMenu !== 'employees' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('employees') ? '!text-white' : ''}`}>
                                                     <IconCaretDown />
                                                 </div>
                                             </button>
@@ -410,12 +470,12 @@ const Sidebar = () => {
                                     )}
                                     {canManageSubscriptions && (
                                         <li className="menu nav-item">
-                                            <button type="button" className={`${currentMenu === 'subscriptions' ? 'active' : ''} ${activeBtnClass(currentMenu === 'subscriptions')} nav-link group !flex !w-full`} onClick={() => toggleMenu('subscriptions')}>
+                                            <button type="button" className={`${currentMenu === 'subscriptions' ? 'active' : ''} ${activeBtnClass(isMenuActive('subscriptions'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('subscriptions')}>
                                                 <div className="flex items-center">
-                                                    <IconMenuInvoice className={`${activeIconClass(currentMenu === 'subscriptions')} shrink-0`} />
-                                                    <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'subscriptions')}`}>{t('subscriptions')}</span>
+                                                    <IconMenuInvoice className={`${activeIconClass(isMenuActive('subscriptions'))} shrink-0`} />
+                                                    <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('subscriptions'))}`}>{t('subscriptions')}</span>
                                                 </div>
-                                                <div className={`cs-caret ${currentMenu !== 'subscriptions' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'subscriptions' ? '!text-white' : ''}`}>
+                                                <div className={`cs-caret ${currentMenu !== 'subscriptions' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('subscriptions') ? '!text-white' : ''}`}>
                                                     <IconCaretDown />
                                                 </div>
                                             </button>
@@ -430,12 +490,12 @@ const Sidebar = () => {
                                     )}
                                     {canViewTickets && (
                                         <li className="menu nav-item">
-                                            <button type="button" className={`${currentMenu === 'support' ? 'active' : ''} ${activeBtnClass(currentMenu === 'support')} nav-link group !flex !w-full`} onClick={() => toggleMenu('support')}>
+                                            <button type="button" className={`${currentMenu === 'support' ? 'active' : ''} ${activeBtnClass(isMenuActive('support'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('support')}>
                                                 <div className="flex items-center">
-                                                    <IconMenuChat className={`${activeIconClass(currentMenu === 'support')} shrink-0`} />
-                                                    <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'support')}`}>{t('support')}</span>
+                                                    <IconMenuChat className={`${activeIconClass(isMenuActive('support'))} shrink-0`} />
+                                                    <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('support'))}`}>{t('support')}</span>
                                                 </div>
-                                                <div className={`cs-caret ${currentMenu !== 'support' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'support' ? '!text-white' : ''}`}>
+                                                <div className={`cs-caret ${currentMenu !== 'support' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('support') ? '!text-white' : ''}`}>
                                                     <IconCaretDown />
                                                 </div>
                                             </button>
@@ -451,7 +511,6 @@ const Sidebar = () => {
                                 </>
                             )}
 
-                            {/* Super Admin (0) only: Shops, Shop Owners, Subscriptions, Crops, Team – not for Shop Owner */}
                             {!isTeamMember && isSuperAdminOnly && (
                                 <>
                                     <li className="menu nav-item">
@@ -467,12 +526,12 @@ const Sidebar = () => {
                                         </NavLink>
                                     </li>
                                     <li className="menu nav-item">
-                                        <button type="button" className={`${currentMenu === 'employees' ? 'active' : ''} ${activeBtnClass(currentMenu === 'employees')} nav-link group !flex !w-full`} onClick={() => toggleMenu('employees')}>
+                                        <button type="button" className={`${currentMenu === 'employees' ? 'active' : ''} ${activeBtnClass(isMenuActive('employees'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('employees')}>
                                             <div className="flex items-center">
-                                                <IconMenuUsers className={`${activeIconClass(currentMenu === 'employees')} shrink-0`} />
-                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'employees')}`}>{t('shop_owners')}</span>
+                                                <IconMenuUsers className={`${activeIconClass(isMenuActive('employees'))} shrink-0`} />
+                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('employees'))}`}>{t('shop_owners')}</span>
                                             </div>
-                                            <div className={`cs-caret ${currentMenu !== 'employees' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'employees' ? '!text-white' : ''}`}>
+                                            <div className={`cs-caret ${currentMenu !== 'employees' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('employees') ? '!text-white' : ''}`}>
                                                 <IconCaretDown />
                                             </div>
                                         </button>
@@ -484,12 +543,12 @@ const Sidebar = () => {
                                         </AnimateHeight>
                                     </li>
                                     <li className="menu nav-item">
-                                        <button type="button" className={`${currentMenu === 'subscriptions' ? 'active' : ''} ${activeBtnClass(currentMenu === 'subscriptions')} nav-link group !flex !w-full`} onClick={() => toggleMenu('subscriptions')}>
+                                        <button type="button" className={`${currentMenu === 'subscriptions' ? 'active' : ''} ${activeBtnClass(isMenuActive('subscriptions'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('subscriptions')}>
                                             <div className="flex items-center">
-                                                <IconMenuInvoice className={`${activeIconClass(currentMenu === 'subscriptions')} shrink-0`} />
-                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'subscriptions')}`}>{t('subscriptions')}</span>
+                                                <IconMenuInvoice className={`${activeIconClass(isMenuActive('subscriptions'))} shrink-0`} />
+                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('subscriptions'))}`}>{t('subscriptions')}</span>
                                             </div>
-                                            <div className={`cs-caret ${currentMenu !== 'subscriptions' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'subscriptions' ? '!text-white' : ''}`}>
+                                            <div className={`cs-caret ${currentMenu !== 'subscriptions' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('subscriptions') ? '!text-white' : ''}`}>
                                                 <IconCaretDown />
                                             </div>
                                         </button>
@@ -502,12 +561,12 @@ const Sidebar = () => {
                                         </AnimateHeight>
                                     </li>
                                     <li className="menu nav-item">
-                                        <button type="button" className={`${currentMenu === 'pesticidePos' ? 'active' : ''} ${activeBtnClass(currentMenu === 'pesticidePos')} nav-link group !flex !w-full`} onClick={() => toggleMenu('pesticidePos')}>
+                                        <button type="button" className={`${currentMenu === 'pesticidePos' ? 'active' : ''} ${activeBtnClass(isMenuActive('pesticidePos'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('pesticidePos')}>
                                             <div className="flex items-center">
-                                                <IconMenuShop className={`${activeIconClass(currentMenu === 'pesticidePos')} shrink-0`} />
-                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'pesticidePos')}`}>{t('pesticide_pos')}</span>
+                                                <IconMenuShop className={`${activeIconClass(isMenuActive('pesticidePos'))} shrink-0`} />
+                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('pesticidePos'))}`}>{t('pesticide_pos')}</span>
                                             </div>
-                                            <div className={`cs-caret ${currentMenu !== 'pesticidePos' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'pesticidePos' ? '!text-white' : ''}`}>
+                                            <div className={`cs-caret ${currentMenu !== 'pesticidePos' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('pesticidePos') ? '!text-white' : ''}`}>
                                                 <IconCaretDown />
                                             </div>
                                         </button>
@@ -522,12 +581,12 @@ const Sidebar = () => {
                                         </AnimateHeight>
                                     </li>
                                     <li className="menu nav-item">
-                                        <button type="button" className={`${currentMenu === 'team' ? 'active' : ''} ${activeBtnClass(currentMenu === 'team')} nav-link group !flex !w-full`} onClick={() => toggleMenu('team')}>
+                                        <button type="button" className={`${currentMenu === 'team' ? 'active' : ''} ${activeBtnClass(isMenuActive('team'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('team')}>
                                             <div className="flex items-center">
-                                                <IconMenuUsers className={`${activeIconClass(currentMenu === 'team')} shrink-0`} />
-                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'team')}`}>{t('team')}</span>
+                                                <IconMenuUsers className={`${activeIconClass(isMenuActive('team'))} shrink-0`} />
+                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('team'))}`}>{t('team')}</span>
                                             </div>
-                                            <div className={`cs-caret ${currentMenu !== 'team' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'team' ? '!text-white' : ''}`}>
+                                            <div className={`cs-caret ${currentMenu !== 'team' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('team') ? '!text-white' : ''}`}>
                                                 <IconCaretDown />
                                             </div>
                                         </button>
@@ -539,12 +598,12 @@ const Sidebar = () => {
                                         </AnimateHeight>
                                     </li>
                                     <li className="menu nav-item">
-                                        <button type="button" className={`${currentMenu === 'crops' ? 'active' : ''} ${activeBtnClass(currentMenu === 'crops')} nav-link group !flex !w-full`} onClick={() => toggleMenu('crops')}>
+                                        <button type="button" className={`${currentMenu === 'crops' ? 'active' : ''} ${activeBtnClass(isMenuActive('crops'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('crops')}>
                                             <div className="flex items-center">
-                                                <IconMenuCalendar className={`${activeIconClass(currentMenu === 'crops')} shrink-0`} />
-                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'crops')}`}>{t('crops')}</span>
+                                                <IconMenuCalendar className={`${activeIconClass(isMenuActive('crops'))} shrink-0`} />
+                                                <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('crops'))}`}>{t('crops')}</span>
                                             </div>
-                                            <div className={`cs-caret ${currentMenu !== 'crops' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'crops' ? '!text-white' : ''}`}>
+                                            <div className={`cs-caret ${currentMenu !== 'crops' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('crops') ? '!text-white' : ''}`}>
                                                 <IconCaretDown />
                                             </div>
                                         </button>
@@ -558,7 +617,6 @@ const Sidebar = () => {
                                 </>
                             )}
 
-                            {/* Shop owner only: My Crops (single link) */}
                             {userRole === '1' && (
                                 <li className="menu nav-item">
                                     <NavLink to="/getassginshopcrops">
@@ -574,7 +632,6 @@ const Sidebar = () => {
                                 </li>
                             )}
 
-                            {/* Shop owner only: POS Shop Management (connect with POS users) */}
                             {userRole === '1' && (
                                 <>
                                     <li className="menu nav-item">
@@ -604,15 +661,14 @@ const Sidebar = () => {
                                 </>
                             )}
 
-                            {/* Customers – Shop Owner ONLY (role '1'). Not shown for Admin, Team Member, or Customer portal. */}
                             {userRole === '1' && (
                             <li className="menu nav-item">
-                                <button type="button" className={`${currentMenu === 'customers' ? 'active' : ''} ${activeBtnClass(currentMenu === 'customers')} nav-link group !flex !w-full`} onClick={() => toggleMenu('customers')}>
+                                <button type="button" className={`${currentMenu === 'customers' ? 'active' : ''} ${activeBtnClass(isMenuActive('customers'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('customers')}>
                                     <div className="flex items-center">
-                                        <IconMenuUsers className={`${activeIconClass(currentMenu === 'customers')} shrink-0`} />
-                                        <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'customers')}`}>{t('customers')}</span>
+                                        <IconMenuUsers className={`${activeIconClass(isMenuActive('customers'))} shrink-0`} />
+                                        <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('customers'))}`}>{t('customers')}</span>
                                     </div>
-                                    <div className={`cs-caret ${currentMenu !== 'customers' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'customers' ? '!text-white' : ''}`}>
+                                    <div className={`cs-caret ${currentMenu !== 'customers' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('customers') ? '!text-white' : ''}`}>
                                         <IconCaretDown />
                                     </div>
                                 </button>
@@ -632,15 +688,14 @@ const Sidebar = () => {
                             </li>
                             )}
 
-                            {/* Finance – Shop Owner (role '1'): dropdown with Finance Overview + Shop Expenses. */}
                             {userRole === '1' && (
                             <li className="menu nav-item">
-                                <button type="button" className={`${currentMenu === 'finance' ? 'active' : ''} ${activeBtnClass(currentMenu === 'finance')} nav-link group !flex !w-full`} onClick={() => toggleMenu('finance')}>
+                                <button type="button" className={`${currentMenu === 'finance' ? 'active' : ''} ${activeBtnClass(isMenuActive('finance'))} nav-link group !flex !w-full`} onClick={() => toggleMenu('finance')}>
                                     <div className="flex items-center">
-                                        <IconMenuInvoice className={`${activeIconClass(currentMenu === 'finance')} shrink-0`} />
-                                        <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(currentMenu === 'finance')}`}>{t('finance')}</span>
+                                        <IconMenuInvoice className={`${activeIconClass(isMenuActive('finance'))} shrink-0`} />
+                                        <span className={`ltr:pl-3 rtl:pr-3 truncate ${activeLabelClass(isMenuActive('finance'))}`}>{t('finance')}</span>
                                     </div>
-                                    <div className={`cs-caret ${currentMenu !== 'finance' ? 'rtl:rotate-90 -rotate-90' : ''} ${currentMenu === 'finance' ? '!text-white' : ''}`}>
+                                    <div className={`cs-caret ${currentMenu !== 'finance' ? 'rtl:rotate-90 -rotate-90' : ''} ${isMenuActive('finance') ? '!text-white' : ''}`}>
                                         <IconCaretDown />
                                     </div>
                                 </button>
@@ -657,8 +712,6 @@ const Sidebar = () => {
                             </li>
                             )}
 
-                            {/* Finance – Customer portal: only Finance Overview exists, so a simple
-                                direct link (no dropdown/caret) instead of a single-item submenu. */}
                             {!isTeamMember && userRole !== '0' && userRole !== '1' && (
                             <li className="menu nav-item">
                                 <NavLink to="/finance">
@@ -674,7 +727,6 @@ const Sidebar = () => {
                             </li>
                             )}
 
-                            {/* Apps, UI, Tables, Forms, Users, Pages, Authentication, Documentation – hidden */}
                         </ul>
                     </PerfectScrollbar>
                 </div>

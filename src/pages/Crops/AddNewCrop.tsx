@@ -5,20 +5,17 @@ import { useNavigate } from "react-router-dom";
 import { ServerSetting } from './../../helperComponents/ServerSetting';
 import { Notification } from './../../helperComponents/Notification';
 import { useAuthToken } from './../../Hooks/useAuthToken';
-import IconArrowLeft from '../../components/Icon/IconArrowLeft';
 import { CROP_TYPE_SELECT_OPTIONS } from '../../constants/cropTypes';
 import IconArrowRight from "../../components/Icon/IconArrowRight";
 
 const card =
-    'rounded-[2rem] border border-white-light bg-white/95 p-6 shadow-sm transition-shadow hover:shadow-md dark:border-white/10 dark:bg-[#0b1526]/85';
-const iconBadge =
-    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary dark:bg-primary/20';
+    'rounded-2xl border border-white-light bg-white/95 p-6 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800/80 dark:bg-[#0b1724]/90 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.65)] dark:backdrop-blur-xl relative dark:overflow-hidden';
 const inputBase =
-    'form-input w-full rounded-2xl border bg-white/80 px-4 py-2.5 text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 dark:bg-white/5 dark:text-white';
-const inputOk = 'border-gray-300 focus:border-primary dark:border-white/10 dark:focus:border-primary';
+    'form-input w-full rounded-2xl border bg-white/80 px-4 py-2.5 text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 dark:bg-[#07121c] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:ring-2 dark:focus:ring-emerald-500 dark:focus:border-emerald-500';
+const inputOk = 'border-gray-300 focus:border-primary dark:border-slate-800';
 const inputError = 'border-red-400 focus:border-red-500 dark:border-red-500/70';
-const labelCls = 'mb-1.5 text-sm font-semibold text-gray-700 dark:text-gray-200';
-const errorCls = 'mt-1 block text-sm text-red-500';
+const labelCls = 'mb-1.5 text-sm font-semibold text-gray-700 dark:text-slate-300 dark:uppercase dark:tracking-wider dark:text-xs';
+const errorCls = 'mt-1 block text-sm text-red-500 dark:text-red-400';
 
 interface FormData {
     cropName: string;
@@ -64,7 +61,6 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
     const [isDragging, setIsDragging] = useState(false);
     const dragRef = useRef({ startX: 0, startY: 0, startPosX: 0, startPosY: 0 });
 
-    // baseScale = the scale at which the image fully COVERS the crop viewport (zoom = 1 reference point)
     const baseScale = useMemo(() => {
         if (!naturalSize.width || !naturalSize.height) return 1;
         return Math.max(CROP_SIZE / naturalSize.width, CROP_SIZE / naturalSize.height);
@@ -72,9 +68,6 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
 
     const scale = baseScale * zoom;
 
-    // Clamps drag position. When the image is LARGER than the viewport it behaves as before
-    // (can't reveal empty edges). When the image is SMALLER than the viewport (minimized/zoomed out),
-    // it gets centered instead of being pinned to a corner.
     const clampPosition = (pos: { x: number; y: number }, currentScale: number) => {
         const displayedWidth = naturalSize.width * currentScale;
         const displayedHeight = naturalSize.height * currentScale;
@@ -134,7 +127,6 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
     const handleConfirm = () => {
         if (!naturalSize.width || !naturalSize.height || !imgRef.current) return;
 
-        // Source rectangle (in ORIGINAL image pixel coordinates) that corresponds to the crop viewport
         const cropX = -position.x / scale;
         const cropY = -position.y / scale;
         const cropSizeOnImage = CROP_SIZE / scale;
@@ -145,12 +137,9 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Fill background first (matters when image is minimized and doesn't cover the whole crop area)
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
-        // Clip the source rect against the actual image bounds so we never pass
-        // negative/oversized values into drawImage (which breaks on some browsers).
         const sxClipped = Math.max(cropX, 0);
         const syClipped = Math.max(cropY, 0);
         const sxEnd = Math.min(cropX + cropSizeOnImage, naturalSize.width);
@@ -179,13 +168,13 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4">
-            <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-[#ebedf2] dark:border-[#191e3a] shadow-xl p-5 sm:p-6">
+            <div className="w-full max-w-sm bg-white dark:bg-[#0b1724] rounded-2xl border border-[#ebedf2] dark:border-slate-800/80 shadow-xl dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.65)] p-5 sm:p-6">
                 <h5 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">
                     {title || t('crop_image')}
                 </h5>
 
                 <div
-                    className="relative mx-auto overflow-hidden bg-gray-100 dark:bg-white/5 select-none touch-none"
+                    className="relative mx-auto overflow-hidden bg-gray-100 dark:bg-[#07121c] select-none touch-none"
                     style={{
                         width: CROP_SIZE,
                         height: CROP_SIZE,
@@ -215,11 +204,11 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
                             maxWidth: 'none',
                         }}
                     />
-                    {!round && <div className="pointer-events-none absolute inset-0 border-2 border-white/70 rounded-xl" />}
+                    {!round && <div className="pointer-events-none absolute inset-0 border-2 border-white/70 dark:border-emerald-500/40 rounded-xl" />}
                 </div>
 
                 <div className="flex items-center gap-3 mt-4">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">−</span>
+                    <span className="text-xs text-gray-500 dark:text-slate-400">−</span>
                     <input
                         type="range"
                         min={MIN_ZOOM}
@@ -227,22 +216,22 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
                         step={0.01}
                         value={zoom}
                         onChange={(e) => handleZoomChange(parseFloat(e.target.value))}
-                        className="w-full accent-green-600"
+                        className="w-full accent-green-600 dark:accent-emerald-500"
                     />
-                    <span className="text-xs text-gray-500 dark:text-gray-400">+</span>
+                    <span className="text-xs text-gray-500 dark:text-slate-400">+</span>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
+                <p className="text-xs text-gray-500 dark:text-slate-400 text-center mt-1">
                     {t('drag_to_reposition_zoom_to_resize')}
                 </p>
 
                 <div className="flex gap-2 mt-6 justify-end">
-                    <button type="button" onClick={onCancel} className="btn btn-outline-secondary rounded-xl flex-1 sm:flex-none">
+                    <button type="button" onClick={onCancel} className="btn btn-outline-secondary rounded-xl flex-1 sm:flex-none dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/60">
                         {t('cancel')}
                     </button>
                     <button
                         type="button"
                         onClick={handleConfirm}
-                        className="btn shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] rounded-xl flex-1 sm:flex-none"
+                        className="btn shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] rounded-xl flex-1 sm:flex-none dark:!bg-emerald-500 dark:!border-emerald-500 dark:hover:!bg-emerald-400 dark:!text-[#04090f] dark:shadow-[0_0_25px_-4px_rgba(16,185,129,0.35)]"
                     >
                         {t('save_crop')}
                     </button>
@@ -268,7 +257,6 @@ const AddNewCrop = () => {
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
 
-    // ---- Image crop state ----
     const [cropModal, setCropModal] = useState<{ open: boolean; imageSrc: string } | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -279,7 +267,6 @@ const AddNewCrop = () => {
         }));
     };
 
-    // Opens the crop modal instead of directly using the picked file.
     const handleImageChange = (e: any) => {
         const file = e.target.files[0];
         if (file) {
@@ -289,12 +276,11 @@ const AddNewCrop = () => {
             };
             reader.readAsDataURL(file);
         }
-        e.target.value = ''; // reset so re-selecting the same file re-triggers onChange
+        e.target.value = '';
     };
 
     const handleCropCancel = () => setCropModal(null);
 
-    // Runs after the user confirms the crop — the cropped blob becomes the crop image.
     const handleCropConfirm = (blob: Blob) => {
         setCropModal(null);
 
@@ -354,21 +340,25 @@ const AddNewCrop = () => {
     return (
         <div className="space-y-6">
             <div className="flex justify-end">
-            <button
-                type="button"
-                onClick={() => navigate('/viewcrops')}
-                className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
-            >
-                <IconArrowRight className="w-4 h-4 rtl:rotate-180"/>
-                {t('back_to_all_crops')}
-            </button>
+                <button
+                    type="button"
+                    onClick={() => navigate('/viewcrops')}
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 dark:hover:border-emerald-500/50"
+                >
+                    <IconArrowRight className="w-4 h-4 rtl:rotate-180" />
+                    {t('back_to_all_crops')}
+                </button>
             </div>
 
             <div className={`${card} mx-auto max-w-md`}>
-                <div className="space-y-5">
+                {/* Subtle top glow accent within card (dark mode only) */}
+                <div className="pointer-events-none absolute top-0 left-1/2 hidden h-[2px] w-3/4 -translate-x-1/2 bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent dark:block"></div>
+                <div className="relative z-10 space-y-5">
                     <div className="text-center">
-                        <h1 className="text-xl font-bold text-success sm:text-2xl">{t('add_new_crop_page')}</h1>
-                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t('add_new_crop_desc')}</p>
+                        <h1 className="text-xl font-bold text-success sm:text-2xl dark:text-white">
+                            {t('add_new_crop_page')}
+                        </h1>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{t('add_new_crop_desc')}</p>
                     </div>
 
                     {/* Crop Image */}
@@ -378,10 +368,10 @@ const AddNewCrop = () => {
                                 <img
                                     src={previewImage}
                                     alt="Crop Preview"
-                                    className="mx-auto h-28 w-28 rounded-full border-2 border-gray-300 object-cover shadow-sm transition-transform duration-300 group-hover:scale-105 dark:border-white/10 md:h-32 md:w-32"
+                                    className="mx-auto h-28 w-28 rounded-full border-2 border-gray-300 object-cover shadow-sm transition-transform duration-300 group-hover:scale-105 dark:border-emerald-500/40 dark:shadow-[0_0_25px_-4px_rgba(16,185,129,0.35)] md:h-32 md:w-32"
                                 />
                             ) : (
-                                <div className="mx-auto flex h-28 w-28 flex-col items-center justify-center gap-1 rounded-full border-2 border-dashed border-gray-300 bg-gray-100 text-xs font-medium text-gray-500 transition-colors group-hover:border-primary/50 dark:border-white/10 dark:bg-white/5 dark:text-gray-400 md:h-32 md:w-32">
+                                <div className="mx-auto flex h-28 w-28 flex-col items-center justify-center gap-1 rounded-full border-2 border-dashed border-gray-300 bg-gray-100 text-xs font-medium text-gray-500 transition-colors group-hover:border-primary/50 dark:border-emerald-500/40 dark:bg-[#07121c]/60 dark:text-slate-400 dark:group-hover:border-emerald-400 dark:group-hover:bg-emerald-950/20 md:h-32 md:w-32">
                                     <span className="text-2xl">🌾</span>
                                     {t('form_upload_image')}
                                 </div>
@@ -444,13 +434,13 @@ const AddNewCrop = () => {
                     <div className="pt-2 text-center">
                         <button
                             type="button"
-                            className={`flex w-full items-center justify-center gap-2 rounded-2xl bg-success px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-success/90 ${loading ? "cursor-not-allowed opacity-50" : ""
+                            className={`flex w-full items-center justify-center gap-2 rounded-2xl bg-success px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-success/90 dark:bg-emerald-500 dark:font-bold dark:tracking-wide dark:text-[#04090f] dark:shadow-[0_0_25px_-4px_rgba(16,185,129,0.35)] dark:hover:bg-emerald-400 dark:hover:shadow-[0_0_35px_-5px_rgba(16,185,129,0.45)] dark:active:scale-[0.99] ${loading ? "cursor-not-allowed opacity-50" : ""
                                 }`}
                             onClick={handleSubmit}
                             disabled={loading}
                         >
                             {loading && (
-                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white dark:border-[#04090f] border-t-transparent" />
                             )}
                             {loading ? t('btn_saving_crop') : t('btn_save_crop_details')}
                         </button>

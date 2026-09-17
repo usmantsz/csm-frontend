@@ -49,7 +49,6 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
     const [isDragging, setIsDragging] = useState(false);
     const dragRef = useRef({ startX: 0, startY: 0, startPosX: 0, startPosY: 0 });
 
-    // baseScale = the scale at which the image fully COVERS the crop viewport (zoom = 1 reference point)
     const baseScale = useMemo(() => {
         if (!naturalSize.width || !naturalSize.height) return 1;
         return Math.max(CROP_SIZE / naturalSize.width, CROP_SIZE / naturalSize.height);
@@ -57,9 +56,6 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
 
     const scale = baseScale * zoom;
 
-    // Clamps drag position. When the image is LARGER than the viewport it behaves as before
-    // (can't reveal empty edges). When the image is SMALLER than the viewport (minimized/zoomed out),
-    // it gets centered instead of being pinned to a corner.
     const clampPosition = (pos: { x: number; y: number }, currentScale: number) => {
         const displayedWidth = naturalSize.width * currentScale;
         const displayedHeight = naturalSize.height * currentScale;
@@ -119,7 +115,6 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
     const handleConfirm = () => {
         if (!naturalSize.width || !naturalSize.height || !imgRef.current) return;
 
-        // Source rectangle (in ORIGINAL image pixel coordinates) that corresponds to the crop viewport
         const cropX = -position.x / scale;
         const cropY = -position.y / scale;
         const cropSizeOnImage = CROP_SIZE / scale;
@@ -130,12 +125,9 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Fill background first (matters when image is minimized and doesn't cover the whole crop area)
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
-        // Clip the source rect against the actual image bounds so we never pass
-        // negative/oversized values into drawImage (which breaks on some browsers).
         const sxClipped = Math.max(cropX, 0);
         const syClipped = Math.max(cropY, 0);
         const sxEnd = Math.min(cropX + cropSizeOnImage, naturalSize.width);
@@ -310,21 +302,14 @@ const CreateUserShopOwner = () => {
     const [upload, setUpload] = useState(false)
     const [perImage, setPerImage] = useState('')
     const [perImageShop, setPerImageShop] = useState('')
-    // const [formData, setFormData] = useState(initialData);
-    // const [errors, setErrors] = useState(initail);
 
-    // ---- Image crop state (profile image + shop bill image) ----
     const [cropState, setCropState] = useState<{ open: boolean; imageSrc: string; target: 'profile' | 'shop' } | null>(null);
 
     function uploadFile() {
         setIsLoading(true)
-
-
-
     }
 
     useEffect(() => {
-        // API call to fetch subscription data
         axios
             .get(`${ServerSetting.serUrl}/api/viewsub`, {
                 headers: {
@@ -333,7 +318,7 @@ const CreateUserShopOwner = () => {
             })
             .then((response) => {
                 if (response.data.status === 200) {
-                    setSubscriptions(response.data.data); // Set the subscription data
+                    setSubscriptions(response.data.data);
                 }
             })
             .catch((error) => {
@@ -342,7 +327,6 @@ const CreateUserShopOwner = () => {
     }, []);
     const MAX_PROFILE_IMAGE_MB = 5;
 
-    // Opens the crop modal instead of directly using the picked file.
     const handelImage = (e: any) => {
         const file = e.target.files[0];
         if (file) {
@@ -357,10 +341,9 @@ const CreateUserShopOwner = () => {
             };
             reader.readAsDataURL(file);
         }
-        e.target.value = ''; // reset so re-selecting the same file re-triggers onChange
+        e.target.value = '';
     };
 
-    // Opens the crop modal instead of directly using the picked file.
     const handelImageShop = (e: any) => {
         const file = e.target.files[0];
         if (file) {
@@ -375,8 +358,6 @@ const CreateUserShopOwner = () => {
 
     const handleCropCancel = () => setCropState(null);
 
-    // Runs after the user confirms the crop — routes the cropped blob to
-    // whichever field (profile image or shop bill image) triggered the modal.
     const handleCropConfirm = (blob: Blob) => {
         if (!cropState) return;
         const { target } = cropState;
@@ -400,15 +381,12 @@ const CreateUserShopOwner = () => {
             setErrorsShop((prev: any) => ({ ...prev, shopBillImageTop: false }));
         }
     };
-    // const [errors, setErrors] = useState({});
 
     const handleChange = (e: any) => {
         const { name, value } = e.target;
 
-        // Update form data
         setFormData({ ...formData, [name]: value });
 
-        // Clear the error for the specific field if it has a valid value
         setErrors((prevErrors) => ({
             ...prevErrors,
             [name]: value.trim() ? "" : t('field_required'),
@@ -419,14 +397,11 @@ const CreateUserShopOwner = () => {
     const handleChangeShop = (e: any) => {
         const { name, value, type, files } = e.target;
 
-        // Handle file input
         if (type === "file") {
             setFormDataShop({ ...formDataShop, [name]: files[0] });
         } else {
-            // Update text or other inputs
             setFormDataShop({ ...formDataShop, [name]: value });
 
-            // Clear the error for the specific field if it has a valid value
             setErrorsShop((prevErrors) => ({
                 ...prevErrors,
                 [name]: value.trim() ? "" : t('field_required'),
@@ -436,10 +411,8 @@ const CreateUserShopOwner = () => {
 
 
     const handleSubmitShop = async () => {
-        // Clone initial error object to avoid mutating state directly
         const newErrors = { ...initailShopDataError };
 
-        // Manually check each field
         if (!formDataShop.shopName.trim()) {
             newErrors.shopName = t('field_required');
         }
@@ -459,20 +432,16 @@ const CreateUserShopOwner = () => {
             newErrors.shopAddress = t('field_required');
         }
 
-        // Update the errors state
         setErrorsShop(newErrors);
 
-        // Check if there are any errors
         const hasErrors = Object.values(newErrors).some((error) => error !== "");
 
         if (!hasErrors) {
-            // Prepare FormData for API submission
             const dataToSendShop = new FormData();
             dataToSendShop.append("shopName", formDataShop.shopName);
             dataToSendShop.append("shopUserId", formDataShop.shopUserId);
             dataToSendShop.append("shopNumber", formDataShop.shopNumber);
 
-            // Add the file only if it exists
             if (formDataShop.shopBillImageTop) {
                 dataToSendShop.append("shopBillImageTop", formDataShop.shopBillImageTop);
             }
@@ -482,7 +451,6 @@ const CreateUserShopOwner = () => {
             dataToSendShop.append("shopCity", formDataShop.shopCity);
             dataToSendShop.append("shopProvince", formDataShop.shopProvince);
 
-            // API call with Axios
             try {
                 const response = await axios.post(`${ServerSetting.serUrl}/api/addshop`, dataToSendShop, {
                     headers: {
@@ -504,21 +472,15 @@ const CreateUserShopOwner = () => {
                     text: error.response.data.message || t('error_generic'),
                     color: 'danger',
                 });
-                // console.error("Error submitting form:", error.message);
             }
         } else {
             console.log("Form submission failed with errors:", newErrors);
         }
     };
 
-
-
-
-    // shopDeatilsSubmit
     const handleSubmit = async () => {
         const newErrors = initialErrors;
 
-        // Manually check each field
         if (!formData.userNameF.trim()) {
             newErrors.userNameF = t('field_required');
         }
@@ -551,7 +513,6 @@ const CreateUserShopOwner = () => {
             newErrors.userAdress = t('field_required');
         }
 
-        // Password: min 6 chars, at least one uppercase, one lowercase, one number (matches backend)
         const pwd = (formData.userPassword || '').trim();
         if (!pwd) {
             newErrors.userPassword = t('password_required');
@@ -563,11 +524,9 @@ const CreateUserShopOwner = () => {
 
         setErrors(newErrors);
 
-        // Check if there are any errors
         const hasErrors = Object.values(newErrors).some((error) => error !== "");
 
         if (!hasErrors) {
-            // Prepare FormData for API submission
             const dataToSend = new FormData();
             Object.keys(formData).forEach((key) => {
                 const k = key as keyof typeof formData;
@@ -580,7 +539,6 @@ const CreateUserShopOwner = () => {
                 }
             });
 
-            // API call with Axios
             try {
                 const response = await axios.post(`${ServerSetting.serUrl}/api/signup`, dataToSend, {
                     headers: {
@@ -622,19 +580,17 @@ const CreateUserShopOwner = () => {
     const maxNumber = 69;
 
     const onChangeImageFront = (imageLists: ImageListType, addUpdateIndex: number[] | undefined) => {
-        // console.log(imageLists[0].file)
         setImages(imageLists as never[]);
     };
     const onChangeImageBack = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
         setImages2(imageList as never[]);
     };
 
-    const [cropData, setCropData] = useState<any[]>([]); // State to store crop (agriculture) data
-    const [selectedCards, setSelectedCards] = useState<string[]>([]); // State to track selected cards
+    const [cropData, setCropData] = useState<any[]>([]);
+    const [selectedCards, setSelectedCards] = useState<string[]>([]);
     const [cropSearchQuery, setCropSearchQuery] = useState('');
     const [cropTypeFilter, setCropTypeFilter] = useState('');
 
-    // Fetch data from the API
     useEffect(() => {
         const fetchCropData = async () => {
             try {
@@ -644,7 +600,7 @@ const CreateUserShopOwner = () => {
                     }
                 });
                 if (response.status === 200) {
-                    setCropData(response.data.data); // Update crop data
+                    setCropData(response.data.data);
                 }
             } catch (error) {
                 console.error("Error fetching crop data:", error);
@@ -665,25 +621,19 @@ const CreateUserShopOwner = () => {
         });
     }, [cropData, cropSearchQuery, cropTypeFilter]);
 
-    // Toggle card selection
     const toggleSelection = (id: string) => {
         if (selectedCards.includes(id)) {
-            // If already selected, remove it
             setSelectedCards(selectedCards.filter((cardId) => cardId !== id));
         } else {
-            // Otherwise, add it
             setSelectedCards([...selectedCards, id]);
         }
-        // console.log(selectedCards)
     };
-
-
 
     const docUpload = async (userId: string) => {
         const formDataApi = new FormData();
         formDataApi.append("imageFront", images[0].file);
         formDataApi.append("ImageBack", images2[0].file);
-        formDataApi.append("userId", userId); // Add the file object
+        formDataApi.append("userId", userId);
 
         try {
             const response = await axios.post(`${ServerSetting.serUrl}/api/uploaddocimage`, formDataApi, {
@@ -693,7 +643,6 @@ const CreateUserShopOwner = () => {
             });
             Notification({ text: response.data.message, color: 'success' });
             toggleTabs('shop-details');
-            // console.log("Form submitted successfully:", response.data);
         } catch (err: unknown) {
             console.error("Error submitting form:", err);
         }
@@ -712,7 +661,6 @@ const CreateUserShopOwner = () => {
             });
             Notification({ text: response.data.message, color: 'success' });
             toggleTabs('cropselect');
-            // console.log("Form submitted successfully:", response.data);
         } catch (err: unknown) {
             console.error("Error submitting form:", err);
             const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || t('something_went_wrong');
@@ -741,8 +689,6 @@ const CreateUserShopOwner = () => {
 
     const stepIndex = ['home', 'shop-details', 'subcription', 'cropselect'].indexOf(tabs);
 
-    // Fixed-size wrapper for step icons — forces a consistent, non-distorted
-    // render regardless of each Icon component's internal viewBox/size.
     const IconWrap = ({ children }: { children: React.ReactNode }) => (
         <span className="cs-step-icon">{children}</span>
     );
@@ -1034,11 +980,14 @@ const CreateUserShopOwner = () => {
                     ''
                 )}
                 {tabs === 'shop-details' ? (
-                    <div className="rounded-2xl border border-white-light bg-white dark:bg-[#0b1526]/60 dark:border-white/10 p-6 shadow-sm">
-                            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-                                <IconMenuShop className="w-5 h-5 text-primary shrink-0" />
-                                {t('shop_information')}
-                            </h2>
+                    <div className="rounded-2xl border border-white-light dark:border-white/[0.08] bg-white dark:bg-[#0b1d28] p-6 sm:p-8 shadow-sm dark:shadow-2xl">
+                            <div className="flex items-center gap-2 pb-3 mb-6 border-b border-gray-200 dark:border-white/[0.06]">
+                                <span className="w-2 h-2 rounded-full bg-green-500 dark:bg-emerald-400 shrink-0"></span>
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                    <IconMenuShop className="w-5 h-5 text-primary dark:text-emerald-400 shrink-0" />
+                                    {t('shop_information')}
+                                </h2>
+                            </div>
                             <div className="flex flex-col lg:flex-row gap-8">
                                 <div className="shrink-0 flex flex-col items-center mx-auto lg:mx-0">
                                     <input
@@ -1049,25 +998,25 @@ const CreateUserShopOwner = () => {
                                         id="shopFileInput"
                                     />
                                     <label htmlFor="shopFileInput" className="cursor-pointer block">
-                                        <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-primary-200 dark:border-primary-700 bg-gray-100 dark:bg-white/5 flex items-center justify-center hover:border-primary transition-colors duration-200">
+                                        <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-primary-200 dark:border-emerald-500/40 bg-gray-100 dark:bg-[#061017] flex items-center justify-center hover:border-primary dark:hover:border-emerald-500 transition-colors duration-200">
                                             <img
                                                 src={perImageShop || "https://cdn.iconscout.com/icon/free/png-256/free-logo-icon-download-in-svg-png-gif-file-formats--emblem-label-round-arrows-elements-pack-sign-symbols-icons-2882300.png"}
                                                 alt={t('shop_alt')}
                                                 className="w-full h-full object-cover"
                                             />
                                         </div>
-                                        <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">{t('shop_logo_bill_image')}</p>
+                                        <p className="text-xs text-center text-gray-500 dark:text-slate-400 mt-2">{t('shop_logo_bill_image')}</p>
                                     </label>
                                 </div>
                                 <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div className="min-w-0">
-                                        <label htmlFor="shopName" className="form-label">{t('shop_name')} <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopName" className="form-label dark:text-slate-300">{t('shop_name')} <span className="text-danger dark:text-emerald-400">*</span></label>
                                         <input
                                             id="shopName"
                                             name="shopName"
                                             type="text"
                                             placeholder={t('form_placeholder_shop_name')}
-                                            className={`form-input w-full ${errorsShop.shopName ? "border-red-500" : ""}`}
+                                            className={`form-input w-full rounded-xl dark:bg-[#061017] dark:border-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500 ${errorsShop.shopName ? "border-red-500" : ""}`}
                                             value={formDataShop.shopName}
                                             onChange={handleChangeShop}
                                         />
@@ -1076,13 +1025,13 @@ const CreateUserShopOwner = () => {
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <label htmlFor="shopRegistrationNumber" className="form-label">{t('license_registration')} <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopRegistrationNumber" className="form-label dark:text-slate-300">{t('license_registration')} <span className="text-danger dark:text-emerald-400">*</span></label>
                                         <input
                                             id="shopRegistrationNumber"
                                             name="shopRegistrationNumber"
                                             type="number"
                                             placeholder="0000000"
-                                            className={`form-input w-full ${errorsShop.shopRegistrationNumber ? "border-red-500" : ""}`}
+                                            className={`form-input w-full rounded-xl dark:bg-[#061017] dark:border-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500 ${errorsShop.shopRegistrationNumber ? "border-red-500" : ""}`}
                                             value={formDataShop.shopRegistrationNumber}
                                             onChange={handleChangeShop}
                                         />
@@ -1091,13 +1040,13 @@ const CreateUserShopOwner = () => {
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <label htmlFor="shopNumber" className="form-label">{t('phone')} <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopNumber" className="form-label dark:text-slate-300">{t('phone')} <span className="text-danger dark:text-emerald-400">*</span></label>
                                         <input
                                             id="shopNumber"
                                             name="shopNumber"
                                             type="text"
                                             placeholder="3000000000"
-                                            className={`form-input w-full ${errorsShop.shopNumber ? "border-red-500" : ""}`}
+                                            className={`form-input w-full rounded-xl dark:bg-[#061017] dark:border-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500 ${errorsShop.shopNumber ? "border-red-500" : ""}`}
                                             value={formDataShop.shopNumber}
                                             onChange={handleChangeShop}
                                         />
@@ -1106,13 +1055,13 @@ const CreateUserShopOwner = () => {
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <label htmlFor="shopProvince" className="form-label">{t('province')} <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopProvince" className="form-label dark:text-slate-300">{t('province')} <span className="text-danger dark:text-emerald-400">*</span></label>
                                         <input
                                             id="shopProvince"
                                             name="shopProvince"
                                             type="text"
                                             placeholder={t('form_placeholder_province')}
-                                            className={`form-input w-full ${errorsShop.shopProvince ? "border-red-500" : ""}`}
+                                            className={`form-input w-full rounded-xl dark:bg-[#061017] dark:border-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500 ${errorsShop.shopProvince ? "border-red-500" : ""}`}
                                             value={formDataShop.shopProvince}
                                             onChange={handleChangeShop}
                                         />
@@ -1121,13 +1070,13 @@ const CreateUserShopOwner = () => {
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <label htmlFor="shopCity" className="form-label">{t('city')} <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopCity" className="form-label dark:text-slate-300">{t('city')} <span className="text-danger dark:text-emerald-400">*</span></label>
                                         <input
                                             id="shopCity"
                                             name="shopCity"
                                             type="text"
                                             placeholder={t('form_placeholder_city')}
-                                            className={`form-input w-full ${errorsShop.shopCity ? "border-red-500" : ""}`}
+                                            className={`form-input w-full rounded-xl dark:bg-[#061017] dark:border-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500 ${errorsShop.shopCity ? "border-red-500" : ""}`}
                                             value={formDataShop.shopCity}
                                             onChange={handleChangeShop}
                                         />
@@ -1136,13 +1085,13 @@ const CreateUserShopOwner = () => {
                                         )}
                                     </div>
                                     <div className="sm:col-span-2 min-w-0">
-                                        <label htmlFor="shopAddress" className="form-label">{t('shop_address')} <span className="text-danger">*</span></label>
+                                        <label htmlFor="shopAddress" className="form-label dark:text-slate-300">{t('shop_address')} <span className="text-danger dark:text-emerald-400">*</span></label>
                                         <input
                                             id="shopAddress"
                                             name="shopAddress"
                                             type="text"
                                             placeholder={t('form_placeholder_shop_address')}
-                                            className={`form-input w-full ${errorsShop.shopAddress ? "border-red-500" : ""}`}
+                                            className={`form-input w-full rounded-xl dark:bg-[#061017] dark:border-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500 ${errorsShop.shopAddress ? "border-red-500" : ""}`}
                                             value={formDataShop.shopAddress}
                                             onChange={handleChangeShop}
                                         />
@@ -1153,10 +1102,10 @@ const CreateUserShopOwner = () => {
 
 
 
-                                    <div className="sm:col-span-2 mt-2 flex justify-end">
+                                    <div className="sm:col-span-2 mt-2 pt-4 border-t border-gray-200 dark:border-white/[0.08] flex justify-end">
                                         <button
                                             type="button"
-                                            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 !bg-[#16a34a] hover:!bg-[#15803d]"
+                                            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 !bg-[#16a34a] hover:!bg-[#15803d] dark:shadow-lg dark:shadow-emerald-500/20"
                                             onClick={handleSubmitShop}
                                         >
                                             {t('btn_save_shop_details_and_next')} →
@@ -1170,30 +1119,33 @@ const CreateUserShopOwner = () => {
                     ''
                 )}
                 {tabs === 'subcription' ? (
-                    <div className="rounded-2xl border border-white-light bg-white dark:bg-[#0b1526]/60 dark:border-white/10 p-6 shadow-sm">
-                            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
-                                <IconUser className="w-5 h-5 text-primary shrink-0" />
-                                {t('choose_subscription_plan')}
-                            </h2>
-                            <p className="text-gray-600 dark:text-gray-400 mb-6">{t('choose_subscription_plan_desc')}</p>
+                    <div className="rounded-2xl border border-white-light dark:border-white/[0.08] bg-white dark:bg-[#0b1d28] p-6 sm:p-8 shadow-sm dark:shadow-2xl">
+                            <div className="flex items-center gap-2 pb-3 mb-2 border-b border-gray-200 dark:border-white/[0.06]">
+                                <span className="w-2 h-2 rounded-full bg-green-500 dark:bg-emerald-400 shrink-0"></span>
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                    <IconUser className="w-5 h-5 text-primary dark:text-emerald-400 shrink-0" />
+                                    {t('choose_subscription_plan')}
+                                </h2>
+                            </div>
+                            <p className="text-gray-600 dark:text-slate-400 mb-6">{t('choose_subscription_plan_desc')}</p>
                             {subscriptions.length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     {subscriptions.map((sub: any) => (
                                         <div
                                             key={sub._id}
-                                            className="flex flex-col h-full min-w-0 rounded-2xl border border-white-light dark:border-white/10 bg-white dark:bg-[#0b1526]/40 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-primary/40"
+                                            className="flex flex-col h-full min-w-0 rounded-2xl border border-white-light dark:border-slate-800 bg-white dark:bg-[#061017] shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-emerald-500/10 hover:border-primary/40 dark:hover:border-emerald-500/50"
                                         >
                                             <div className="p-5 flex-1">
                                                 <div className="flex items-start justify-between gap-3 mb-3">
                                                     <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate" dir="ltr" title={sub.subName}>{sub.subName}</h3>
-                                                    <span className="shrink-0 whitespace-nowrap inline-flex items-center rounded-xl bg-primary/10 dark:bg-primary/20 px-3 py-1.5 text-sm font-bold text-primary">
+                                                    <span className="shrink-0 whitespace-nowrap inline-flex items-center rounded-xl bg-primary/10 dark:bg-emerald-500/15 dark:border dark:border-emerald-500/30 px-3 py-1.5 text-sm font-bold text-primary dark:text-emerald-400">
                                                         {sub.subPrice} {t('currency_pkr')}
                                                     </span>
                                                 </div>
-                                                <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(sub.subDescription || '') }} />
+                                                <div className="text-sm text-gray-600 dark:text-slate-400 line-clamp-3 prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(sub.subDescription || '') }} />
                                             </div>
-                                            <div className="px-5 py-3 border-t border-white-light dark:border-white/10">
-                                                <ul className="space-y-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            <div className="px-5 py-3 border-t border-white-light dark:border-white/[0.06]">
+                                                <ul className="space-y-1.5 text-sm font-medium text-gray-700 dark:text-slate-300">
                                                     <li>{t('crops_allowed')}: {sub.subCrop}</li>
                                                     {sub.timeDuration && <li>{t('duration')}: {sub.timeDuration} {t('months')}</li>}
                                                 </ul>
@@ -1211,9 +1163,9 @@ const CreateUserShopOwner = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-12 rounded-xl bg-gray-50 dark:bg-white/5">
-                                    <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">{t('no_subscription_plans_found')}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">{t('add_plans_from_subscriptions')}</p>
+                                <div className="text-center py-12 rounded-xl bg-gray-50 dark:bg-[#061017] dark:border dark:border-slate-800">
+                                    <p className="text-lg font-semibold text-gray-600 dark:text-slate-400">{t('no_subscription_plans_found')}</p>
+                                    <p className="text-sm text-gray-500 dark:text-slate-500 mt-1">{t('add_plans_from_subscriptions')}</p>
                                 </div>
                             )}
                     </div>
@@ -1221,37 +1173,40 @@ const CreateUserShopOwner = () => {
                     ''
                 )}
                 {tabs === 'cropselect' ? (
-                    <div className="rounded-2xl border border-white-light bg-white dark:bg-[#0b1526]/60 dark:border-white/10 p-6 shadow-sm">
-                            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
-                                <IconPhone className="w-5 h-5 text-primary shrink-0" />
-                                {t('assign_crops_to_shop_owner')}
-                            </h2>
-                            <p className="text-gray-600 dark:text-gray-400 mb-6">{t('assign_crops_desc')}</p>
+                    <div className="rounded-2xl border border-white-light dark:border-white/[0.08] bg-white dark:bg-[#0b1d28] p-6 sm:p-8 shadow-sm dark:shadow-2xl">
+                            <div className="flex items-center gap-2 pb-3 mb-2 border-b border-gray-200 dark:border-white/[0.06]">
+                                <span className="w-2 h-2 rounded-full bg-green-500 dark:bg-emerald-400 shrink-0"></span>
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                    <IconPhone className="w-5 h-5 text-primary dark:text-emerald-400 shrink-0" />
+                                    {t('assign_crops_to_shop_owner')}
+                                </h2>
+                            </div>
+                            <p className="text-gray-600 dark:text-slate-400 mb-6">{t('assign_crops_desc')}</p>
                             {cropData.length > 0 ? (
                                 <>
                                     <div className="flex flex-wrap items-center gap-3 mb-4">
                                         <div className="flex-1 min-w-[200px] relative">
-                                            <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                                            <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-slate-500 pointer-events-none" />
                                             <input
                                                 type="text"
                                                 placeholder={t('search_crops_placeholder')}
                                                 value={cropSearchQuery}
                                                 onChange={(e) => setCropSearchQuery(e.target.value)}
-                                                className="form-input pl-10 w-full"
+                                                className="form-input pl-10 w-full rounded-xl dark:bg-[#061017] dark:border-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-emerald-500 dark:focus:ring-emerald-500"
                                             />
                                         </div>
                                         <div className="w-full sm:w-auto sm:min-w-[180px]">
                                             <select
                                                 value={cropTypeFilter}
                                                 onChange={(e) => setCropTypeFilter(e.target.value)}
-                                                className="form-select w-full"
+                                                className="form-select w-full rounded-xl dark:bg-[#061017] dark:border-slate-800 dark:text-white dark:focus:border-emerald-500 dark:focus:ring-emerald-500"
                                             >
                                                 {CROP_TYPE_OPTIONS.map((opt) => (
                                                     <option key={opt.value || 'all'} value={opt.value}>{opt.label}</option>
                                                 ))}
                                             </select>
                                         </div>
-                                        <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                                        <span className="text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap">
                                             {filteredCrops.length} {t('of')} {cropData.length} {cropData.length !== 1 ? t('crops') : t('crop')}
                                         </span>
                                     </div>
@@ -1264,12 +1219,12 @@ const CreateUserShopOwner = () => {
                                                     key={crop._id}
                                                     type="button"
                                                     onClick={() => toggleSelection(crop._id)}
-                                                    className={`rounded-2xl border-2 p-4 text-center flex flex-col items-center gap-3 min-w-0 transition-all duration-200 cursor-pointer hover:shadow-md bg-white dark:bg-[#0b1526]/40 ${isSelected
-                                                        ? 'border-primary bg-primary/5 dark:bg-primary/10 shadow-md ring-2 ring-primary/30'
-                                                        : 'border-white-light dark:border-white/10 hover:border-primary/40'
+                                                    className={`rounded-2xl border-2 p-4 text-center flex flex-col items-center gap-3 min-w-0 transition-all duration-200 cursor-pointer hover:shadow-md bg-white dark:bg-[#061017] ${isSelected
+                                                        ? 'border-primary dark:border-emerald-500 bg-primary/5 dark:bg-emerald-500/10 shadow-md ring-2 ring-primary/30 dark:ring-emerald-500/30'
+                                                        : 'border-white-light dark:border-slate-800 hover:border-primary/40 dark:hover:border-emerald-500/50'
                                                         }`}
                                                 >
-                                                    <div className="w-full aspect-[4/3] rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
+                                                    <div className="w-full aspect-[4/3] rounded-lg bg-gray-100 dark:bg-[#08141d] flex items-center justify-center overflow-hidden">
                                                         {cropImg ? (
                                                             <img src={cropImg} alt={crop.cropName} className="w-full h-full object-contain" />
                                                         ) : (
@@ -1277,18 +1232,18 @@ const CreateUserShopOwner = () => {
                                                         )}
                                                     </div>
                                                     <span className="font-semibold text-gray-800 dark:text-white text-sm line-clamp-2">{crop.cropName}</span>
-                                                    {isSelected && <span className="inline-flex items-center rounded-lg bg-primary px-2 py-0.5 text-xs font-semibold text-white">{t('selected')}</span>}
+                                                    {isSelected && <span className="inline-flex items-center rounded-lg bg-primary dark:bg-emerald-500 px-2 py-0.5 text-xs font-semibold text-white dark:text-slate-950">{t('selected')}</span>}
                                                 </button>
                                             );
                                         })}
                                     </div>
-                                    <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    <div className="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-200 dark:border-white/[0.08]">
+                                        <p className="text-sm text-gray-500 dark:text-slate-400">
                                             {selectedCards.length} {t('crops_selected')}
                                         </p>
                                         <button
                                             type="button"
-                                            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 !bg-[#16a34a] hover:!bg-[#15803d]"
+                                            className="flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 !bg-[#16a34a] hover:!bg-[#15803d] dark:shadow-lg dark:shadow-emerald-500/20"
                                             onClick={handleSubmitCrop}
                                         >
                                             {t('btn_save_and_finish')} →
@@ -1296,9 +1251,9 @@ const CreateUserShopOwner = () => {
                                     </div>
                                 </>
                             ) : (
-                                <div className="text-center py-12 rounded-xl bg-gray-50 dark:bg-white/5">
-                                    <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">{t('no_crops_found')}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">{t('add_crops_from_crops')}</p>
+                                <div className="text-center py-12 rounded-xl bg-gray-50 dark:bg-[#061017] dark:border dark:border-slate-800">
+                                    <p className="text-lg font-semibold text-gray-600 dark:text-slate-400">{t('no_crops_found')}</p>
+                                    <p className="text-sm text-gray-500 dark:text-slate-500 mt-1">{t('add_crops_from_crops')}</p>
                                 </div>
                             )}
                     </div>

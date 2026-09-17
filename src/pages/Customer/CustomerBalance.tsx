@@ -12,6 +12,7 @@ import IconCashBanknotes from '../../components/Icon/IconCashBanknotes';
 import IconClock from '../../components/Icon/IconClock';
 import IconDollarSign from '../../components/Icon/IconDollarSign';
 import IconArrowBackward from '../../components/Icon/IconArrowBackward';
+import IconArrowLeft from '../../components/Icon/IconArrowLeft';
 import { FaSearch } from 'react-icons/fa';
 
 interface BalanceRecord {
@@ -407,8 +408,8 @@ const CustomerBalance = () => {
             title: t('customer') || 'Customer',
             render: (record) => (
                 <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-500/15 flex items-center justify-center shrink-0">
-                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-sm">
+                    <div className="w-9 h-9 rounded-full bg-green-50 dark:bg-green-500/15 flex items-center justify-center shrink-0">
+                        <span className="text-green-600 dark:text-green-400 font-semibold text-sm">
                             {record.cusId?.cusNameF?.[0]?.toUpperCase() || 'C'}
                         </span>
                     </div>
@@ -436,7 +437,7 @@ const CustomerBalance = () => {
             accessor: 'cusBlane',
             title: t('shop_owes_to_customer'),
             render: (record) => (
-                <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="font-semibold text-green-600 dark:text-green-400">
                     Rs. {(record.cusBlane ?? 0).toLocaleString()}
                 </span>
             ),
@@ -461,7 +462,7 @@ const CustomerBalance = () => {
                         onClick={() => openPayModal(record)}
                         disabled={(record.cusBlane ?? 0) <= 0}
                         title={t('pay_customer_deduct')}
-                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs hover:bg-emerald-100 dark:hover:bg-emerald-500/25 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-50 dark:bg-green-500/15 text-green-600 dark:text-green-400 text-xs hover:bg-green-100 dark:hover:bg-green-500/25 transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         <IconDollarSign className="w-3.5 h-3.5" /> Pay
                     </button>
@@ -498,21 +499,38 @@ const CustomerBalance = () => {
     ];
 
     return (
-        <div>
-            <div className='mb-3 flex justify-end'>
-                
+        <div className="space-y-6">
+            {/* Header row - breadcrumb + back button, matches AddNewCustomer / PosShopManagement layout */}
+            <div className="flex flex-wrap items-center justify-between gap-2">
+                <ul className="flex flex-wrap items-center gap-2 text-sm">
+                    <li>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/dashboard')}
+                            className="text-green-600 hover:underline dark:text-green-400"
+                        >
+                            {t('dashboard')}
+                        </button>
+                    </li>
+                    <li className="text-gray-500 before:mr-2 before:content-['/'] dark:text-gray-400 ltr:before:mr-2 rtl:before:ml-2">
+                        {t('customer_balance_title') || 'Customer Balance'}
+                    </li>
+                </ul>
+
                 <button
-    onClick={() => navigate('/customerlist')}
-                            className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
->
-    ← {t('back_to_customer_list')}
-</button>
+                    type="button"
+                    onClick={() => navigate('/customerlist')}
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                >
+                    <IconArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                    {t('back_to_customer_list')}
+                </button>
             </div>
 
             {/* Main Card */}
-            <div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-300 dark:border-white/10 shadow-sm p-5 sm:p-6 mb-6">
+            <div className="rounded-xl bg-white dark:bg-[#0e1726] border border-gray-300 dark:border-white/10 shadow-sm p-5 sm:p-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3 mb-4">
-                    <h3 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                         {t('customer_balance_title') || 'Customer Balance'}
                     </h3>
 
@@ -524,16 +542,17 @@ const CustomerBalance = () => {
                                 value={search}
                                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                                 placeholder={t('search_by_name_cnic_phone_balance')}
-                                className="w-full pl-9 pr-4 py-2 rounded-lg bg-white dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-800 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                                className="w-full pl-9 pr-4 py-2 rounded-lg bg-white dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-800 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/40"
                             />
                         </div>
 
                         <button
-    onClick={addCustomer}
-    className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#16a34a] text-white font-medium hover:bg-[#15803d] transition whitespace-nowrap"
->
-    {t('add_new_customer')}
-</button>
+                            type="button"
+                            onClick={addCustomer}
+                            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition whitespace-nowrap"
+                        >
+                            {t('add_new_customer')}
+                        </button>
                     </div>
                 </div>
 
@@ -541,7 +560,7 @@ const CustomerBalance = () => {
 
                 {isLoading ? (
                     <div className="flex justify-center items-center py-20">
-                        <span className="animate-[spin_1s_linear_infinite] border-4 border-gray-200 dark:border-white/10 border-t-emerald-500 rounded-full w-10 h-10 inline-block"></span>
+                        <span className="animate-[spin_1s_linear_infinite] border-4 border-gray-200 dark:border-white/10 border-t-green-500 rounded-full w-10 h-10 inline-block"></span>
                     </div>
                 ) : (
                     <div className="rounded-xl overflow-hidden border border-gray-300 dark:border-white/5">
@@ -570,30 +589,30 @@ const CustomerBalance = () => {
                 )}
             </div>
 
-{/* Summary Cards */}
-<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 shadow-sm p-5">
-        <p className="text-sm font-medium text-black dark:text-white mb-1">{t('shop_owes_to_customer')}</p>
-        <p className="text-2xl font-bold text-black dark:text-white">
-            Rs. {totalShopOwesToCustomer.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-        <p className="text-xs text-black/70 dark:text-white/80 mt-1">{t('total_shop_pay_customers')}</p>
-    </div>
-    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 shadow-sm p-5">
-        <p className="text-sm font-medium text-black dark:text-white mb-1">{t('customer_owes_to_shop')}</p>
-        <p className="text-2xl font-bold text-black dark:text-white">
-            Rs. {totalCustomerOwesToShop.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-        <p className="text-xs text-black/70 dark:text-white/80 mt-1">{t('total_customers_owe_shop')}</p>
-    </div>
-    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 shadow-sm p-5">
-        <p className="text-sm font-medium text-black dark:text-white mb-1">{t('return_amount_total_label')}</p>
-        <p className="text-2xl font-bold text-black dark:text-white">
-            Rs. {returnAmountTotalDisplay.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-        <p className="text-xs text-black/70 dark:text-white/80 mt-1">{t('return_amount_total_desc')}</p>
-    </div>
-</div>
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 shadow-sm p-5">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{t('shop_owes_to_customer')}</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                        Rs. {totalShopOwesToCustomer.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                    <p className="text-xs text-gray-700/70 dark:text-white/80 mt-1">{t('total_shop_pay_customers')}</p>
+                </div>
+                <div className="rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 shadow-sm p-5">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{t('customer_owes_to_shop')}</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                        Rs. {totalCustomerOwesToShop.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                    <p className="text-xs text-gray-700/70 dark:text-white/80 mt-1">{t('total_customers_owe_shop')}</p>
+                </div>
+                <div className="rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 shadow-sm p-5">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{t('return_amount_total_label')}</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                        Rs. {returnAmountTotalDisplay.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                    <p className="text-xs text-gray-700/70 dark:text-white/80 mt-1">{t('return_amount_total_desc')}</p>
+                </div>
+            </div>
 
             {/* Pay Modal */}
             <Modal
@@ -601,7 +620,7 @@ const CustomerBalance = () => {
                 onClose={closePayModal}
                 title={
                     <div className="flex items-center gap-2">
-                        <IconCashBanknotes className="w-5 h-5 text-emerald-500" />
+                        <IconCashBanknotes className="w-5 h-5 text-green-500" />
                         <span className="text-lg font-semibold">Record Payment to Customer</span>
                         {selectedPayRecord?.cusId && (
                             <span className="text-sm font-normal text-gray-500">
@@ -617,7 +636,7 @@ const CustomerBalance = () => {
                     {selectedPayRecord && (
                         <>
                             <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                Current balance (Shop owes): <strong className="text-emerald-600 dark:text-emerald-400">Rs. {(selectedPayRecord.cusBlane ?? 0).toLocaleString()}</strong>
+                                Current balance (Shop owes): <strong className="text-green-600 dark:text-green-400">Rs. {(selectedPayRecord.cusBlane ?? 0).toLocaleString()}</strong>
                             </p>
                             <div>
                                 <label className="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">Amount (Rs.) *</label>
@@ -625,7 +644,7 @@ const CustomerBalance = () => {
                                     type="number"
                                     min={1}
                                     step={1}
-                                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500/40"
                                     placeholder="Enter amount"
                                     value={payAmount}
                                     onChange={(e) => setPayAmount(e.target.value)}
@@ -634,7 +653,7 @@ const CustomerBalance = () => {
                             <div>
                                 <label className="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">Remarks</label>
                                 <textarea
-                                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 resize-none"
+                                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-[#171f2f] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500/40 resize-none"
                                     placeholder="Optional notes (e.g. cash paid, cheque #, purpose)"
                                     value={payRemarks}
                                     onChange={(e) => setPayRemarks(e.target.value)}
@@ -649,7 +668,7 @@ const CustomerBalance = () => {
                                     type="button"
                                     onClick={handleRecordPayment}
                                     disabled={paySubmitting || !payAmount || Number(payAmount) <= 0}
-                                    className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition disabled:opacity-50"
+                                    className="px-4 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition disabled:opacity-50"
                                 >
                                     {paySubmitting ? t('saving') : t('record_payment_btn_balance')}
                                 </button>
@@ -665,7 +684,7 @@ const CustomerBalance = () => {
                 onClose={closeHistoryModal}
                 title={
                     <div className="flex items-center gap-2">
-                        <IconClock className="w-5 h-5 text-emerald-500" />
+                        <IconClock className="w-5 h-5 text-green-500" />
                         <span className="text-lg font-semibold">Payment History</span>
                         {selectedHistoryRecord?.cusId && typeof selectedHistoryRecord.cusId === 'object' && (
                             <span className="text-sm font-normal text-gray-500">
@@ -680,7 +699,7 @@ const CustomerBalance = () => {
                 <div className="pt-2">
                     {historyLoading ? (
                         <div className="flex justify-center py-8">
-                            <span className="animate-[spin_1s_linear_infinite] border-4 border-gray-200 dark:border-white/10 border-t-emerald-500 rounded-full w-8 h-8 inline-block" />
+                            <span className="animate-[spin_1s_linear_infinite] border-4 border-gray-200 dark:border-white/10 border-t-green-500 rounded-full w-8 h-8 inline-block" />
                         </div>
                     ) : paymentHistory.length === 0 ? (
                         <p className="text-center text-gray-500 py-8">No payments recorded yet.</p>

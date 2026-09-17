@@ -8,16 +8,17 @@ import { ServerSetting } from '../../helperComponents/ServerSetting';
 import { useAuthToken } from '../../Hooks/useAuthToken';
 import { Notification } from '../../helperComponents/Notification';
 import IconEye from '../../components/Icon/IconEye';
-import IconArrowLeft from '../../components/Icon/IconArrowLeft';
 import IconUser from '../../components/Icon/IconUser';
 import IconMenuUsers from '../../components/Icon/Menu/IconMenuUsers';
 import IconArrowRight from '../../components/Icon/IconArrowRight';
 
 const card =
-    'rounded-[2rem] border border-white-dark/10 bg-white/95 shadow-sm transition-shadow hover:shadow-md dark:border-white/10 dark:bg-[#0b1526]/85';
+    'rounded-[2rem] border border-white-dark/10 bg-white/95 shadow-sm transition-shadow hover:shadow-md dark:border-white/10 dark:bg-[#0b1526]/85 overflow-hidden';
 const iconBadge =
-    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-gray-100 text-primary dark:bg-primary/20 dark:shadow-none dark:ring-0';
-const subSectionHeading = 'text-lg font-semibold text-primary dark:text-primary-light';
+    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-gray-100 text-success dark:bg-success/20 dark:shadow-none dark:ring-0';
+const subSectionHeading = 'text-lg font-semibold text-success dark:text-primary-light';
+const inputClass = 'form-input';
+const labelClass = 'form-label';
 
 interface PermissionItem {
     key: string;
@@ -111,23 +112,24 @@ const AddTeamMember = () => {
     return (
         <div className="space-y-6">
             <div className='flex justify-end'>
-            <button
-                type="button"
-                onClick={() => navigate('/admin/team')}
-className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"            >
-                <IconArrowRight className="w-4 h-4 rtl:rotate-180"/>
-                                {t('back_to_team_list')}
-            </button>
+                <button
+                    type="button"
+                    onClick={() => navigate('/admin/team')}
+                    className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                >
+                    <IconArrowRight className="w-4 h-4 rtl:rotate-180" />
+                    {t('back_to_team_list')}
+                </button>
             </div>
 
             {/* Centered form container */}
             <div className="flex justify-center px-0">
                 <div className="w-full max-w-5xl">
                     <form onSubmit={handleSubmit} className="space-y-0">
-                        <div className={`${card} overflow-hidden`}>
+                        <div className={card}>
                             {/* Heading inside the card */}
                             <div className="flex items-center gap-3 border-b border-white-dark/10 p-6 dark:border-white/10 lg:px-8">
-                                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-gray-100 text-success dark:bg-success/20 dark:shadow-none dark:ring-0">
+                                <span className={iconBadge}>
                                     <IconMenuUsers className="w-5 h-5" />
                                 </span>
                                 <div>
@@ -148,10 +150,10 @@ className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="form-label">{t('form_first_name')} <span className="text-danger">*</span></label>
+                                            <label className={labelClass}>{t('form_first_name')} <span className="text-danger">*</span></label>
                                             <input
                                                 type="text"
-                                                className="form-input"
+                                                className={inputClass}
                                                 value={userNameF}
                                                 onChange={(e) => setUserNameF(e.target.value)}
                                                 required
@@ -159,10 +161,10 @@ className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 
                                             />
                                         </div>
                                         <div>
-                                            <label className="form-label">{t('form_last_name')} <span className="text-danger">*</span></label>
+                                            <label className={labelClass}>{t('form_last_name')} <span className="text-danger">*</span></label>
                                             <input
                                                 type="text"
-                                                className="form-input"
+                                                className={inputClass}
                                                 value={userNameL}
                                                 onChange={(e) => setUserNameL(e.target.value)}
                                                 required
@@ -171,10 +173,10 @@ className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="form-label">{t('form_email')} <span className="text-danger">*</span></label>
+                                        <label className={labelClass}>{t('form_email')} <span className="text-danger">*</span></label>
                                         <input
                                             type="email"
-                                            className="form-input"
+                                            className={inputClass}
                                             value={userEmail}
                                             onChange={(e) => setUserEmail(e.target.value)}
                                             required
@@ -183,10 +185,10 @@ className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="form-label">{t('form_phone')} <span className="text-danger">*</span></label>
+                                            <label className={labelClass}>{t('form_phone')} <span className="text-danger">*</span></label>
                                             <input
                                                 type="text"
-                                                className="form-input"
+                                                className={inputClass}
                                                 value={userPhone}
                                                 onChange={(e) => setUserPhone(e.target.value)}
                                                 required
@@ -194,10 +196,10 @@ className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 
                                             />
                                         </div>
                                         <div>
-                                            <label className="form-label">{t('form_cnic')} <span className="text-danger">*</span></label>
+                                            <label className={labelClass}>{t('form_cnic')} <span className="text-danger">*</span></label>
                                             <input
                                                 type="text"
-                                                className="form-input"
+                                                className={inputClass}
                                                 placeholder={t('form_placeholder_cnic_without_dashes')}
                                                 value={userCNIC}
                                                 onChange={(e) => setUserCNIC(e.target.value)}
@@ -207,20 +209,20 @@ className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="form-label">{t('province')}</label>
+                                            <label className={labelClass}>{t('province')}</label>
                                             <input
                                                 type="text"
-                                                className="form-input"
+                                                className={inputClass}
                                                 value={userProvince}
                                                 onChange={(e) => setUserProvince(e.target.value)}
                                                 placeholder={t('form_placeholder_province')}
                                             />
                                         </div>
                                         <div>
-                                            <label className="form-label">{t('city')}</label>
+                                            <label className={labelClass}>{t('city')}</label>
                                             <input
                                                 type="text"
-                                                className="form-input"
+                                                className={inputClass}
                                                 value={userCity}
                                                 onChange={(e) => setUserCity(e.target.value)}
                                                 placeholder={t('form_placeholder_city')}
@@ -228,10 +230,10 @@ className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="form-label">{t('form_address')}</label>
+                                        <label className={labelClass}>{t('form_address')}</label>
                                         <input
                                             type="text"
-                                            className="form-input"
+                                            className={inputClass}
                                             value={userAdress}
                                             onChange={(e) => setUserAdress(e.target.value)}
                                             placeholder={t('form_placeholder_street_address')}
@@ -248,11 +250,11 @@ className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 
                                         <h3 className={subSectionHeading}>{t('section_account_permissions')}</h3>
                                     </div>
                                     <div>
-                                        <label className="form-label">{t('form_password')}</label>
+                                        <label className={labelClass}>{t('form_password')}</label>
                                         <div className="relative">
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
-                                                className="form-input pr-10"
+                                                className={`${inputClass} pr-10`}
                                                 value={userPassword}
                                                 onChange={(e) => setUserPassword(e.target.value)}
                                                 placeholder={t('form_placeholder_password_default')}
@@ -269,7 +271,7 @@ className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 
                                         <p className="mt-1 text-xs text-white-dark">{t('form_password_hint')}</p>
                                     </div>
                                     <div>
-                                        <label className="form-label">{t('form_role')} <span className="text-danger">*</span></label>
+                                        <label className={labelClass}>{t('form_role')} <span className="text-danger">*</span></label>
                                         <select
                                             className="form-select w-full"
                                             value={userRole}

@@ -201,13 +201,13 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4">
-            <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-[#ebedf2] dark:border-[#191e3a] shadow-xl p-5 sm:p-6">
-                <h5 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white text-center">
+            <div className="w-full max-w-sm rounded-2xl border border-[#172b40] bg-[#0b1724] p-5 shadow-xl sm:p-6">
+                <h5 className="mb-4 text-center text-lg font-semibold text-white">
                     {title || t('crop_image')}
                 </h5>
 
                 <div
-                    className="relative mx-auto overflow-hidden bg-gray-100 dark:bg-white/5 select-none touch-none"
+                    className="relative mx-auto touch-none select-none overflow-hidden bg-[#07121c]"
                     style={{
                         width: CROP_SIZE,
                         height: CROP_SIZE,
@@ -237,11 +237,11 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
                             maxWidth: 'none',
                         }}
                     />
-                    {!round && <div className="pointer-events-none absolute inset-0 border-2 border-white/70 rounded-xl" />}
+                    {!round && <div className="pointer-events-none absolute inset-0 rounded-xl border-2 border-white/20" />}
                 </div>
 
-                <div className="flex items-center gap-3 mt-4">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">−</span>
+                <div className="mt-4 flex items-center gap-3">
+                    <span className="text-xs text-slate-400">−</span>
                     <input
                         type="range"
                         min={MIN_ZOOM}
@@ -249,22 +249,26 @@ const ImageCropModal: FC<ImageCropModalProps> = ({ imageSrc, round = false, titl
                         step={0.01}
                         value={zoom}
                         onChange={(e) => handleZoomChange(parseFloat(e.target.value))}
-                        className="w-full accent-green-600"
+                        className="w-full accent-emerald-500"
                     />
-                    <span className="text-xs text-gray-500 dark:text-gray-400">+</span>
+                    <span className="text-xs text-slate-400">+</span>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
+                <p className="mt-1 text-center text-xs text-slate-500">
                     {t('drag_to_reposition_zoom_to_resize')}
                 </p>
 
-                <div className="flex gap-2 mt-6 justify-end">
-                    <button type="button" onClick={onCancel} className="btn btn-outline-secondary rounded-xl flex-1 sm:flex-none">
+                <div className="mt-6 flex justify-end gap-2">
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        className="flex-1 rounded-xl border border-[#172b40] bg-transparent px-4 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:bg-[#0e2030] sm:flex-none"
+                    >
                         {t('cancel')}
                     </button>
                     <button
                         type="button"
                         onClick={handleConfirm}
-                        className="btn shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] rounded-xl flex-1 sm:flex-none"
+                        className="flex-1 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_-3px_rgba(16,185,129,0.35)] transition-colors hover:bg-emerald-400 sm:flex-none"
                     >
                         {t('save_crop')}
                     </button>
@@ -422,21 +426,21 @@ const Profile = () => {
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
                     {/* Profile hero */}
                     <div className="xl:col-span-7">
-                        <div className="overflow-hidden rounded-[2rem] border border-white-dark/15 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-white/10 dark:bg-[#0e1726]">
-                            <div className="relative h-28 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 sm:h-32">
+                        <div className="overflow-hidden rounded-2xl border border-white-dark/15 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-[#172b40] dark:bg-[#0b1724] dark:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.45)]">
+                            <div className="relative h-28 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 sm:h-36">
                                 <div
-                                    className="pointer-events-none absolute inset-0 opacity-30 mix-blend-overlay [background-image:radial-gradient(circle_at_20%_20%,white_0,transparent_50%),radial-gradient(circle_at_80%_60%,white_0,transparent_45%)]"
+                                    className="pointer-events-none absolute inset-0 opacity-15 [background-image:radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"
                                     aria-hidden
                                 />
                             </div>
                             <div className="relative px-6 pb-6 pt-0 sm:px-8">
-                                <div className="-mt-10 flex flex-col gap-6 sm:-mt-12 sm:flex-row sm:items-end sm:justify-between">
+                                <div className="-mt-14 flex flex-col gap-6 sm:-mt-16 sm:flex-row sm:items-end sm:justify-between">
                                     <div className="flex flex-col items-center sm:flex-row sm:items-end sm:gap-5">
                                         <div className="relative shrink-0">
                                             <img
                                                 src={avatarSrc}
                                                 alt=""
-                                                className={`h-28 w-28 rounded-2xl border-4 border-white object-cover shadow-xl dark:border-[#0e1726] sm:h-32 sm:w-32 ${
+                                                className={`h-28 w-28 rounded-2xl border-4 border-white object-cover shadow-2xl dark:border-[#0b1724] sm:h-32 sm:w-32 ${
                                                     uploadingAvatar ? 'opacity-60' : ''
                                                 }`}
                                             />
@@ -454,7 +458,7 @@ const Profile = () => {
                                             />
                                             <label
                                                 htmlFor="profileAvatarInput"
-                                                className="absolute -bottom-1 -right-1 flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-primary text-white shadow-md transition hover:opacity-95"
+                                                className="absolute -bottom-1 -right-1 flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border-2 border-white bg-emerald-500 text-white shadow-md transition-all hover:bg-emerald-400 dark:border-[#0b1724] dark:shadow-[0_0_20px_-3px_rgba(16,185,129,0.35)]"
                                                 title={t('edit_profile')}
                                             >
                                                 <IconPencilPaper className="h-5 w-5" />
@@ -463,13 +467,13 @@ const Profile = () => {
                                         <div className="mt-4 text-center sm:mt-0 sm:pb-1 sm:text-left">
                                             <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">{displayName}</h1>
                                             <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-                                                <span className="inline-flex items-center rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-800 dark:text-amber-300">
+                                                <span className="inline-flex items-center rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
                                                     <IconCoffee className="mr-1.5 h-3.5 w-3.5" />
                                                     {roleLabel(dataUserLogin?.userRole, t)}
                                                 </span>
                                                 <Link
                                                     to="/users/user-account-settings?tab=password"
-                                                    className="text-xs font-medium text-primary underline-offset-2 hover:underline"
+                                                    className="rounded-xl px-2 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:text-emerald-500 dark:text-slate-400 dark:hover:text-emerald-400"
                                                 >
                                                     {t('account_settings')}
                                                 </Link>
@@ -478,43 +482,47 @@ const Profile = () => {
                                     </div>
                                 </div>
 
-                                <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                                    <div className="flex items-start gap-3 rounded-2xl border border-white-dark/10 bg-gray-50/80 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-                                        <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm dark:bg-white/10">
+                                <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                                    <div className="flex items-start gap-4 rounded-xl border border-white-dark/10 bg-gray-50/80 p-4 transition-colors dark:border-[#172b40] dark:bg-[#0e1726] dark:hover:border-[#233e5c] sm:p-5">
+                                        <span className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm dark:border dark:border-[#172b40] dark:bg-[#0e2030] dark:text-slate-400">
                                             <IconMapPin className="h-5 w-5" />
                                         </span>
-                                        <div className="min-w-0">
-                                            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{t('address')}</p>
-                                            <p className="mt-1 text-sm font-medium leading-snug text-gray-900 dark:text-gray-100">{formatAddress(dataUserLogin, t('not_set'))}</p>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="mb-0.5 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-slate-500">{t('address')}</p>
+                                            <p className="truncate text-sm font-semibold leading-snug text-gray-900 dark:text-slate-100" title={formatAddress(dataUserLogin, t('not_set'))}>
+                                                {formatAddress(dataUserLogin, t('not_set'))}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="flex items-start gap-3 rounded-2xl border border-white-dark/10 bg-gray-50/80 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-                                        <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm dark:bg-white/10">
+                                    <div className="flex items-start gap-4 rounded-xl border border-white-dark/10 bg-gray-50/80 p-4 transition-colors dark:border-[#172b40] dark:bg-[#0e1726] dark:hover:border-[#233e5c] sm:p-5">
+                                        <span className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm dark:border dark:border-[#172b40] dark:bg-[#0e2030] dark:text-slate-400">
                                             <IconMail className="h-5 w-5" />
                                         </span>
-                                        <div className="min-w-0">
-                                            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{t('email')}</p>
-                                            <p className="mt-1 truncate text-sm font-medium text-primary">{dataUserLogin.userEmail ? String(dataUserLogin.userEmail) : '—'}</p>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="mb-0.5 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-slate-500">{t('email')}</p>
+                                            <p className="truncate text-sm font-semibold text-primary dark:text-emerald-400">
+                                                {dataUserLogin.userEmail ? String(dataUserLogin.userEmail) : '—'}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="flex items-start gap-3 rounded-2xl border border-white-dark/10 bg-gray-50/80 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-                                        <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm dark:bg-white/10">
+                                    <div className="flex items-start gap-4 rounded-xl border border-white-dark/10 bg-gray-50/80 p-4 transition-colors dark:border-[#172b40] dark:bg-[#0e1726] dark:hover:border-[#233e5c] sm:p-5">
+                                        <span className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm dark:border dark:border-[#172b40] dark:bg-[#0e2030] dark:text-slate-400">
                                             <IconCalendar className="h-5 w-5" />
                                         </span>
-                                        <div className="min-w-0">
-                                            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{t('cnic_label')}</p>
-                                            <p className="mt-1 font-mono text-sm font-medium text-gray-900 dark:text-gray-100" dir="ltr">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="mb-0.5 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-slate-500">{t('cnic_label')}</p>
+                                            <p className="font-mono text-sm font-semibold tracking-wide text-gray-900 dark:text-slate-100" dir="ltr">
                                                 {dataUserLogin.userCNIC != null && String(dataUserLogin.userCNIC) !== '' ? String(dataUserLogin.userCNIC) : '—'}
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="flex items-start gap-3 rounded-2xl border border-white-dark/10 bg-gray-50/80 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-                                        <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm dark:bg-white/10">
+                                    <div className="flex items-start gap-4 rounded-xl border border-white-dark/10 bg-gray-50/80 p-4 transition-colors dark:border-[#172b40] dark:bg-[#0e1726] dark:hover:border-[#233e5c] sm:p-5">
+                                        <span className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm dark:border dark:border-[#172b40] dark:bg-[#0e2030] dark:text-slate-400">
                                             <IconPhone className="h-5 w-5" />
                                         </span>
-                                        <div className="min-w-0">
-                                            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{t('phone')}</p>
-                                            <p className="mt-1 text-sm font-medium text-gray-900 dark:text-gray-100" dir="ltr">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="mb-0.5 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-slate-500">{t('phone')}</p>
+                                            <p className="text-sm font-semibold tracking-wide text-gray-900 dark:text-slate-100" dir="ltr">
                                                 {dataUserLogin.userPhone != null && String(dataUserLogin.userPhone) !== '' ? String(dataUserLogin.userPhone) : '—'}
                                             </p>
                                         </div>
@@ -532,15 +540,15 @@ const Profile = () => {
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     {isShopOwner && (
                         <>
-                            <div className="rounded-2xl border border-white-dark/15 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#0e1726]">
+                            <div className="rounded-2xl border border-white-dark/15 bg-white p-6 shadow-sm dark:border-[#172b40] dark:bg-[#0b1724] dark:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.45)]">
                                 <div className="mb-5 flex items-center justify-between">
                                     <h5 className="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white">
-                                        <IconMenuInvoice className="h-5 w-5 text-primary" />
+                                        <IconMenuInvoice className="h-5 w-5 text-primary dark:text-emerald-400" />
                                         {t('current_plan')}
                                     </h5>
                                     <Link
                                         to="/users/user-account-settings?tab=subscription"
-                                        className="btn btn-sm rounded-xl shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]"
+                                        className="btn btn-sm rounded-xl shadow-none !bg-emerald-500 !text-white !border-emerald-500 hover:!bg-emerald-400"
                                     >
                                         {t('manage')}
                                     </Link>
@@ -552,16 +560,16 @@ const Profile = () => {
                                 ) : activeSubscription ? (
                                     <div className="space-y-4">
                                         <div>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('table_plan_name')}</p>
-                                            <p className="text-lg font-semibold">{activeSubscription.subId?.subName || activeSubscription.subNameHistory || '—'}</p>
+                                            <p className="text-sm text-gray-500 dark:text-slate-400">{t('table_plan_name')}</p>
+                                            <p className="text-lg font-semibold dark:text-slate-100">{activeSubscription.subId?.subName || activeSubscription.subNameHistory || '—'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('price')}</p>
-                                            <p className="font-semibold">{t('currency_rs')} {activeSubscription.subId?.subPrice ?? activeSubscription.subPriceHistory ?? '—'}</p>
+                                            <p className="text-sm text-gray-500 dark:text-slate-400">{t('price')}</p>
+                                            <p className="font-semibold dark:text-slate-100">{t('currency_rs')} {activeSubscription.subId?.subPrice ?? activeSubscription.subPriceHistory ?? '—'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('table_expires')}</p>
-                                            <p className="font-semibold">
+                                            <p className="text-sm text-gray-500 dark:text-slate-400">{t('table_expires')}</p>
+                                            <p className="font-semibold dark:text-slate-100">
                                                 {activeSubscription.expireDate
                                                     ? new Date(activeSubscription.expireDate).toLocaleDateString(
                                                           i18n.language === 'ur' ? 'ur-PK' : 'en-PK',
@@ -574,8 +582,8 @@ const Profile = () => {
                                                     : '—'}
                                             </p>
                                         </div>
-                                        <div className="flex items-center justify-between border-t border-[#ebedf2] pt-3 dark:border-[#191e3a]">
-                                            <span className="flex items-center gap-1 text-sm">
+                                        <div className="flex items-center justify-between border-t border-[#ebedf2] pt-3 dark:border-[#172b40]">
+                                            <span className="flex items-center gap-1 text-sm dark:text-slate-300">
                                                 <IconClock className="h-4 w-4" />
                                                 {activeSubscription.expireDate
                                                     ? (() => {
@@ -594,27 +602,27 @@ const Profile = () => {
                                         </div>
                                         <Link
                                             to="/SubcriptionHistory"
-                                            className="btn btn-sm mt-2 w-full rounded-xl shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]"
+                                            className="btn btn-sm mt-2 w-full rounded-xl shadow-none !bg-emerald-500 !text-white !border-emerald-500 hover:!bg-emerald-400"
                                         >
                                             {t('view_full_history')}
                                         </Link>
                                     </div>
                                 ) : (
-                                    <div className="py-6 text-center text-gray-500 dark:text-gray-400">
+                                    <div className="py-6 text-center text-gray-500 dark:text-slate-400">
                                         <p className="mb-3">{t('no_active_subscription')}</p>
                                         <Link
                                             to="/addsubcription"
-                                            className="btn btn-sm rounded-xl shadow-none !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d]"
+                                            className="btn btn-sm rounded-xl shadow-none !bg-emerald-500 !text-white !border-emerald-500 hover:!bg-emerald-400"
                                         >
                                             {t('subscribe_now')}
                                         </Link>
                                     </div>
                                 )}
                             </div>
-                            <div className="rounded-2xl border border-white-dark/15 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#0e1726]">
+                            <div className="rounded-2xl border border-white-dark/15 bg-white p-6 shadow-sm dark:border-[#172b40] dark:bg-[#0b1724] dark:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.45)]">
                                 <div className="mb-5 flex items-center justify-between">
                                     <h5 className="text-lg font-bold text-gray-900 dark:text-white">{t('subscription_history_title')}</h5>
-                                    <Link to="/SubcriptionHistory" className="text-sm text-primary hover:underline">
+                                    <Link to="/SubcriptionHistory" className="text-sm text-primary hover:underline dark:text-emerald-400">
                                         {t('view_all')}
                                     </Link>
                                 </div>
@@ -630,11 +638,11 @@ const Profile = () => {
                                             return (
                                                 <div
                                                     key={h._id}
-                                                    className="flex items-center justify-between border-b border-[#ebedf2] py-2 last:border-0 dark:border-[#191e3a]"
+                                                    className="flex items-center justify-between border-b border-[#ebedf2] py-2 last:border-0 dark:border-[#172b40]"
                                                 >
                                                     <div>
-                                                        <p className="font-medium">{h.subNameHistory || h.subIdHistory?.subName || '—'}</p>
-                                                        <p className="text-xs text-gray-500">
+                                                        <p className="font-medium dark:text-slate-100">{h.subNameHistory || h.subIdHistory?.subName || '—'}</p>
+                                                        <p className="text-xs text-gray-500 dark:text-slate-400">
                                                             {t('currency_rs')} {h.subPriceHistory || h.subIdHistory?.subPrice || '—'} •{' '}
                                                             {h.expireDateHistory ? new Date(h.expireDateHistory).toLocaleDateString() : '—'}
                                                         </p>
@@ -645,7 +653,7 @@ const Profile = () => {
                                         })}
                                     </div>
                                 ) : (
-                                    <p className="py-6 text-center text-gray-500 dark:text-gray-400">{t('no_subscription_history')}</p>
+                                    <p className="py-6 text-center text-gray-500 dark:text-slate-400">{t('no_subscription_history')}</p>
                                 )}
                             </div>
                         </>

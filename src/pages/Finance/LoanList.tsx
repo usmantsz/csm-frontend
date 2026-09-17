@@ -194,14 +194,15 @@ const LoanList: React.FC = () => {
         return types[type as keyof typeof types] ?? t('loanlist_type_unknown');
     };
 
-    const getLoanTypeColor = (type: number) => {
-        const colors: { [key: number]: string } = {
-            0: 'primary',
-            1: 'success',
-            2: 'info',
-            3: 'info',
+    // Returns a full Tailwind class string for the loan-type badge (dark theme)
+    const getLoanTypeBadgeClasses = (type: number) => {
+        const classes: { [key: number]: string } = {
+            0: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30',
+            1: 'bg-sky-500/10 text-sky-400 border border-sky-500/30',
+            2: 'bg-purple-500/10 text-purple-400 border border-purple-500/30',
+            3: 'bg-purple-500/10 text-purple-400 border border-purple-500/30',
         };
-        return colors[type] || 'dark';
+        return classes[type] || 'bg-slate-500/10 text-slate-300 border border-slate-500/30';
     };
 
     const getStatusLabel = (status: number) => {
@@ -213,13 +214,15 @@ const LoanList: React.FC = () => {
         return statuses[status] || t('loanlist_status_unknown');
     };
 
-    const getStatusColor = (status: number) => {
-        const colors: { [key: number]: string } = {
-            0: 'success',
-            1: 'danger',
-            2: 'primary',
+    // Returns a full Tailwind class string for the payment-status badge (dark theme)
+    const getPaymentStatusBadgeClasses = (color: string) => {
+        const classes: { [key: string]: string } = {
+            primary: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30',
+            warning: 'bg-amber-500/10 text-amber-400 border border-amber-500/30',
+            success: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30',
+            info: 'bg-sky-500/10 text-sky-400 border border-sky-500/30',
         };
-        return colors[status] || 'dark';
+        return classes[color] || 'bg-slate-500/10 text-slate-300 border border-slate-500/30';
     };
 
     // Payment/return display: 0=Loan de diya, 1=Kuch baki, 2=Full return (saved or derived)
@@ -394,22 +397,22 @@ const LoanList: React.FC = () => {
     );
 
     return (
-        <div>
+        <div className="bg-[#050b14] min-h-full -m-5 p-5">
             {/* Breadcrumb */}
-            <ul className="flex space-x-2 rtl:space-x-reverse mb-6">
+            <ul className="flex space-x-2 rtl:space-x-reverse mb-6 text-sm">
                 <li>
-                    <Link to="/dashboard" 
-                    className="text-primary hover:underline"
+                    <Link to="/dashboard"
+                    className="text-emerald-400 hover:text-emerald-300 hover:underline"
                     >
                         {t('loanlist_breadcrumb_dashboard')}
                     </Link>
                 </li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <Link to="/getassginshopcrops" className="text-primary hover:underline">
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 before:text-slate-600 text-slate-400">
+                    <Link to="/getassginshopcrops" className="text-emerald-400 hover:text-emerald-300 hover:underline">
                         {t('loanlist_breadcrumb_my_crops')}
                     </Link>
                 </li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2 before:text-slate-600 text-slate-400">
                     <span>{t('loanlist_breadcrumb_loan_list')}</span>
                 </li>
             </ul>
@@ -419,13 +422,16 @@ const LoanList: React.FC = () => {
                 <button
                     type="button"
                     onClick={() => navigate(-1)}
-                        className="inline-flex items-center gap-2 rounded-2xl border-2 border-green-600 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-600 hover:text-white dark:border-green-700 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-950/20 hover:bg-emerald-900/30 px-4 py-2 text-xs font-semibold tracking-wide text-emerald-400 hover:text-emerald-300 transition-all"
                 >
-                    <span>←</span> {t('loanlist_back_to_crop')}
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    {t('loanlist_back_to_crop')}
                 </button>
                 <button
                     type="button"
-                    className="btn !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] shadow-none rounded-xl"
+                    className="inline-flex items-center px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-semibold text-xs transition-all shadow-lg shadow-emerald-500/20 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#050b14] disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => navigate(getFinanceFormUrl())}
                     disabled={!effectiveUserId || !cropId || !shopId}
                 >
@@ -436,69 +442,69 @@ const LoanList: React.FC = () => {
 
             {/* Summary + CNIC Search – single merged card, only when crop + shop resolved */}
             {(cropId && shopId) && (
-            <div className="rounded-xl border border-green-200 dark:border-green-900/40 bg-white dark:bg-[#0e1726] p-5 shadow-md dark:shadow-none mb-6">
+            <div className="rounded-xl border border-[#162b42] bg-[#0d1d2d] p-5 shadow-xl mb-6">
                 {/* Summary Cards */}
                 <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                    <div className="rounded-lg border border-green-200 dark:border-green-900/40 bg-green-50/40 dark:bg-green-900/10 p-4">
+                    <div className="rounded-lg border border-[#162b42] bg-[#0a1624] p-4">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">{t('loanlist_summary_loans_given_count')}</span>
-                            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/30">
-                                <FaFileInvoice className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            <span className="text-slate-400 text-sm font-medium">{t('loanlist_summary_loans_given_count')}</span>
+                            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+                                <FaFileInvoice className="w-4 h-4 text-emerald-400" />
                             </div>
                         </div>
-                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{loansGivenCount}</div>
+                        <div className="text-2xl font-bold text-emerald-400">{loansGivenCount}</div>
                     </div>
 
-                    <div className="rounded-lg border border-green-200 dark:border-green-900/40 bg-green-50/40 dark:bg-green-900/10 p-4">
+                    <div className="rounded-lg border border-[#162b42] bg-[#0a1624] p-4">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">{t('loanlist_summary_total_given')}</span>
-                            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/30">
-                                <span className="text-green-600 dark:text-green-400">💰</span>
+                            <span className="text-slate-400 text-sm font-medium">{t('loanlist_summary_total_given')}</span>
+                            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+                                <span className="text-emerald-400">💰</span>
                             </div>
                         </div>
-                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(totalGiven)}</div>
+                        <div className="text-2xl font-bold text-emerald-400">{formatCurrency(totalGiven)}</div>
                     </div>
 
-                    <div className="rounded-lg border border-green-200 dark:border-green-900/40 bg-green-50/40 dark:bg-green-900/10 p-4">
+                    <div className="rounded-lg border border-[#162b42] bg-[#0a1624] p-4">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">{t('loanlist_summary_total_received')}</span>
-                            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/30">
-                                <span className="text-green-600 dark:text-green-400">✅</span>
+                            <span className="text-slate-400 text-sm font-medium">{t('loanlist_summary_total_received')}</span>
+                            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/30">
+                                <span className="text-sky-400">✅</span>
                             </div>
                         </div>
-                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(totalReceived)}</div>
+                        <div className="text-2xl font-bold text-sky-400">{formatCurrency(totalReceived)}</div>
                     </div>
 
-                    <div className="rounded-lg border border-green-200 dark:border-green-900/40 bg-green-50/40 dark:bg-green-900/10 p-4">
+                    <div className="rounded-lg border border-[#162b42] bg-[#0a1624] p-4">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">{t('loanlist_summary_remaining')}</span>
-                            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/30">
-                                <span className="text-green-600 dark:text-green-400">📊</span>
+                            <span className="text-slate-400 text-sm font-medium">{t('loanlist_summary_remaining')}</span>
+                            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                                <span className="text-amber-400">📊</span>
                             </div>
                         </div>
-                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(totalRemaining)}</div>
+                        <div className="text-2xl font-bold text-amber-400">{formatCurrency(totalRemaining)}</div>
                     </div>
                 </div>
 
                 {/* Divider */}
-                <div className="border-t border-green-200 dark:border-green-900/40 my-5"></div>
+                <div className="border-t border-[#162b42] my-5"></div>
 
                 {/* CNIC Search – specific customer records */}
                 <div className="flex flex-col md:flex-row gap-4 items-end">
                     <div className="flex-1">
-                        <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-300">
+                        <label className="block mb-2 font-semibold text-slate-300 text-xs uppercase tracking-wide">
                             {t('loanlist_cnic_search_label')}
                         </label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <IconCreditCard className="w-5 h-5 text-gray-400" />
+                        <div className="relative rounded-lg">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <IconCreditCard className="w-4 h-4 text-slate-500" />
                             </div>
                             <input
                                 type="text"
                                 value={searchCNIC}
                                 onChange={(e) => setSearchCNIC(e.target.value.replace(/\D/g, '').slice(0, 13))}
                                 placeholder={t('loanlist_cnic_search_placeholder')}
-                                className="form-input pl-10 w-full"
+                                className="w-full pl-10 pr-4 py-2.5 bg-[#0a1624] border border-[#162b42] text-sm text-slate-100 placeholder-slate-500 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40 transition-colors"
                                 maxLength={13}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearchByCNIC()}
                             />
@@ -509,11 +515,11 @@ const LoanList: React.FC = () => {
                             type="button"
                             onClick={handleSearchByCNIC}
                             disabled={searchingByCNIC || !searchCNIC.trim()}
-                            className="btn !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] shadow-none rounded-xl"
+                            className="inline-flex items-center px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-semibold text-xs transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {searchingByCNIC ? (
                                 <>
-                                    <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block mr-2"></span>
+                                    <span className="animate-spin border-2 border-slate-950 border-t-transparent rounded-full w-4 h-4 inline-block mr-2"></span>
                                     {t('loanlist_searching')}
                                 </>
                             ) : (
@@ -527,7 +533,7 @@ const LoanList: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={handleClearSearch}
-                                className="btn btn-outline-primary"
+                                className="inline-flex items-center px-4 py-2.5 rounded-lg border border-[#162b42] text-slate-300 hover:bg-slate-800/60 hover:text-slate-100 text-xs font-medium transition-colors"
                             >
                                 {t('loanlist_clear_all_records')}
                             </button>
@@ -535,7 +541,7 @@ const LoanList: React.FC = () => {
                     </div>
                 </div>
                 {selectedCustomer && (
-                    <p className="mt-3 text-sm text-primary-600 dark:text-primary-400 font-medium">
+                    <p className="mt-3 text-sm text-emerald-400 font-medium">
                         {t('loanlist_showing_records_for')} {selectedCustomer.cusNameF} {selectedCustomer.cusNameL} ({t('loanlist_cnic_label_short')} {selectedCustomer.cusCNIC})
                     </p>
                 )}
@@ -543,9 +549,9 @@ const LoanList: React.FC = () => {
             )}
 
             {/* Loans Table */}
-            <div className="panel shadow-md dark:shadow-none">
+            <div className="rounded-xl border border-[#162b42] bg-[#0d1d2d] p-6 shadow-xl">
                 <div className="mb-5">
-                    <h5 className="text-lg font-semibold">
+                    <h5 className="text-base font-semibold text-slate-100 tracking-tight">
                         {selectedCustomer
                             ? `${t('loanlist_loans_for')} ${selectedCustomer.cusNameF} ${selectedCustomer.cusNameL}`
                             : cropName ? `${t('loanlist_loans_for')} ${cropName}` : t('loanlist_all_loans')}
@@ -554,21 +560,21 @@ const LoanList: React.FC = () => {
 
                 {loading ? (
                     <div className="text-center py-10">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                        <p className="mt-4 text-gray-600">
+                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                        <p className="mt-4 text-slate-400">
                             {fetchingShopId ? t('loanlist_resolving_shop') : t('loanlist_loading_loans')}
                         </p>
                     </div>
                 ) : !cropId || !shopId ? (
                     <div className="text-center py-10">
                         <div className="text-6xl mb-4">⚠️</div>
-                        <h3 className="text-xl font-semibold mb-2">{t('loanlist_cannot_load_title')}</h3>
-                        <p className="text-gray-600 mb-4">
+                        <h3 className="text-xl font-semibold mb-2 text-slate-100">{t('loanlist_cannot_load_title')}</h3>
+                        <p className="text-slate-400 mb-4">
                             {t('loanlist_cannot_load_desc')}
                         </p>
                         <button
                             type="button"
-                            className="btn btn-outline-primary"
+                            className="inline-flex items-center px-4 py-2.5 rounded-lg border border-emerald-500/40 text-emerald-400 hover:bg-emerald-950/30 text-xs font-medium transition-colors"
                             onClick={() => navigate(-1)}
                         >
                             <IconArrowLeft className="w-4 h-4 mr-2" />
@@ -578,15 +584,15 @@ const LoanList: React.FC = () => {
                 ) : loans.length === 0 ? (
                     <div className="text-center py-10">
                         <div className="text-6xl mb-4">📋</div>
-                        <h3 className="text-xl font-semibold mb-2">
+                        <h3 className="text-xl font-semibold mb-2 text-slate-100">
                             {t('loanlist_no_loans_for')} {cropName || t('loanlist_this_crop')}
                         </h3>
-                        <p className="text-gray-600 mb-4">
+                        <p className="text-slate-400 mb-4">
                             {t('loanlist_no_loans_desc')}
                         </p>
                         <button
                             type="button"
-                            className="btn !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] shadow-none rounded-xl"
+                            className="inline-flex items-center px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-semibold text-xs transition-all shadow-lg shadow-emerald-500/20"
                             onClick={() => navigate(getFinanceFormUrl())}
                         >
                             <IconPlus className="w-4 h-4 mr-2" />
@@ -594,15 +600,22 @@ const LoanList: React.FC = () => {
                         </button>
                     </div>
                 ) : (
-                    <div className="datatables">
+                    <div className="datatables px-1 pb-3 [&_.mantine-datatable-footer]:px-2 [&_.mantine-datatable-footer]:mt-2">
                         <DataTable
-                            className="whitespace-nowrap table-hover"
+                            className="whitespace-nowrap table-hover !bg-transparent !text-slate-200
+                                [&_table]:!bg-transparent
+                                [&_thead]:!bg-[#0a1624]
+                                [&_thead_th]:!text-slate-400 [&_thead_th]:!text-[11px] [&_thead_th]:!font-semibold [&_thead_th]:!uppercase [&_thead_th]:!tracking-wider [&_thead_th]:!border-[#162b42]
+                                [&_tbody_tr]:!border-[#162b42] [&_tbody_tr]:!bg-transparent
+                                [&_tbody_tr:hover]:!bg-slate-800/40
+                                [&_.mantine-Pagination-root]:!text-slate-400
+                                [&_select]:!bg-[#0a1624] [&_select]:!border-[#162b42] [&_select]:!text-slate-300"
                             records={paginatedLoans}
                             columns={[
                                 {
                                     accessor: 'index',
                                     title: t('loanlist_col_index'),
-                                    render: (_, index) => (page - 1) * pageSize + index + 1,
+                                    render: (_, index) => <span className="text-slate-300">{(page - 1) * pageSize + index + 1}</span>,
                                 },
                                 {
                                     accessor: 'finaceCusId',
@@ -610,10 +623,10 @@ const LoanList: React.FC = () => {
                                     sortable: true,
                                     render: (loan: Loan) => (
                                         <div>
-                                            <div className="font-semibold">
+                                            <div className="font-semibold text-slate-200">
                                                 {loan.finaceCusId?.cusNameF} {loan.finaceCusId?.cusNameL}
                                             </div>
-                                            <div className="text-xs text-gray-500">
+                                            <div className="text-xs text-slate-500">
                                                 {t('loanlist_cnic_label_short')} {loan.finaceCusId?.cusCNIC}
                                             </div>
                                         </div>
@@ -624,7 +637,7 @@ const LoanList: React.FC = () => {
                                     title: t('loanlist_col_loan_amount'),
                                     sortable: true,
                                     render: (loan: Loan) => (
-                                        <span className="font-semibold text-primary">
+                                        <span className="font-semibold text-emerald-400">
                                             {formatCurrency(loan.loanAmount)}
                                         </span>
                                     ),
@@ -634,7 +647,7 @@ const LoanList: React.FC = () => {
                                     title: t('loanlist_col_paid_amount'),
                                     sortable: true,
                                     render: (loan: Loan) => (
-                                        <span className="font-semibold text-success">
+                                        <span className="font-semibold text-sky-400">
                                             {formatCurrency(loan.loanPaidAmount || 0)}
                                         </span>
                                     ),
@@ -647,7 +660,7 @@ const LoanList: React.FC = () => {
                                         return (
                                             <span
                                                 className={`font-semibold ${
-                                                    remaining > 0 ? 'text-warning' : 'text-success'
+                                                    remaining > 0 ? 'text-amber-400' : 'text-emerald-400'
                                                 }`}
                                             >
                                                 {formatCurrency(remaining)}
@@ -661,7 +674,7 @@ const LoanList: React.FC = () => {
                                     sortable: true,
                                     render: (loan: Loan) => (
                                         <span
-                                            className={`badge bg-${getLoanTypeColor(loan.finaceType)}-light text-${getLoanTypeColor(loan.finaceType)} rounded-full`}
+                                            className={`inline-flex items-center px-2.5 py-1 text-[11px] font-medium rounded-full ${getLoanTypeBadgeClasses(loan.finaceType)}`}
                                         >
                                             {getLoanTypeLabel(loan.finaceType)}
                                         </span>
@@ -679,10 +692,10 @@ const LoanList: React.FC = () => {
                                                     value={display.value}
                                                     onChange={(e) => updatePaymentStatus(loan._id, Number(e.target.value))}
                                                     disabled={updatingStatusId === loan._id}
-                                                    className="form-select form-select-sm min-w-[160px] rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+                                                    className="text-xs min-w-[160px] rounded-full border border-[#162b42] bg-[#0a1624] text-slate-200 px-3 py-1.5 focus:outline-none focus:border-emerald-500"
                                                 >
                                                     {PAYMENT_STATUS_OPTIONS.map((opt) => (
-                                                        <option key={opt.value} value={opt.value}>
+                                                        <option key={opt.value} value={opt.value} className="bg-[#0a1624] text-slate-200">
                                                             {opt.label}
                                                         </option>
                                                     ))}
@@ -690,7 +703,7 @@ const LoanList: React.FC = () => {
                                             );
                                         }
                                         return (
-                                            <span className={`badge bg-${display.color}-light text-${display.color} rounded-full`}>
+                                            <span className={`inline-flex items-center px-2.5 py-1 text-[11px] font-medium rounded-full ${getPaymentStatusBadgeClasses(display.color)}`}>
                                                 {display.label}
                                             </span>
                                         );
@@ -700,7 +713,7 @@ const LoanList: React.FC = () => {
                                     accessor: 'createdAt',
                                     title: t('loanlist_col_date'),
                                     sortable: true,
-                                    render: (loan: Loan) => formatDate(loan.createdAt),
+                                    render: (loan: Loan) => <span className="text-slate-300">{formatDate(loan.createdAt)}</span>,
                                 },
                                 {
                                     accessor: 'actions',
@@ -709,22 +722,22 @@ const LoanList: React.FC = () => {
                                         <div className="flex items-center gap-2">
                                             <button
                                                 type="button"
-                                                className="btn btn-sm btn-outline-primary"
+                                                className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-emerald-500/40 bg-emerald-950/30 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition-all"
                                                 onClick={() => {
                                                     setSelectedLoan(loan);
                                                     setViewModal(true);
                                                 }}
                                                 title={t('loanlist_view_details')}
                                             >
-                                                <FaEye />
+                                                <FaEye className="w-3.5 h-3.5" />
                                             </button>
                                             <button
                                                 type="button"
-                                                className="btn btn-sm btn-outline-success"
+                                                className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-sky-500/40 bg-sky-950/30 text-sky-400 hover:bg-sky-500 hover:text-slate-950 transition-all"
                                                 onClick={() => navigate(getFinanceFormUrl(loan._id))}
                                                 title={t('loanlist_edit_loan')}
                                             >
-                                                <FaEdit />
+                                                <FaEdit className="w-3.5 h-3.5" />
                                             </button>
                                         </div>
                                     ),
@@ -749,14 +762,14 @@ const LoanList: React.FC = () => {
 
             {/* View Loan Modal */}
             {viewModal && selectedLoan && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+                    <div className="bg-[#0d1d2d] rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-[#162b42]">
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('loanlist_modal_title')}</h3>
+                                <h3 className="text-xl font-bold text-slate-100">{t('loanlist_modal_title')}</h3>
                                 <button
                                     type="button"
-                                    className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400 dark:hover:text-white"
+                                    className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
                                     onClick={() => setViewModal(false)}
                                     aria-label={t('loanlist_close_aria')}
                                 >
@@ -765,97 +778,97 @@ const LoanList: React.FC = () => {
                             </div>
 
                             <div className="space-y-6">
-                                <section className="rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-900/30 p-4">
-                                    <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">{t('loanlist_section_customer')}</h4>
+                                <section className="rounded-lg border border-[#162b42] bg-[#0a1624] p-4">
+                                    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">{t('loanlist_section_customer')}</h4>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_customer_name')}</label>
-                                            <p className="mt-0.5 font-semibold text-gray-900 dark:text-white">{customerName(selectedLoan)}</p>
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_customer_name')}</label>
+                                            <p className="mt-0.5 font-semibold text-slate-100">{customerName(selectedLoan)}</p>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_cnic')}</label>
-                                            <p className="mt-0.5 font-semibold text-gray-900 dark:text-white">{customerCNIC(selectedLoan)}</p>
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_cnic')}</label>
+                                            <p className="mt-0.5 font-semibold text-slate-100">{customerCNIC(selectedLoan)}</p>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_phone')}</label>
-                                            <p className="mt-0.5 font-semibold text-gray-900 dark:text-white">{customerPhone(selectedLoan)}</p>
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_phone')}</label>
+                                            <p className="mt-0.5 font-semibold text-slate-100">{customerPhone(selectedLoan)}</p>
                                         </div>
                                     </div>
                                 </section>
 
-                                <section className="rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-900/30 p-4">
-                                    <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">{t('loanlist_section_loan')}</h4>
+                                <section className="rounded-lg border border-[#162b42] bg-[#0a1624] p-4">
+                                    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">{t('loanlist_section_loan')}</h4>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_loan_type')}</label>
-                                            <p className="mt-0.5 font-semibold text-gray-900 dark:text-white">{getLoanTypeLabel(selectedLoan.finaceType)}</p>
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_loan_type')}</label>
+                                            <p className="mt-0.5 font-semibold text-slate-100">{getLoanTypeLabel(selectedLoan.finaceType)}</p>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_loan_amount')}</label>
-                                            <p className="mt-0.5 font-semibold text-primary">{formatCurrency(selectedLoan.loanAmount)}</p>
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_loan_amount')}</label>
+                                            <p className="mt-0.5 font-semibold text-emerald-400">{formatCurrency(selectedLoan.loanAmount)}</p>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_paid_amount')}</label>
-                                            <p className="mt-0.5 font-semibold text-success">{formatCurrency(selectedLoan.loanPaidAmount ?? null)}</p>
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_paid_amount')}</label>
+                                            <p className="mt-0.5 font-semibold text-sky-400">{formatCurrency(selectedLoan.loanPaidAmount ?? null)}</p>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_remaining_amount')}</label>
-                                            <p className="mt-0.5 font-semibold text-warning">
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_remaining_amount')}</label>
+                                            <p className="mt-0.5 font-semibold text-amber-400">
                                                 {formatCurrency(selectedLoan.finaceType === 0 ? calculateRemainingAmount(selectedLoan) : 0)}
                                             </p>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_status')}</label>
-                                            <p className="mt-0.5 font-semibold text-gray-900 dark:text-white">{getPaymentStatusDisplay(selectedLoan).label}</p>
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_status')}</label>
+                                            <p className="mt-0.5 font-semibold text-slate-100">{getPaymentStatusDisplay(selectedLoan).label}</p>
                                         </div>
                                         <div className="col-span-2">
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_remarks')}</label>
-                                            <p className="mt-0.5 font-semibold text-gray-900 dark:text-white">{selectedLoan.finaceRemarks || '—'}</p>
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_remarks')}</label>
+                                            <p className="mt-0.5 font-semibold text-slate-100">{selectedLoan.finaceRemarks || '—'}</p>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_created_date')}</label>
-                                            <p className="mt-0.5 font-semibold text-gray-900 dark:text-white">{formatDate(selectedLoan.createdAt)}</p>
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_created_date')}</label>
+                                            <p className="mt-0.5 font-semibold text-slate-100">{formatDate(selectedLoan.createdAt)}</p>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">{t('loanlist_field_last_updated')}</label>
-                                            <p className="mt-0.5 font-semibold text-gray-900 dark:text-white">{formatDate(selectedLoan.updatedAt)}</p>
+                                            <label className="block text-xs font-medium text-slate-500">{t('loanlist_field_last_updated')}</label>
+                                            <p className="mt-0.5 font-semibold text-slate-100">{formatDate(selectedLoan.updatedAt)}</p>
                                         </div>
                                     </div>
                                 </section>
 
-                                <section className="rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-900/30 p-4">
-                                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">{t('loanlist_pos_record_title')}</h4>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{t('loanlist_pos_record_desc')}</p>
+                                <section className="rounded-lg border border-[#162b42] bg-[#0a1624] p-4">
+                                    <h4 className="text-sm font-semibold text-slate-300 mb-1">{t('loanlist_pos_record_title')}</h4>
+                                    <p className="text-xs text-slate-500 mb-3">{t('loanlist_pos_record_desc')}</p>
                                     {posUserRecordsLoading ? (
-                                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 py-3">
-                                            <span className="animate-spin border-2 border-primary border-t-transparent rounded-full w-4 h-4 inline-block" /> {t('loanlist_loading')}
+                                        <div className="flex items-center gap-2 text-slate-400 py-3">
+                                            <span className="animate-spin border-2 border-emerald-500 border-t-transparent rounded-full w-4 h-4 inline-block" /> {t('loanlist_loading')}
                                         </div>
                                     ) : posUserRecords.length === 0 ? (
-                                        <p className="text-gray-500 dark:text-gray-400 text-sm py-3">{t('loanlist_no_pos_records')}</p>
+                                        <p className="text-slate-500 text-sm py-3">{t('loanlist_no_pos_records')}</p>
                                     ) : (
-                                        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-600">
+                                        <div className="overflow-x-auto rounded-lg border border-[#162b42]">
                                             <table className="table-auto w-full text-sm">
                                                 <thead>
-                                                    <tr className="bg-gray-100 dark:bg-white/5 border-b border-gray-200 dark:border-gray-600">
-                                                        <th className="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{t('loanlist_pos_col_receipt')}</th>
-                                                        <th className="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{t('loanlist_pos_col_pos_user')}</th>
-                                                        <th className="text-right py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{t('loanlist_pos_col_amount')}</th>
-                                                        <th className="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{t('loanlist_pos_col_status')}</th>
-                                                        <th className="text-left py-2.5 px-3 font-semibold text-gray-700 dark:text-gray-300">{t('loanlist_pos_col_date')}</th>
+                                                    <tr className="bg-[#050b14] border-b border-[#162b42]">
+                                                        <th className="text-left py-2.5 px-3 font-semibold text-slate-300">{t('loanlist_pos_col_receipt')}</th>
+                                                        <th className="text-left py-2.5 px-3 font-semibold text-slate-300">{t('loanlist_pos_col_pos_user')}</th>
+                                                        <th className="text-right py-2.5 px-3 font-semibold text-slate-300">{t('loanlist_pos_col_amount')}</th>
+                                                        <th className="text-left py-2.5 px-3 font-semibold text-slate-300">{t('loanlist_pos_col_status')}</th>
+                                                        <th className="text-left py-2.5 px-3 font-semibold text-slate-300">{t('loanlist_pos_col_date')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {posUserRecords.map((r: any) => (
-                                                        <tr key={r._id} className="border-b border-gray-100 dark:border-gray-700 last:border-0">
-                                                            <td className="py-2.5 px-3 font-mono text-gray-900 dark:text-white">{r.receiptNumber}</td>
-                                                            <td className="py-2.5 px-3 text-gray-900 dark:text-white">{r.posUserName || '—'}</td>
-                                                            <td className="py-2.5 px-3 text-right font-medium text-gray-900 dark:text-white">{r.totalAmount != null ? `Rs ${Number(r.totalAmount).toLocaleString()}` : '—'}</td>
+                                                        <tr key={r._id} className="border-b border-[#162b42]/60 last:border-0">
+                                                            <td className="py-2.5 px-3 font-mono text-slate-200">{r.receiptNumber}</td>
+                                                            <td className="py-2.5 px-3 text-slate-200">{r.posUserName || '—'}</td>
+                                                            <td className="py-2.5 px-3 text-right font-medium text-slate-200">{r.totalAmount != null ? `Rs ${Number(r.totalAmount).toLocaleString()}` : '—'}</td>
                                                             <td className="py-2.5 px-3">
-                                                                <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${r.status === 'fulfilled' ? 'bg-success/20 text-success' : r.status === 'pending' ? 'bg-warning/20 text-warning' : 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300'}`}>
+                                                                <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${r.status === 'fulfilled' ? 'bg-emerald-500/10 text-emerald-400' : r.status === 'pending' ? 'bg-amber-500/10 text-amber-400' : 'bg-slate-700/40 text-slate-300'}`}>
                                                                     {r.status}
                                                                 </span>
                                                             </td>
-                                                            <td className="py-2.5 px-3 text-gray-500 dark:text-gray-400">{r.createdAt ? formatDate(r.createdAt) : '—'}</td>
+                                                            <td className="py-2.5 px-3 text-slate-500">{r.createdAt ? formatDate(r.createdAt) : '—'}</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -864,10 +877,10 @@ const LoanList: React.FC = () => {
                                     )}
                                 </section>
 
-                                <div className="flex flex-wrap gap-3 pt-2 border-t border-gray-200 dark:border-gray-600">
+                                <div className="flex flex-wrap gap-3 pt-2 border-t border-[#162b42]">
                                     <button
                                         type="button"
-                                        className="btn !bg-[#16a34a] !text-white !border-[#16a34a] hover:!bg-[#15803d] shadow-none rounded-xl inline-flex items-center"
+                                        className="inline-flex items-center px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-semibold text-xs transition-all shadow-lg shadow-emerald-500/20"
                                         onClick={() => {
                                             setViewModal(false);
                                             navigate(getFinanceFormUrl(selectedLoan._id));
@@ -878,7 +891,7 @@ const LoanList: React.FC = () => {
                                     </button>
                                     <button
                                         type="button"
-                                        className="btn btn-outline-primary"
+                                        className="inline-flex items-center px-5 py-2.5 rounded-lg border border-[#162b42] text-slate-300 hover:bg-slate-800/60 hover:text-slate-100 text-xs font-medium transition-colors"
                                         onClick={() => setViewModal(false)}
                                     >
                                         {t('loanlist_close_btn')}

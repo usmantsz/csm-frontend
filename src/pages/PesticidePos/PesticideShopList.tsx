@@ -13,13 +13,16 @@ import IconMenuShop from '../../components/Icon/Menu/IconMenuShop';
 import IconEdit from '../../components/Icon/IconEdit';
 import IconXCircle from '../../components/Icon/IconXCircle';
 
-// Shared style tokens so this page stays visually consistent with the rest
-// of the app (see AdminOverview / Header / TableCard).
+// Design tokens taken from the Stitch dark navy + emerald "brand" theme.
+// Same structure/features/handlers as before — only the visual styling
+// (card, icon badge, table, action chips, status badges, empty state) changed.
 const card =
-    'rounded-[2rem] border border-primary-200 bg-white/95 p-6 shadow-sm transition-shadow hover:shadow-md dark:border-primary-800 dark:bg-gray-900/85';
+    'rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md ' +
+    'dark:border-emerald-500/20 dark:bg-[#081522] dark:shadow-2xl';
 const iconBadge =
-    'flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white shadow-lg ring-1 ring-gray-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 dark:shadow-none dark:ring-0';
-const sectionHeading = 'text-lg font-semibold text-gray-900 dark:text-white';
+    'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-md ring-1 ring-gray-100 text-emerald-700 ' +
+    'dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-1 dark:ring-emerald-500/30 dark:shadow-inner';
+const sectionHeading = 'text-lg font-bold tracking-tight text-gray-900 dark:text-white';
 const actionChipWide =
     'inline-flex h-8 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold transition-colors';
 
@@ -79,7 +82,7 @@ const PesticideShopList = () => {
         const date = new Date(d);
         const expired = date.getTime() < Date.now();
         return (
-            <span className={expired ? 'font-medium text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}>
+            <span className={expired ? 'font-medium text-red-600 dark:text-rose-400' : 'text-gray-700 dark:text-slate-300'}>
                 {date.toLocaleDateString('en-PK', { year: 'numeric', month: 'short', day: 'numeric' })}
                 {expired && ' (Expired)'}
             </span>
@@ -88,17 +91,25 @@ const PesticideShopList = () => {
 
     return (
         <div className="space-y-6">
-            <ul className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <li><Link to="/dashboard" className="text-primary hover:underline dark:text-primary-light">Dashboard</Link></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><span>Pesticide POS</span></li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2"><span>Pesticide Shop List</span></li>
+            <ul className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-500">
+                <li>
+                    <Link to="/dashboard" className="text-emerald-600 hover:underline dark:text-emerald-400">
+                        Dashboard
+                    </Link>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span>Pesticide POS</span>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span>Pesticide Shop List</span>
+                </li>
             </ul>
 
             <div className={card}>
-                <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-gray-200 dark:border-[#112438]">
                     <div className="flex items-center gap-3">
                         <span className={iconBadge}>
-                            <span className="text-lg">🏪</span>
+                            <IconMenuShop className="w-5 h-5" />
                         </span>
                         <h2 className={sectionHeading}>{t('pesticide_shop_list_page')}</h2>
                     </div>
@@ -106,46 +117,71 @@ const PesticideShopList = () => {
 
                 {loading ? (
                     <div className="py-16 text-center">
-                        <div className="mb-4 inline-block h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent dark:border-primary-light"></div>
-                        <p className="text-gray-500 dark:text-gray-400">{t('loading')}</p>
+                        <div className="mb-4 inline-block h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
+                        <p className="text-gray-500 dark:text-slate-400">{t('loading')}</p>
                     </div>
                 ) : list.length === 0 ? (
                     <div className="py-16 text-center">
-                        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-50 dark:bg-white/5">
-                            <IconMenuShop className="w-7 h-7 text-primary/60 dark:text-primary-light/60" />
+                        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-[#0d2235]/60 dark:border dark:border-[#163552]">
+                            <IconMenuShop className="w-7 h-7 text-gray-400 dark:text-slate-400" />
                         </div>
-                        <p className="text-gray-500 dark:text-gray-400">{t('no_pesticide_shops_yet')}</p>
+                        <p className="text-gray-500 dark:text-slate-300">{t('no_pesticide_shops_yet')}</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto rounded-2xl border border-primary-100 dark:border-white/10">
+                    <div className="overflow-x-auto rounded-2xl border border-gray-200 dark:border-[#112438]">
                         <table className="w-full table-auto text-sm">
                             <thead>
-                                <tr className="border-b border-primary-100 bg-primary-50 dark:border-white/10 dark:bg-white/5">
-                                    <th className="py-3 px-4 text-left font-semibold text-gray-500 dark:text-gray-400">{t('shop_name')}</th>
-                                    <th className="py-3 px-4 text-left font-semibold text-gray-500 dark:text-gray-400">{t('table_reg_number')}</th>
-                                    <th className="py-3 px-4 text-left font-semibold text-gray-500 dark:text-gray-400">{t('phone_number')}</th>
-                                    <th className="py-3 px-4 text-left font-semibold text-gray-500 dark:text-gray-400">{t('table_owner')}</th>
-                                    <th className="py-3 px-4 text-left font-semibold text-gray-500 dark:text-gray-400">{t('subscriptions_title')}</th>
-                                    <th className="py-3 px-4 text-left font-semibold text-gray-500 dark:text-gray-400">{t('table_expires')}</th>
-                                    <th className="py-3 px-4 text-left font-semibold text-gray-500 dark:text-gray-400">{t('status')}</th>
-                                    <th className="py-3 px-4 text-right font-semibold text-gray-500 dark:text-gray-400">{t('actions')}</th>
+                                <tr className="border-b border-gray-200 bg-gray-50 dark:border-[#112438] dark:bg-[#0b1a26]">
+                                    <th className="py-3.5 px-4 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">
+                                        {t('shop_name')}
+                                    </th>
+                                    <th className="py-3.5 px-4 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">
+                                        {t('table_reg_number')}
+                                    </th>
+                                    <th className="py-3.5 px-4 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">
+                                        {t('phone_number')}
+                                    </th>
+                                    <th className="py-3.5 px-4 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">
+                                        {t('table_owner')}
+                                    </th>
+                                    <th className="py-3.5 px-4 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">
+                                        {t('subscriptions_title')}
+                                    </th>
+                                    <th className="py-3.5 px-4 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">
+                                        {t('table_expires')}
+                                    </th>
+                                    <th className="py-3.5 px-4 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">
+                                        {t('status')}
+                                    </th>
+                                    <th className="py-3.5 px-4 text-right text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-slate-400">
+                                        {t('actions')}
+                                    </th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="dark:divide-y dark:divide-[#112438]">
                                 {list.map((s) => (
-                                    <tr key={s._id} className="border-b border-primary-100 transition-colors last:border-0 hover:bg-primary-50 dark:border-white/10 dark:hover:bg-white/5">
-                                        <td className="py-3 px-4 font-medium text-gray-800 dark:text-gray-200">{s.shopName}</td>
-                                        <td className="py-3 px-4 text-gray-700 dark:text-gray-300">{s.shopRegistrationNumber}</td>
-                                        <td className="py-3 px-4 text-gray-700 dark:text-gray-300">{s.shopPhone}</td>
-                                        <td className="py-3 px-4 text-gray-700 dark:text-gray-300">{getOwnerName(s)}</td>
-                                        <td className="py-3 px-4 text-gray-700 dark:text-gray-300">{getSubName(s)}</td>
-                                        <td className="py-3 px-4">{formatExpire(s)}</td>
-                                        <td className="py-3 px-4">
-                                            <span className={`badge ${s.status === 1 ? 'badge-outline-danger' : 'badge-outline-success'}`}>
+                                    <tr
+                                        key={s._id}
+                                        className="border-b border-gray-200 transition-colors last:border-0 hover:bg-gray-50 dark:border-0 dark:hover:bg-[#0b1a26]/60"
+                                    >
+                                        <td className="py-4 px-4 font-semibold text-gray-800 dark:text-white">{s.shopName}</td>
+                                        <td className="py-4 px-4 text-gray-700 dark:text-slate-300">{s.shopRegistrationNumber}</td>
+                                        <td className="py-4 px-4 text-gray-700 dark:text-slate-300">{s.shopPhone}</td>
+                                        <td className="py-4 px-4 text-gray-700 dark:text-slate-300">{getOwnerName(s)}</td>
+                                        <td className="py-4 px-4 text-gray-700 dark:text-slate-300">{getSubName(s)}</td>
+                                        <td className="py-4 px-4">{formatExpire(s)}</td>
+                                        <td className="py-4 px-4">
+                                            <span
+                                                className={`inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-medium border ${
+                                                    s.status === 1
+                                                        ? 'bg-red-50 text-rose-700 border-red-200 dark:bg-red-950/80 dark:text-rose-300 dark:border-red-500/40'
+                                                        : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-500/40'
+                                                }`}
+                                            >
                                                 {s.status === 1 ? 'Blocked' : 'Active'}
                                             </span>
                                         </td>
-                                        <td className="py-3 px-4">
+                                        <td className="py-4 px-4">
                                             <div className="flex items-center justify-end gap-1.5 flex-nowrap whitespace-nowrap">
                                                 <Link
                                                     to={`/pesticide-pos/shops/edit/${s._id}`}

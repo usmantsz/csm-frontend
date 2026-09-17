@@ -278,6 +278,65 @@ const Header = () => {
 
     return (
         <header className={`z-40 ${themeConfig.semidark && themeConfig.menu === 'horizontal' ? 'dark' : ''}`}>
+            {/* Same green hover/active treatment as the sidebar nav-links,
+                applied here to the header's round icon buttons (theme toggle,
+                language flag, notification bell, profile avatar) so both
+                match visually — including the "open/clicked" state, which now
+                gets the same solid green fill the sidebar uses for its
+                active/open menu items (.cs-active), not just a hover tint. */}
+            <style>{`
+                .cs-icon-btn {
+                    transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease !important;
+                }
+                .cs-icon-btn:hover {
+                    background-color: rgba(22, 163, 74, 0.08) !important;
+                    color: #16a34a !important;
+                }
+                .cs-icon-btn:hover svg {
+                    color: #16a34a !important;
+                }
+                .dark .cs-icon-btn:hover {
+                    background-color: #0c1a28 !important;
+                    color: #34d399 !important;
+                }
+                .dark .cs-icon-btn:hover svg {
+                    color: #34d399 !important;
+                }
+
+                /* Open/clicked state — matches sidebar's .cs-active look
+                   (solid green fill, white icon) while the dropdown panel
+                   is open. :focus-within on the wrapper keeps this applied
+                   for as long as focus stays inside (i.e. while it's open). */
+                .dropdown:focus-within .cs-icon-btn {
+                    background-color: #16a34a !important;
+                    box-shadow: 0 10px 20px 0 rgba(22, 163, 74, 0.35) !important;
+                }
+                .dropdown:focus-within .cs-icon-btn,
+                .dropdown:focus-within .cs-icon-btn svg {
+                    color: #ffffff !important;
+                }
+                .dark .dropdown:focus-within .cs-icon-btn {
+                    background-color: #10b981 !important;
+                    box-shadow: 0 10px 20px 0 rgba(16, 185, 129, 0.3) !important;
+                }
+                .dark .dropdown:focus-within .cs-icon-btn,
+                .dark .dropdown:focus-within .cs-icon-btn svg {
+                    color: #ffffff !important;
+                }
+
+                .cs-profile-btn:hover img {
+                    box-shadow: 0 0 0 2px #16a34a !important;
+                }
+                .dark .cs-profile-btn:hover img {
+                    box-shadow: 0 0 0 2px #10b981 !important;
+                }
+                .dropdown:focus-within .cs-profile-btn img {
+                    box-shadow: 0 0 0 2px #16a34a !important;
+                }
+                .dark .dropdown:focus-within .cs-profile-btn img {
+                    box-shadow: 0 0 0 2px #10b981 !important;
+                }
+            `}</style>
             <div className="shadow-sm">
                 <div className="relative bg-white flex w-full items-center px-5 py-2.5 dark:bg-black">
                     <div className="horizontal-logo flex lg:hidden justify-between items-center ltr:mr-2 rtl:ml-2">
@@ -289,7 +348,7 @@ const Header = () => {
                         </div>
                         <button
                             type="button"
-                            className="collapse-icon flex-none dark:text-[#d0d2d6] hover:text-success dark:hover:text-success flex lg:hidden ltr:ml-2 rtl:mr-2 p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:bg-white-light/90 dark:hover:bg-dark/60"
+                            className="cs-icon-btn collapse-icon flex-none dark:text-[#d0d2d6] flex lg:hidden ltr:ml-2 rtl:mr-2 p-2 rounded-full bg-white-light/40 dark:bg-dark/40"
                             onClick={() => {
                                 dispatch(toggleSidebar());
                             }}
@@ -305,7 +364,7 @@ const Header = () => {
                             {themeConfig.theme === 'light' ? (
                                 <button
                                     className={`${themeConfig.theme === 'light' &&
-                                        'flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-success hover:bg-white-light/90 dark:hover:bg-dark/60'
+                                        'cs-icon-btn flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40'
                                         }`}
                                     onClick={() => {
                                         dispatch(toggleTheme('dark'));
@@ -319,7 +378,7 @@ const Header = () => {
                             {themeConfig.theme === 'dark' && (
                                 <button
                                     className={`${themeConfig.theme === 'dark' &&
-                                        'flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-success hover:bg-white-light/90 dark:hover:bg-dark/60'
+                                        'cs-icon-btn flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40'
                                         }`}
                                     onClick={() => {
                                         dispatch(toggleTheme('system'));
@@ -331,7 +390,7 @@ const Header = () => {
                             {themeConfig.theme === 'system' && (
                                 <button
                                     className={`${themeConfig.theme === 'system' &&
-                                        'flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-success hover:bg-white-light/90 dark:hover:bg-dark/60'
+                                        'cs-icon-btn flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40'
                                         }`}
                                     onClick={() => {
                                         dispatch(toggleTheme('light'));
@@ -345,7 +404,7 @@ const Header = () => {
                             <Dropdown
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                btnClassName="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-success hover:bg-white-light/90 dark:hover:bg-dark/60"
+                                btnClassName="cs-icon-btn block p-2 rounded-full bg-white-light/40 dark:bg-dark/40"
                                 button={<img className="w-5 h-5 object-cover rounded-full" src={`/assets/images/flags/${flag.toUpperCase()}.svg`} alt="flag" />}
                             >
                                 <ul className="!px-1 text-dark dark:text-white-dark grid grid-cols-1 gap-1 font-semibold dark:text-white-light/90 w-[280px]">
@@ -374,7 +433,7 @@ const Header = () => {
                             <Dropdown
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                btnClassName="relative block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-success hover:bg-white-light/90 dark:hover:bg-dark/60"
+                                btnClassName="cs-icon-btn relative block p-2 rounded-full bg-white-light/40 dark:bg-dark/40"
                                 button={
                                     <span className="relative inline-flex">
                                         <IconBellBing className="w-5 h-5" />
@@ -444,7 +503,7 @@ const Header = () => {
                             <Dropdown
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                btnClassName="relative group block"
+                                btnClassName="cs-profile-btn relative group block"
                                 button={<img className="w-9 h-9 rounded-full object-cover saturate-50 group-hover:saturate-100" src={dataUserLogin?.userProfileImage ? `${ServerSetting.serUrl}/profile/${dataUserLogin.userProfileImage}` : '/assets/images/profile-34.jpeg'} alt="userProfile" />}
                             >
                                 <ul className="text-dark dark:text-white-dark !py-0 w-[230px] font-semibold dark:text-white-light/90">
